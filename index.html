@@ -851,6 +851,113 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 #cropCanvas{border:2px solid rgba(155,93,229,.6);touch-action:none;max-width:100%;max-height:100%;}
 .crop-handle{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--grape);border:2px solid #fff;cursor:pointer;touch-action:none;}
 .crop-bar{display:flex;gap:10px;padding:14px 18px 28px;width:100%;max-width:430px;}
+
+/* ── Search & Filter Bar ── */
+.gallery-search-row{
+  display:flex;gap:8px;padding:10px 18px 0;flex-shrink:0;align-items:center;
+}
+.gallery-search-wrap{
+  flex:1;position:relative;display:flex;align-items:center;
+}
+.gallery-search-ico{
+  position:absolute;left:11px;pointer-events:none;
+  color:var(--muted);
+}
+.gallery-search-ico svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;}
+.gallery-search-inp{
+  width:100%;background:var(--soft);border:1.5px solid var(--inpborder);
+  color:var(--text);padding:9px 36px 9px 34px;border-radius:50px;
+  font-size:13px;font-weight:600;outline:none;
+  transition:border-color .15s;
+}
+.gallery-search-inp:focus{border-color:var(--accent);}
+.gallery-search-clear{
+  position:absolute;right:10px;background:none;border:none;
+  color:var(--muted);font-size:16px;cursor:pointer;display:none;padding:2px;line-height:1;
+}
+.gallery-search-clear.visible{display:block;}
+.gallery-sort-btn{
+  flex-shrink:0;width:38px;height:38px;border-radius:50%;
+  background:var(--soft);border:1.5px solid var(--inpborder);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all .15s;position:relative;
+}
+.gallery-sort-btn.active{background:var(--accent);border-color:var(--accent);}
+.gallery-sort-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;}
+.gallery-sort-btn.active svg{stroke:#fff;}
+/* Sort/filter pill row */
+.gallery-filter-pills{
+  display:flex;gap:7px;padding:8px 18px 0;overflow-x:auto;scrollbar-width:none;flex-shrink:0;
+}
+.gallery-filter-pills::-webkit-scrollbar{display:none;}
+.filter-pill{
+  padding:5px 14px;border-radius:50px;font-size:11px;font-weight:800;
+  letter-spacing:.3px;white-space:nowrap;cursor:pointer;border:none;
+  background:var(--soft);color:var(--muted);transition:all .15s;
+}
+.filter-pill.active{background:var(--accent);color:#fff;}
+/* Timeline "Show all" / "Show less" */
+.tgrid-more-btn{
+  margin:4px 18px 8px;width:calc(100% - 36px);
+  padding:10px;border-radius:var(--rs);
+  background:var(--soft);border:1.5px solid var(--border);
+  font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;
+  transition:all .15s;
+}
+.tgrid-more-btn:hover{background:var(--border);}
+/* Search empty state */
+.search-empty{
+  display:flex;flex-direction:column;align-items:center;
+  padding:40px 24px;gap:10px;text-align:center;
+}
+.search-empty-ico{font-size:48px;}
+.search-empty-t{font-family:'Fredoka One',cursive;font-size:18px;color:var(--text);}
+.search-empty-d{font-size:13px;color:var(--text2);}
+/* Multi-art split screen */
+#scr-multisplit{background:var(--bg);}
+.split-stage{
+  flex:1;overflow-y:auto;padding:14px 18px 100px;
+  -webkit-overflow-scrolling:touch;
+}
+.split-source-wrap{
+  position:relative;border-radius:var(--rs);overflow:hidden;
+  border:2px solid var(--border);margin-bottom:14px;
+  background:var(--soft);
+  cursor:pointer;
+}
+.split-source-img{width:100%;height:auto;display:block;}
+.split-source-placeholder{
+  height:180px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:8px;color:var(--muted);
+}
+.split-source-placeholder svg{width:40px;height:40px;stroke:currentColor;stroke-width:1.5;fill:none;}
+/* Detected region overlays */
+.split-canvas-wrap{position:relative;display:inline-block;width:100%;}
+#splitCanvas{width:100%;height:auto;display:block;border-radius:var(--rs);}
+/* Detected crops preview row */
+.split-crops-row{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px;
+}
+.split-crop-card{
+  background:var(--card);border-radius:var(--rs);overflow:hidden;
+  border:1.5px solid var(--border);
+}
+.split-crop-thumb{width:100%;height:110px;object-fit:contain;background:var(--soft);display:block;}
+.split-crop-info{padding:7px 9px 9px;}
+.split-crop-inp{
+  width:100%;background:var(--inp);border:1.5px solid var(--inpborder);
+  color:var(--text);padding:6px 9px;border-radius:var(--rx);
+  font-size:12px;font-weight:700;outline:none;
+}
+.split-confirm-bar{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  padding:12px 18px 24px;background:var(--card);
+  border-top:1.5px solid var(--border);z-index:30;
+  display:none;flex;gap:10px;align-items:center;
+  transition:background .3s;
+}
+.split-confirm-bar.visible{display:flex;}
 /* ══════════════════════════════════════
    SCROLLBAR
 ══════════════════════════════════════ */
@@ -1087,6 +1194,14 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
         <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none"><path d="M9 18l6-6-6-6"/></svg>
       </div>
     </div>
+        <div onclick="navigate('multisplit')" style="margin:10px 18px 0;background:linear-gradient(135deg,rgba(78,205,196,.13),rgba(155,93,229,.10));border:1.5px solid rgba(78,205,196,.28);border-radius:var(--rs);padding:14px 16px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:transform .15s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--sky);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🖼️</div>
+      <div>
+        <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--text)">Multi-Art Split</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">One photo of many pieces → auto-split into separate artworks</div>
+      </div>
+      <div style="margin-left:auto;color:var(--muted)"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
     <div style="padding:14px 18px 0;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">Box Clearer — One at a Time</div>
 
     <div style="padding:14px 18px 0">
@@ -1232,6 +1347,76 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
     <button class="btn btn-accent btn-full" onclick="applyCrop()">
       <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
       Apply Crop
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     MULTI-ART SPLIT SCREEN
+════════════════════════════════════ -->
+<div class="screen right" id="scr-multisplit">
+  <div class="top-bar">
+    <button class="back-btn" id="splitBack">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="logo" style="font-size:18px;margin:0 auto"><span class="logo-dot"></span>Multi-Art Split</div>
+    <div style="width:36px"></div>
+  </div>
+  <div class="split-stage" id="splitStage">
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:6px;text-align:center">Lay out 2–6 artworks flat, then photograph them together</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:20px;color:var(--text);margin-bottom:6px;text-align:center">One photo → multiple artworks</div>
+    <div style="font-size:12px;color:var(--text2);text-align:center;line-height:1.55;margin-bottom:14px">The app detects each piece automatically. Adjust splits, add titles, save all at once.</div>
+
+    <!-- Session config -->
+    <div style="display:flex;gap:10px;margin-bottom:10px">
+      <div class="field" style="flex:1"><label>Child</label>
+        <select id="splitKidSel"><option value="">— select —</option></select>
+      </div>
+      <div class="field" style="flex:1"><label>Date</label>
+        <input type="date" id="splitDate">
+      </div>
+    </div>
+
+    <!-- Source photo -->
+    <label class="upload-drop" id="splitDrop" for="splitFileInput" style="margin:0 0 14px;padding:22px 16px">
+      <div class="upload-drop-ico" style="font-size:32px">🖼️</div>
+      <div class="upload-drop-t" style="font-size:15px">Tap to photograph artworks</div>
+      <div class="upload-drop-s">Lay pieces flat with gaps between them</div>
+    </label>
+    <input type="file" id="splitFileInput" accept="image/*" capture="environment" style="display:none">
+
+    <!-- Canvas preview (shown after photo) -->
+    <div id="splitPreviewArea" style="display:none">
+      <div class="split-canvas-wrap">
+        <canvas id="splitCanvas"></canvas>
+      </div>
+      <div style="display:flex;gap:8px;margin:10px 0">
+        <button class="btn btn-soft" style="flex:1;padding:9px;font-size:12px" onclick="splitDetect()">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;margin-right:4px"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          Re-detect
+        </button>
+        <button class="btn btn-soft" style="flex:1;padding:9px;font-size:12px" id="splitAddManual">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add region
+        </button>
+        <button class="btn btn-soft" style="flex:1;padding:9px;font-size:12px" onclick="document.getElementById('splitFileInput').click()">
+          📷 Retake
+        </button>
+      </div>
+      <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--text);margin-bottom:8px" id="splitDetectedLabel">Detected 0 artworks</div>
+      <div class="split-crops-row" id="splitCropsRow"></div>
+    </div>
+  </div>
+  <!-- Confirm bar -->
+  <div class="split-confirm-bar" id="splitConfirmBar">
+    <div style="flex:1">
+      <div style="font-family:'Fredoka One',cursive;font-size:14px;color:var(--text)" id="splitConfirmLabel">Save 0 artworks</div>
+      <div style="font-size:11px;color:var(--text2)">Each piece cropped individually</div>
+    </div>
+    <button class="btn btn-soft" style="padding:10px 14px;font-size:12px" onclick="splitReset()">Clear</button>
+    <button class="btn btn-accent" style="padding:10px 18px;font-size:12px" onclick="splitSaveAll()">
+      <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;stroke-width:2.5;fill:none"><path d="M20 6L9 17l-5-5"/></svg>
+      Save All
     </button>
   </div>
 </div>
@@ -1634,7 +1819,7 @@ function toast(type,title,msg,ms=3000){
 }
 
 /* ══ SCREEN NAVIGATION ══ */
-const SCREENS={gallery:'scr-gallery',kids:'scr-kids',studio:'scr-studio',upload:'scr-upload',intro:'scr-intro',fastsnap:'scr-fastsnap'};
+const SCREENS={gallery:'scr-gallery',kids:'scr-kids',studio:'scr-studio',upload:'scr-upload',intro:'scr-intro',fastsnap:'scr-fastsnap',multisplit:'scr-multisplit'};
 function navigate(to){
   // Update internal back stack
   if(to==='gallery'){
@@ -1661,6 +1846,7 @@ function navigate(to){
   if(to==='studio')renderStudio();
   if(to==='upload')renderUploadKids();
   if(to==='fastsnap'){renderFsnapKids();fsnapReset();}
+  if(to==='multisplit'){renderSplitKids();splitReset();}
 }
 
 /* ══ INTRO ══ */
@@ -1684,6 +1870,11 @@ document.querySelectorAll('.idot').forEach(d=>d.addEventListener('click',()=>{in
 function replayIntro(){closeSettings();introIdx=0;updateIntro();navigate('intro');}
 
 /* ══ GALLERY ══ */
+/* ── Gallery state ── */
+let gallerySearch='';
+let gallerySort='newest'; // newest|oldest|alpha|favs
+let timelineExpanded=false;
+
 function renderGallery(){
   const arts=filteredArts();
   if(carouselIdx>=arts.length)carouselIdx=0;
@@ -1698,9 +1889,45 @@ function renderGallery(){
   });
   tabs.innerHTML=tabHtml;
   tabs.querySelectorAll('.ctab').forEach(t=>t.addEventListener('click',()=>{
-    curKidFilter=t.dataset.kid;carouselIdx=0;renderGallery();
+    curKidFilter=t.dataset.kid;carouselIdx=0;gallerySearch='';renderGallery();
   }));
   body.appendChild(tabs);
+
+  // Search + sort row
+  const searchRow=document.createElement('div');searchRow.className='gallery-search-row';
+  searchRow.innerHTML=`
+    <div class="gallery-search-wrap">
+      <span class="gallery-search-ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span>
+      <input class="gallery-search-inp" id="gallerySearchInp" placeholder="Search artworks…" value="${gallerySearch}">
+      <button class="gallery-search-clear${gallerySearch?' visible':''}" id="gallerySearchClear">✕</button>
+    </div>
+    <button class="gallery-sort-btn${gallerySort!=='newest'?' active':''}" id="gallerySortBtn" title="Sort">
+      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+    </button>
+  `;
+  body.appendChild(searchRow);
+
+  // Sort pills
+  const pillRow=document.createElement('div');pillRow.className='gallery-filter-pills';
+  const sorts=[['newest','Newest'],['oldest','Oldest'],['alpha','A–Z'],['favs','⭐ Favorites']];
+  sorts.forEach(([val,label])=>{
+    const p=document.createElement('button');p.className='filter-pill'+(gallerySort===val?' active':'');
+    p.textContent=label;
+    p.addEventListener('click',()=>{gallerySort=val;renderGallery();});
+    pillRow.appendChild(p);
+  });
+  body.appendChild(pillRow);
+
+  // Search events
+  const sinp=searchRow.querySelector('#gallerySearchInp');
+  const sclr=searchRow.querySelector('#gallerySearchClear');
+  sinp.addEventListener('input',()=>{gallerySearch=sinp.value;sclr.classList.toggle('visible',!!gallerySearch);carouselIdx=0;renderGallery();});
+  sclr.addEventListener('click',()=>{gallerySearch='';renderGallery();});
+  searchRow.querySelector('#gallerySortBtn').addEventListener('click',()=>{
+    const order=['newest','oldest','alpha','favs'];
+    gallerySort=order[(order.indexOf(gallerySort)+1)%order.length];
+    renderGallery();
+  });
 
   if(DB.kids.length===0){
     body.innerHTML+=`<div class="empty-state"><div class="empty-ico">👧</div><div class="empty-t">No kids yet</div><div class="empty-d">Add your first child to start building their art gallery.</div><button class="btn btn-accent" onclick="navigate('kids')" style="margin-top:8px">Add a Child</button></div>`;
@@ -1777,12 +2004,14 @@ function renderGallery(){
   body.appendChild(us);
 
   // Timeline
+  const allTimeline=[...arts].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const showCount=timelineExpanded?allTimeline.length:4;
+  const timelineArts=allTimeline.slice(0,showCount);
   const th=document.createElement('div');th.className='sec';
-  th.innerHTML=`<span class="sec-t">📅 Timeline</span><span class="sec-link">All Eras</span>`;
+  th.innerHTML=`<span class="sec-t">📅 Timeline</span><span class="sec-link" id="timelineToggle">${timelineExpanded?'Show less':'All '+allTimeline.length+' →'}</span>`;
   body.appendChild(th);
   const tg=document.createElement('div');tg.className='tgrid';
-  const recent=[...arts].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,4);
-  recent.forEach(a=>{
+  timelineArts.forEach(a=>{
     const k=kidById(a.kidId);
     const g=gradeAt(k?.schoolStart,a.date);
     const gc=gradClass(g);
@@ -1792,6 +2021,14 @@ function renderGallery(){
     tg.appendChild(d);
   });
   body.appendChild(tg);
+  // Show all toggle
+  if(allTimeline.length>4){
+    const moreBtn=document.createElement('button');moreBtn.className='tgrid-more-btn';
+    moreBtn.textContent=timelineExpanded?'Show less ↑':'Show all '+allTimeline.length+' artworks ↓';
+    moreBtn.addEventListener('click',()=>{timelineExpanded=!timelineExpanded;renderGallery();});
+    body.appendChild(moreBtn);
+  }
+  th.querySelector('#timelineToggle')?.addEventListener('click',()=>{timelineExpanded=!timelineExpanded;renderGallery();});
 }
 function buildArtCard(art,pos,isCenter){
   if(!art)return'';
@@ -2001,9 +2238,11 @@ function previewArtImg(input){
   const r=new FileReader();
   r.onload=async e=>{
     const cropped=await autoCropImage(e.target.result);
-    artImgData=cropped;
+    artImgData=cropped;artImgOrigData=cropped;
     document.getElementById('artImgPreview').innerHTML=`<img src="${artImgData}" style="width:100%;height:100%;object-fit:contain;background:#F9F6F1">`;
-    toast('info','Auto-cropped','White borders trimmed automatically. Looks good!',2200);
+    const bgBtn=document.getElementById('artBgRemoveBtn');
+    if(bgBtn){bgBtn.style.display='inline-flex';bgBtn.classList.remove('active');bgBtn.innerHTML='<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg> Remove Background';}
+    toast('info','Auto-cropped ✓','Tap "Remove Background" to isolate just the artwork.',2800);
   };
   r.readAsDataURL(input.files[0]);
 }
@@ -2558,7 +2797,7 @@ document.getElementById('unlockToggle').addEventListener('change',function(){
     2800);
 });
 function confirmClearSamples(){
-  showConfirm('🧹','Clear Sample Data?','The demo kids (Leo, Mia) and their artwork will be removed. Your own data is safe.',()=>{
+  showConfirm('🧹','Clear Sample Data?','The demo kids (Cathy, Johnny) and their artwork will be removed. Your own data is safe.',()=>{
     DB.kids=DB.kids.filter(k=>!k.isSample);
     DB.arts=DB.arts.filter(a=>!a.isSample);
     if(!DB.kids.find(k=>k.id===curKidFilter))curKidFilter='all';
@@ -2884,6 +3123,229 @@ function applyCrop(){
   closeCropModal();
   renderFsnapGrid();
   toast('success','Crop applied!','',1800);
+}
+
+
+/* ══ MULTI-ART SPLIT ══════════════════════════════════════════
+   Computer vision gutter detection:
+   1. Load photo onto canvas
+   2. Compute column/row brightness profiles
+   3. Find valleys (dark gutters between pieces)
+   4. Crop each region out as separate artwork
+═══════════════════════════════════════════════════════════════ */
+let splitSourceImg=null;
+let splitSourceDataURL=null;
+let splitRegions=[]; // [{x,y,w,h}] in original image coords
+let splitCropDataURLs=[]; // cropped base64 per region
+let splitTitles=[];
+
+function splitReset(){
+  splitSourceImg=null;splitSourceDataURL=null;
+  splitRegions=[];splitCropDataURLs=[];splitTitles=[];
+  document.getElementById('splitPreviewArea').style.display='none';
+  document.getElementById('splitConfirmBar').style.display='none';
+  document.getElementById('splitFileInput').value='';
+  const ctx=document.getElementById('splitCanvas').getContext('2d');
+  ctx.clearRect(0,0,1,1);
+}
+
+document.getElementById('splitBack').addEventListener('click',()=>navigate('upload'));
+
+document.getElementById('splitFileInput').addEventListener('change',async function(){
+  if(!this.files[0])return;
+  const raw=await fileToDataURL(this.files[0]);
+  splitSourceDataURL=raw;
+  splitSourceImg=new Image();
+  await new Promise(res=>{splitSourceImg.onload=res;splitSourceImg.src=raw;});
+  drawSplitCanvas();
+  splitDetect();
+  document.getElementById('splitPreviewArea').style.display='block';
+  this.value='';
+});
+
+function drawSplitCanvas(){
+  const cvs=document.getElementById('splitCanvas');
+  const maxW=cvs.parentElement.offsetWidth||360;
+  const scale=maxW/splitSourceImg.naturalWidth;
+  cvs.width=splitSourceImg.naturalWidth*scale;
+  cvs.height=splitSourceImg.naturalHeight*scale;
+  const ctx=cvs.getContext('2d');
+  ctx.drawImage(splitSourceImg,0,0,cvs.width,cvs.height);
+}
+
+function splitDetect(){
+  if(!splitSourceImg)return;
+  const W=splitSourceImg.naturalWidth,H=splitSourceImg.naturalHeight;
+  // Work on a downsampled canvas for speed
+  const SCALE=0.25;
+  const sw=Math.round(W*SCALE),sh=Math.round(H*SCALE);
+  const tmp=document.createElement('canvas');tmp.width=sw;tmp.height=sh;
+  const ctx=tmp.getContext('2d');
+  ctx.drawImage(splitSourceImg,0,0,sw,sh);
+  const data=ctx.getImageData(0,0,sw,sh).data;
+
+  // Lightness profile per row and column
+  function lightness(r,g,b){return(Math.max(r,g,b)+Math.min(r,g,b))/2/255;}
+  const rowL=new Float32Array(sh);
+  const colL=new Float32Array(sw);
+  for(let y=0;y<sh;y++) for(let x=0;x<sw;x++){
+    const i=(y*sw+x)*4;
+    const l=lightness(data[i],data[i+1],data[i+2]);
+    rowL[y]+=l/sw;
+    colL[x]+=l/sh;
+  }
+  // Find gutter valleys: regions where avg lightness > 0.82 (light/white background)
+  // This means the row/col is mostly background
+  const BG_THRESH=0.78;
+  const MIN_GUTTER=Math.round(sh*0.02); // at least 2% of image height
+  const MIN_CONTENT=Math.round(sh*0.08); // content block at least 8% tall
+
+  function findSegments(profile,len,minGutter,minContent){
+    // Mark each position as gutter or content
+    const isGutter=profile.map(v=>v>BG_THRESH);
+    // Run-length encode
+    const segs=[];let start=0,inGutter=isGutter[0];
+    for(let i=1;i<=len;i++){
+      if(i===len||isGutter[i]!==inGutter){
+        segs.push({gutter:inGutter,start,end:i-1,len:i-start});
+        start=i;inGutter=i<len?isGutter[i]:false;
+      }
+    }
+    // Extract content segments (non-gutter, long enough)
+    const content=segs.filter(s=>!s.gutter&&s.len>=minContent);
+    // Merge adjacent content separated by tiny gutters
+    const merged=[];
+    content.forEach(s=>{
+      if(merged.length&&s.start-merged[merged.length-1].end<minGutter){
+        merged[merged.length-1].end=s.end;
+        merged[merged.length-1].len=merged[merged.length-1].end-merged[merged.length-1].start+1;
+      } else merged.push({...s});
+    });
+    return merged;
+  }
+
+  const rowSegs=findSegments(rowL,sh,MIN_GUTTER,MIN_CONTENT);
+  const colSegs=findSegments(colL,sw,Math.round(sw*0.02),Math.round(sw*0.08));
+
+  // Scale segments back to original image coords
+  function scaleSegs(segs,scale){
+    return segs.map(s=>({start:Math.round(s.start/scale),end:Math.round(s.end/scale),len:Math.round(s.len/scale)}));
+  }
+  const rows=scaleSegs(rowSegs,SCALE);
+  const cols=scaleSegs(colSegs,SCALE);
+
+  // Build grid of regions
+  splitRegions=[];
+  const rr=rows.length>0?rows:[{start:0,end:H-1,len:H}];
+  const cc=cols.length>0?cols:[{start:0,end:W-1,len:W}];
+  rr.forEach(r=>cc.forEach(c=>{
+    const pad=8;
+    splitRegions.push({
+      x:Math.max(0,c.start-pad),y:Math.max(0,r.start-pad),
+      w:Math.min(W,c.end+pad)-Math.max(0,c.start-pad),
+      h:Math.min(H,r.end+pad)-Math.max(0,r.start-pad)
+    });
+  }));
+
+  // Cap at 9 regions max
+  if(splitRegions.length>9)splitRegions=splitRegions.slice(0,9);
+
+  // Draw detection overlay on canvas
+  drawSplitOverlay();
+  // Crop each region
+  cropSplitRegions();
+}
+
+function drawSplitOverlay(){
+  const cvs=document.getElementById('splitCanvas');
+  const scaleX=cvs.width/splitSourceImg.naturalWidth;
+  const scaleY=cvs.height/splitSourceImg.naturalHeight;
+  const ctx=cvs.getContext('2d');
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  ctx.drawImage(splitSourceImg,0,0,cvs.width,cvs.height);
+  // Semi-dark overlay outside regions
+  ctx.fillStyle='rgba(8,8,24,0.38)';
+  ctx.fillRect(0,0,cvs.width,cvs.height);
+  splitRegions.forEach((r,i)=>{
+    const rx=r.x*scaleX,ry=r.y*scaleY,rw=r.w*scaleX,rh=r.h*scaleY;
+    // Clear region (show original image through)
+    ctx.clearRect(rx,ry,rw,rh);
+    ctx.drawImage(splitSourceImg,r.x,r.y,r.w,r.h,rx,ry,rw,rh);
+    // Border
+    ctx.strokeStyle='rgba(155,93,229,0.9)';ctx.lineWidth=2.5;
+    ctx.strokeRect(rx+1,ry+1,rw-2,rh-2);
+    // Number badge
+    ctx.fillStyle='rgba(155,93,229,0.9)';
+    const bw=26,bh=26;
+    ctx.beginPath();ctx.arc(rx+bw/2+4,ry+bh/2+4,13,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='bold 13px Nunito,Arial,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(i+1,rx+bw/2+4,ry+bh/2+5);
+  });
+}
+
+async function cropSplitRegions(){
+  const kid=DB.kids.find(k=>k.id===document.getElementById('splitKidSel').value);
+  splitCropDataURLs=[];
+  splitTitles=[];
+  for(let i=0;i<splitRegions.length;i++){
+    const r=splitRegions[i];
+    const tmp=document.createElement('canvas');tmp.width=r.w;tmp.height=r.h;
+    const ctx=tmp.getContext('2d');
+    ctx.drawImage(splitSourceImg,r.x,r.y,r.w,r.h,0,0,r.w,r.h);
+    // Auto-crop each region
+    const rawDataURL=tmp.toDataURL('image/jpeg',0.92);
+    const cropped=await autoCropImage(rawDataURL);
+    splitCropDataURLs.push(cropped);
+    const kidName=kid?kid.name:'Artwork';
+    splitTitles.push(kidName+' — Piece '+(i+1));
+  }
+  renderSplitCrops();
+}
+
+function renderSplitCrops(){
+  const row=document.getElementById('splitCropsRow');
+  row.innerHTML='';
+  splitCropDataURLs.forEach((url,i)=>{
+    const card=document.createElement('div');card.className='split-crop-card';
+    card.innerHTML=`
+      <img class="split-crop-thumb" src="${url}" alt="Piece ${i+1}">
+      <div class="split-crop-info">
+        <input class="split-crop-inp" value="${splitTitles[i]||''}" placeholder="Title…" oninput="splitTitles[${i}]=this.value">
+      </div>
+    `;
+    row.appendChild(card);
+  });
+  document.getElementById('splitDetectedLabel').textContent='Detected '+splitRegions.length+' artwork'+(splitRegions.length!==1?'s':'');
+  document.getElementById('splitConfirmLabel').textContent='Save '+splitRegions.length+' artwork'+(splitRegions.length!==1?'s':'');
+  document.getElementById('splitConfirmBar').style.display=splitRegions.length>0?'flex':'none';
+  document.getElementById('splitConfirmBar').classList.toggle('visible',splitRegions.length>0);
+}
+
+async function splitSaveAll(){
+  const kid=DB.kids.find(k=>k.id===document.getElementById('splitKidSel').value);
+  if(!kid){toast('warning','Select a child first','',2500);return;}
+  const date=document.getElementById('splitDate').value||new Date().toISOString().split('T')[0];
+  const fills=['g1','g2','g3','g4','g5','g6','g7','g8'];
+  splitCropDataURLs.forEach((url,i)=>{
+    DB.arts.push({
+      id:uid(),kidId:kid.id,title:splitTitles[i]||kid.name+' — Piece '+(i+1),
+      date,notes:'',emoji:'🎨',fill:fills[DB.arts.length%fills.length],
+      fav:false,imageData:url,isSample:false
+    });
+  });
+  save();
+  const count=splitCropDataURLs.length;
+  splitReset();
+  navigate('gallery');
+  toast('success',count+' artworks saved!','Auto-split and cropped. Head to the gallery! 🎨',3500);
+}
+
+// Populate kid select + default date when entering screen
+function renderSplitKids(){
+  const sel=document.getElementById('splitKidSel');
+  sel.innerHTML='<option value="">— select child —</option>'+DB.kids.map(k=>`<option value="${k.id}">${k.emoji} ${k.name}</option>`).join('');
+  document.getElementById('splitDate').value=new Date().toISOString().split('T')[0];
 }
 
 /* ══ LEAVE GUARD ══
