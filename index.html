@@ -342,19 +342,21 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 .ctab-av{width:20px;height:20px;border-radius:50%;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;}
 
 /* Carousel */
-.carousel-wrap{height:296px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;flex-shrink:0;perspective:900px;}
+.carousel-wrap{height:312px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;flex-shrink:0;perspective:900px;}
 .art-card{
   position:absolute;background:var(--card);border-radius:var(--r);
   overflow:hidden;border:1.5px solid var(--border);
   transition:all .38s cubic-bezier(.34,1.2,.64,1);
   box-shadow:var(--sh);cursor:pointer;
 }
-.art-card.center{width:205px;height:auto;min-height:248px;transform:translateX(0) rotateY(0) scale(1);z-index:10;box-shadow:0 14px 42px rgba(44,44,84,.16);display:flex;flex-direction:column;}
+.art-card.center{width:210px;height:auto;min-height:256px;transform:translateX(0) rotateY(0) scale(1);z-index:10;box-shadow:0 14px 42px rgba(44,44,84,.16);display:flex;flex-direction:column;}
 .art-card.left{width:165px;height:200px;transform:translateX(-152px) rotateY(20deg) scale(.86);opacity:.42;z-index:5;display:flex;flex-direction:column;}
 .art-card.right{width:165px;height:200px;transform:translateX(152px) rotateY(-20deg) scale(.86);opacity:.42;z-index:5;display:flex;flex-direction:column;}
-.art-thumb{width:100%;height:158px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;}
-.art-card.left .art-thumb,.art-card.right .art-thumb{height:126px;}
-.art-thumb-img{width:100%;height:100%;object-fit:cover;}
+.art-thumb{width:100%;height:175px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.art-card.left .art-thumb,.art-card.right .art-thumb{height:136px;}
+.art-thumb-img{width:100%;height:100%;object-fit:contain;}
+.art-thumb-img[src^="data:image/png"]{background:repeating-conic-gradient(#E8E4DF 0% 25%,#F9F6F1 0% 50%) 0 0/16px 16px;}
+.art-thumb[class*="g"]{background-position:center;background-size:cover;}
 .art-thumb-emoji{font-size:52px;}
 .art-fav-btn{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.92);border:none;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;}
 .art-fav-btn:hover{transform:scale(1.2);}
@@ -465,7 +467,8 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 }
 .museum-frame-wrap{
   display:flex;flex-direction:column;align-items:center;
-  padding:14px 14px 0;width:100%;position:relative;z-index:2;
+  padding:12px 14px 0;width:100%;position:relative;z-index:2;
+  flex:1;overflow:hidden;
 }
 .museum-frame-glow{
   position:relative;width:calc(100% - 8px);max-width:356px;
@@ -478,6 +481,7 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
     0 0 88px rgba(155,93,229,.20),
     0 36px 72px rgba(0,0,0,.82);
   animation:framePulse 5s ease-in-out infinite;
+  display:flex;flex-direction:column;
 }
 @keyframes framePulse{
   0%,100%{box-shadow:0 0 0 1px rgba(155,93,229,.14),0 0 44px rgba(155,93,229,.38),0 0 88px rgba(155,93,229,.20),0 36px 72px rgba(0,0,0,.82);}
@@ -486,13 +490,22 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 .museum-frame{
   position:relative;width:100%;
   border-radius:16px 16px 0 0;overflow:hidden;
+  display:flex;flex-direction:column;
 }
 .museum-art{
-  width:100%;height:250px;background:#0E0E22;
+  width:100%;
+  min-height:200px;
+  max-height:58dvh;
+  flex:1;
+  background:#0A0818;
   display:flex;align-items:center;justify-content:center;
-  font-size:100px;position:relative;
+  font-size:100px;position:relative;overflow:hidden;
 }
-.museum-art-img{width:100%;height:100%;object-fit:cover;}
+.museum-art-img{
+  width:100%;height:100%;
+  object-fit:contain;
+  display:block;
+}
 .studio-edit-overlay{
   position:absolute;inset:0;background:rgba(8,8,24,.52);
   display:none;align-items:center;justify-content:center;
@@ -600,6 +613,15 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 .uq-name{font-size:13px;font-weight:700;color:var(--text);}
 .uq-saved{font-size:11px;color:var(--sky);font-weight:700;margin-top:2px;}
 .uq-del{background:none;border:none;color:var(--coral);font-size:18px;padding:4px;cursor:pointer;}
+.bg-remove-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--soft);border:1.5px solid var(--inpborder);color:var(--text2);
+  font-size:11px;font-weight:700;padding:5px 10px;border-radius:50px;cursor:pointer;
+  transition:all .15s;margin-top:4px;
+}
+.bg-remove-btn:hover{background:rgba(155,93,229,.1);border-color:var(--accent);color:var(--accent);}
+.bg-remove-btn.active{background:rgba(155,93,229,.15);border-color:var(--accent);color:var(--accent);}
+.bg-remove-btn svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;}
 .uq-name-temp{color:var(--accent);font-style:italic;}
 .uq-name-temp:empty::before{content:attr(data-placeholder);color:var(--muted);}
 
@@ -1341,6 +1363,12 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
         </div>
       </div>
       <input type="file" id="artImgInput" accept="image/*" style="display:none" onchange="previewArtImg(this)">
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="bg-remove-btn" id="artBgRemoveBtn" onclick="artToggleBgRemove()" style="display:none">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+          Remove Background
+        </button>
+      </div>
       <div class="field"><label>Title</label><input type="text" id="afTitle" placeholder="e.g. Laser Dinosaur"></div>
       <div class="field"><label>Child</label><select id="afKid"></select></div>
       <div class="field"><label>Date Created</label><input type="date" id="afDate"></div>
@@ -1640,7 +1668,7 @@ function renderGallery(){
     const g=gradeAt(k?.schoolStart,a.date);
     const gc=gradClass(g);
     const d=document.createElement('div');d.className='titem';
-    d.innerHTML=`<div class="tthumb ${a.fill}">${a.imageData?`<img src="${a.imageData}" style="width:100%;height:100%;object-fit:cover">`:`<span>${a.emoji||'🎨'}</span>`}</div><div class="tinfo"><div class="tera ${gc}">${g}</div><div class="tname">${a.title}</div></div>`;
+    d.innerHTML=`<div class="tthumb ${a.fill}">${a.imageData?`<img src="${a.imageData}" style="width:100%;height:100%;object-fit:contain;background:#F9F6F1">`:`<span>${a.emoji||'🎨'}</span>`}</div><div class="tinfo"><div class="tera ${gc}">${g}</div><div class="tname">${a.title}</div></div>`;
     d.addEventListener('click',()=>{studioArtList=arts;studioIdx=arts.indexOf(a);navigate('studio');});
     tg.appendChild(d);
   });
@@ -1843,7 +1871,7 @@ function openArtForm(art){
   document.getElementById('afEditId').value=art?art.id:'';
   artImgData=art?art.imageData:null;
   const prev=document.getElementById('artImgPreview');
-  prev.innerHTML=artImgData?`<img src="${artImgData}" style="width:100%;height:100%;object-fit:cover">`:`<div style="text-align:center;color:var(--muted)"><div style="font-size:36px;margin-bottom:6px">📷</div><div style="font-size:12px;font-weight:700">Tap to choose image</div></div>`;
+  prev.innerHTML=artImgData?`<img src="${artImgData}" style="width:100%;height:100%;object-fit:contain;background:#F9F6F1">`:`<div style="text-align:center;color:var(--muted)"><div style="font-size:36px;margin-bottom:6px">📷</div><div style="font-size:12px;font-weight:700">Tap to choose image</div></div>`;
   // Populate kid select
   const sel=document.getElementById('afKid');
   sel.innerHTML=DB.kids.map(k=>`<option value="${k.id}" ${art&&art.kidId===k.id?'selected':''}>${k.emoji} ${k.name}</option>`).join('');
@@ -1855,11 +1883,33 @@ function previewArtImg(input){
   r.onload=async e=>{
     const cropped=await autoCropImage(e.target.result);
     artImgData=cropped;
-    document.getElementById('artImgPreview').innerHTML=`<img src="${artImgData}" style="width:100%;height:100%;object-fit:cover">`;
+    document.getElementById('artImgPreview').innerHTML=`<img src="${artImgData}" style="width:100%;height:100%;object-fit:contain;background:#F9F6F1">`;
     toast('info','Auto-cropped','White borders trimmed automatically. Looks good!',2200);
   };
   r.readAsDataURL(input.files[0]);
 }
+async function artToggleBgRemove(){
+  if(!artImgData)return;
+  const btn=document.getElementById('artBgRemoveBtn');
+  const wasRemoved=btn.classList.contains('active');
+  btn.textContent='Processing…';btn.disabled=true;
+  if(wasRemoved){
+    artImgData=artImgOrigData||artImgData;
+    btn.innerHTML='<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg> Remove Background';
+    btn.classList.remove('active');
+  } else {
+    artImgOrigData=artImgData;
+    artImgData=await removeBackground(artImgData);
+    btn.innerHTML='<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg> ✓ BG Removed';
+    btn.classList.add('active');
+  }
+  const prev=document.getElementById('artImgPreview');
+  const bg=btn.classList.contains('active')?'repeating-conic-gradient(#ccc 0% 25%,#fff 0% 50%) 0 0/16px 16px':'';
+  prev.style.background=bg;
+  prev.innerHTML=`<img src="${artImgData}" style="width:100%;height:100%;object-fit:contain">`;
+  btn.disabled=false;
+}
+let artImgOrigData=null;
 function saveArtwork(){
   const title=document.getElementById('afTitle').value.trim();
   const kidId=document.getElementById('afKid').value;
@@ -1933,6 +1983,95 @@ function fileToDataURL(file){
 
 /* Smart auto-crop: detects content bounds, removes white/light borders,
    then outputs a square-ish cropped JPEG at max 1200px */
+
+/* ══ BACKGROUND REMOVAL ══
+   Multi-pass flood fill from image edges to isolate artwork.
+   Works well for art on white/light paper or table surfaces.
+   tolerance: 0-255, higher = removes more background ──────── */
+function removeBackground(dataURL, tolerance=38){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      const maxW=800; // process at reduced size for speed
+      const scale=Math.min(1,maxW/img.width);
+      const W=Math.round(img.width*scale), H=Math.round(img.height*scale);
+      const c=document.createElement('canvas');c.width=W;c.height=H;
+      const ctx=c.getContext('2d');
+      ctx.drawImage(img,0,0,W,H);
+      const imgData=ctx.getImageData(0,0,W,H);
+      const data=imgData.data;
+      const visited=new Uint8Array(W*H);
+      const queue=[];
+
+      // Sample background color from corners + edges
+      const samples=[];
+      [[0,0],[W-1,0],[0,H-1],[W-1,H-1],
+       [Math.floor(W/2),0],[Math.floor(W/2),H-1],
+       [0,Math.floor(H/2)],[W-1,Math.floor(H/2)]
+      ].forEach(([x,y])=>{
+        const i=(y*W+x)*4;
+        samples.push([data[i],data[i+1],data[i+2]]);
+      });
+      // Average background color
+      const bgR=Math.round(samples.reduce((s,c)=>s+c[0],0)/samples.length);
+      const bgG=Math.round(samples.reduce((s,c)=>s+c[1],0)/samples.length);
+      const bgB=Math.round(samples.reduce((s,c)=>s+c[2],0)/samples.length);
+
+      function colorDist(i){
+        const dr=data[i]-bgR, dg=data[i+1]-bgG, db=data[i+2]-bgB;
+        return Math.sqrt(dr*dr+dg*dg+db*db);
+      }
+      function enqueue(x,y){
+        if(x<0||y<0||x>=W||y>=H)return;
+        const idx=y*W+x;
+        if(visited[idx])return;
+        if(colorDist(idx*4)>tolerance)return;
+        visited[idx]=1;queue.push(x,y);
+      }
+      // Seed from all edges
+      for(let x=0;x<W;x++){enqueue(x,0);enqueue(x,H-1);}
+      for(let y=0;y<H;y++){enqueue(0,y);enqueue(W-1,y);}
+      // BFS flood fill
+      let qi=0;
+      while(qi<queue.length){
+        const x=queue[qi++],y=queue[qi++];
+        const pi=(y*W+x)*4;
+        data[pi+3]=0; // transparent
+        enqueue(x-1,y);enqueue(x+1,y);enqueue(x,y-1);enqueue(x,y+1);
+      }
+      ctx.putImageData(imgData,0,0);
+
+      // Auto-crop to content bounds
+      let top=H,bottom=0,left=W,right=0;
+      for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+        if(data[(y*W+x)*4+3]>10){
+          if(y<top)top=y;if(y>bottom)bottom=y;
+          if(x<left)left=x;if(x>right)right=x;
+        }
+      }
+      const pad=8;
+      top=Math.max(0,top-pad);bottom=Math.min(H-1,bottom+pad);
+      left=Math.max(0,left-pad);right=Math.min(W-1,right+pad);
+      const cw=right-left||W, ch=bottom-top||H;
+
+      // Scale back to original resolution, max 1200px
+      const scaleBack=img.width/W;
+      const ox=Math.round(left*scaleBack), oy=Math.round(top*scaleBack);
+      const ow=Math.round(cw*scaleBack), oh=Math.round(ch*scaleBack);
+      const maxOut=1200, scOut=Math.min(1,maxOut/Math.max(ow,oh));
+      const fc=document.createElement('canvas');
+      fc.width=Math.round(ow*scOut);fc.height=Math.round(oh*scOut);
+      const fctx=fc.getContext('2d');
+      // Redraw from original at full res, apply mask
+      const src=document.createElement('canvas');src.width=W;src.height=H;
+      src.getContext('2d').putImageData(imgData,0,0);
+      fctx.drawImage(src,left,top,cw,ch,0,0,fc.width,fc.height);
+      resolve(fc.toDataURL('image/png')); // PNG to preserve transparency
+    };
+    img.onerror=()=>resolve(dataURL);
+    img.src=dataURL;
+  });
+}
 function autoCropImage(dataURL){
   return new Promise((resolve)=>{
     const img=new Image();
@@ -2047,13 +2186,20 @@ document.getElementById('downloadPng').addEventListener('click',async function()
 
 /* ══ EXPORT / IMPORT ══ */
 function exportJSON(mode){
-  const blob=new Blob([JSON.stringify({version:'1.0',exportDate:new Date().toISOString(),kids:DB.kids,arts:DB.arts.map(a=>({...a,imageData:undefined}))},null,2)],{type:'application/json'});
+  // Include imageData — warn if large
+  const payload={version:'1.1',exportDate:new Date().toISOString(),kids:DB.kids,arts:DB.arts};
+  const json=JSON.stringify(payload);
+  const mb=(json.length/1024/1024).toFixed(1);
+  if(parseFloat(mb)>45){
+    toast('warning','Large Export ('+mb+' MB)','Your images are included. This may take a moment to download.',4000);
+  }
+  const blob=new Blob([json],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;a.download=`canvaskeep-backup-${new Date().toISOString().split('T')[0]}.json`;
   a.click();URL.revokeObjectURL(url);
-  if(mode==='icloud'){toast('save','Backup Downloaded','Now drag this file into your iCloud Drive folder at icloud.com or in Finder.',4000);}
-  else{toast('save','Backup Exported','JSON file downloaded to your device.',2500);}
+  if(mode==='icloud'){toast('save','Backup Downloaded ('+mb+' MB)','Images included. Drag into iCloud Drive folder.',4000);}
+  else{toast('save','Full Backup Exported',''+mb+' MB — images included.',2800);}
 }
 function importJSON(input){
   if(!input.files[0])return;
@@ -2199,6 +2345,10 @@ function renderFsnapGrid(){
       <div class="fsnap-info">
         <input class="fsnap-name-inp" value="${item.title}" placeholder="Title…" oninput="fsnapItems[${idx}].title=this.value">
         <textarea class="fsnap-notes-inp" placeholder="Notes, story, context…" oninput="fsnapItems[${idx}].notes=this.value">${item.notes||''}</textarea>
+        <button class="bg-remove-btn${item.bgRemoved?' active':''}" onclick="toggleBgRemove(${idx},this)">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+          ${item.bgRemoved?'✓ BG Removed':'Remove Background'}
+        </button>
       </div>
     `;
     grid.appendChild(card);
@@ -2211,6 +2361,26 @@ function fsnapDelete(idx){
   fsnapItems.splice(idx,1);
   if(fsnapItems.length===0){fsnapReset();return;}
   renderFsnapGrid();
+}
+async function toggleBgRemove(idx,btn){
+  const item=fsnapItems[idx];
+  if(item.bgRemoved){
+    // Restore original auto-crop
+    btn.textContent='Processing…';btn.disabled=true;
+    item.croppedDataURL=await autoCropImage(item.origDataURL);
+    item.bgRemoved=false;
+  } else {
+    btn.textContent='Processing…';btn.disabled=true;
+    item.croppedDataURL=await removeBackground(item.origDataURL);
+    item.bgRemoved=true;
+  }
+  const imgEl=document.getElementById('fsnapImg_'+idx);
+  if(imgEl)imgEl.src=item.croppedDataURL;
+  // Update the image background to show transparency
+  const wrap=imgEl?.closest('.fsnap-img-wrap');
+  if(wrap)wrap.style.background=item.bgRemoved?'repeating-conic-gradient(#ccc 0% 25%,#fff 0% 50%) 0 0/16px 16px':'';
+  renderFsnapGrid();
+  toast('success',item.bgRemoved?'Background removed!':'Background restored','',2000);
 }
 
 document.getElementById('fsnapFileInput').addEventListener('change',async function(){
