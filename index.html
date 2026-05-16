@@ -2597,31 +2597,66 @@ function applyCrop(){
   toast('success','Crop applied!','',1800);
 }
 
-/* ══ BEFORE UNLOAD ══ */
+/* ══ LEAVE GUARD ══
+   Strategy: intercept at the source (clicks, back button) BEFORE
+   any navigation starts. beforeunload is too late to show a modal —
+   the page is already tearing down. We use it only as a last-resort
+   native browser fallback. ──────────────────────────────────────── */
 let allowLeave=false;
-let buPending=false;
+
+function showLeaveModal(){
+  document.getElementById('buModal').classList.add('open');
+}
+function hideLeaveModal(){
+  document.getElementById('buModal').classList.remove('open');
+}
+
+/* 1. Intercept ALL clicks on <a> tags */
+document.addEventListener('click',e=>{
+  if(allowLeave)return;
+  const a=e.target.closest('a[href]');
+  if(!a)return;
+  const href=a.getAttribute('href');
+  if(!href||href==='#'||href.startsWith('javascript'))return;
+  e.preventDefault();
+  e.stopPropagation();
+  showLeaveModal();
+  // Store intent so "Leave Anyway" can follow through
+  document.getElementById('buLeave').dataset.href=href;
+},{capture:true});
+
+/* 2. Intercept browser back / forward (History API) */
+// Push a dummy state so the back button pops to us first
+history.pushState({canvaskeep:true},'','');
+window.addEventListener('popstate',e=>{
+  if(allowLeave)return;
+  // Re-push so the URL stays put while modal is open
+  history.pushState({canvaskeep:true},'','');
+  showLeaveModal();
+});
+
+/* 3. Last-resort native dialog if something slips through */
 window.addEventListener('beforeunload',e=>{
   if(allowLeave)return;
-  // Show our custom modal instead of browser prompt
-  // We can't suppress the browser dialog reliably, but we open ours too
-  if(!buPending){
-    buPending=true;
-    setTimeout(()=>{
-      document.getElementById('buModal').classList.add('open');
-      buPending=false;
-    },50);
-  }
-  // Don't set returnValue so browser prompt is suppressed in modern browsers
+  e.preventDefault();
+  e.returnValue=''; // triggers native browser dialog as fallback
 });
+
+/* Modal buttons */
 document.getElementById('buStay').addEventListener('click',()=>{
-  document.getElementById('buModal').classList.remove('open');
-  toast('success','Welcome back!','Your gallery is right where you left it.',2000);
+  hideLeaveModal();
+  delete document.getElementById('buLeave').dataset.href;
+  toast('success','Welcome back!','Your gallery is right here. 🎨',2200);
 });
 document.getElementById('buLeave').addEventListener('click',()=>{
   allowLeave=true;
-  document.getElementById('buModal').classList.remove('open');
-  toast('info','See you soon! 👋','Come back anytime — your art is all saved.',2200);
-  setTimeout(()=>{try{history.back();}catch(e){}},600);
+  hideLeaveModal();
+  const href=document.getElementById('buLeave').dataset.href;
+  if(href){window.location.href=href;}
+  else{
+    // Back button case — go back two (one is our dummy pushState)
+    history.go(-2);
+  }
 });
 
 /* ══ APPLY SETTINGS ══ */
