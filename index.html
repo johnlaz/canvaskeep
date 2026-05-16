@@ -3,1199 +3,1175 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#9B5DE5">
+<meta name="theme-color" id="themeColorMeta" content="#9B5DE5">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="LittlePicasso">
-<meta name="description" content="Save and celebrate your child's artwork across every grade and year.">
-<title>LittlePicasso</title>
+<meta name="apple-mobile-web-app-title" content="CanvasKeep">
+<meta name="description" content="Preserve your child's artwork — every crayon, every grade, every year.">
+<title>CanvasKeep</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
-<!-- html2canvas for PNG export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-/* ═══════════════════════════════════════════
-   RESET & ROOT
-═══════════════════════════════════════════ */
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+/* ══════════════════════════════════════
+   TOKENS & RESET
+══════════════════════════════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
-  --c-sun:#FFD166;
-  --c-coral:#FF6B6B;
-  --c-sky:#4ECDC4;
-  --c-grape:#9B5DE5;
-  --c-peach:#FFA07A;
-  --c-cream:#FFF9F0;
-  --c-white:#FFFFFF;
-  --c-navy:#2C2C54;
-  --c-softgray:#F7F4EF;
-  --c-border:rgba(44,44,84,0.10);
-  --c-muted:#8A8070;
-  --c-card:#FFFFFF;
-  --c-bg:#FFF9F0;
-  --c-text:#2C2C54;
-  --c-text2:#6B6580;
-  --c-input:#F7F4EF;
-  --c-inputborder:rgba(44,44,84,0.15);
-  --c-overlay:rgba(44,44,84,0.55);
-  --c-toastbg:#2C2C54;
-  --c-toasttext:#FFFFFF;
-  --radius:20px;
-  --radius-sm:12px;
-  --radius-xs:8px;
-  --shadow-card:0 4px 20px rgba(44,44,84,0.10);
-  --shadow-fab:0 6px 20px rgba(255,107,107,0.40);
-  --shadow-grape:0 4px 16px rgba(155,93,229,0.30);
-  --transition:0.22s cubic-bezier(0.34,1.2,0.64,1);
-  --nav-h:64px;
+  --grape:#9B5DE5;--coral:#FF6B6B;--sky:#4ECDC4;--sun:#FFD166;
+  --accent:var(--grape);
+  --bg:#FFF9F0;--card:#FFFFFF;--soft:#F4F1EC;
+  --border:rgba(44,44,84,0.09);--border2:rgba(44,44,84,0.16);
+  --text:#2C2C54;--text2:#6B6580;--muted:#9990AA;
+  --inp:#F4F1EC;--inpborder:rgba(44,44,84,0.14);
+  --overlay:rgba(20,20,50,0.62);
+  --tbg:#2C2C54;--ttxt:#FFFFFF;
+  --r:20px;--rs:12px;--rx:8px;
+  --sh:0 4px 24px rgba(44,44,84,0.11);
+  --sha:0 4px 18px rgba(155,93,229,0.30);
+  --shcoral:0 4px 18px rgba(255,107,107,0.38);
+  --nav:62px;
 }
-[data-theme="dark"]{
-  --c-cream:#1A1A2E;
-  --c-bg:#1A1A2E;
-  --c-card:#252542;
-  --c-white:#252542;
-  --c-softgray:#2A2A48;
-  --c-border:rgba(255,255,255,0.08);
-  --c-text:#EEE8FF;
-  --c-text2:#9990BB;
-  --c-muted:#7A7095;
-  --c-input:#2A2A48;
-  --c-inputborder:rgba(255,255,255,0.12);
-  --c-overlay:rgba(10,10,28,0.75);
-  --c-toastbg:#EEE8FF;
-  --c-toasttext:#1A1A2E;
+[data-theme=dark]{
+  --bg:#16162A;--card:#22223C;--soft:#2A2A46;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#EEE8FF;--text2:#9B93C0;--muted:#6A647E;
+  --inp:#2A2A46;--inpborder:rgba(255,255,255,0.11);
+  --overlay:rgba(6,6,20,0.82);
+  --tbg:#EEE8FF;--ttxt:#16162A;
 }
-html,body{height:100%;background:var(--c-bg);color:var(--c-text);font-family:'Nunito',sans-serif;transition:background 0.3s,color 0.3s;overflow-x:hidden;}
+html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;}
+button{font-family:'Nunito',sans-serif;cursor:pointer;}
+input,select,textarea{font-family:'Nunito',sans-serif;}
 
-/* ═══════════════════════════════════════════
+/* ══════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════ */
+#app{
+  width:100%;max-width:430px;height:100dvh;
+  margin:0 auto;position:relative;overflow:hidden;
+}
+
+/* ══════════════════════════════════════
    SCREEN SYSTEM
-═══════════════════════════════════════════ */
+══════════════════════════════════════ */
 .screen{
-  display:none;
-  flex-direction:column;
-  min-height:100vh;
-  max-width:430px;
-  margin:0 auto;
-  position:relative;
-  animation:fadeUp 0.35s ease both;
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  background:var(--bg);will-change:transform;
+  pointer-events:none;opacity:0;z-index:1;
+  transition:transform .36s cubic-bezier(.4,0,.2,1),opacity .3s;
 }
-.screen.active{display:flex;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+.screen.right{transform:translateX(100%);}
+.screen.left{transform:translateX(-30%);}
+.screen.active{transform:translateX(0)!important;opacity:1;pointer-events:all;z-index:10;}
+.scr-body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+.scr-body.padnav{padding-bottom:var(--nav);}
 
-/* ═══════════════════════════════════════════
-   INTRO SCREENS
-═══════════════════════════════════════════ */
-#screen-intro{
-  background:var(--c-bg);
-  justify-content:stretch;
-  overflow:hidden;
-}
-.intro-viewport{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  position:relative;
-}
-.intro-slides-track{
-  display:flex;
-  transition:transform 0.42s cubic-bezier(0.4,0,0.2,1);
-  height:100%;
-}
-.intro-slide{
-  min-width:100%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-start;
-  padding:0 32px 24px;
-}
-.intro-hero{
-  width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding-top:40px;
-  padding-bottom:20px;
-}
-.hero-art{
-  width:220px;height:220px;
-  border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:88px;
-  position:relative;
-}
-.hero-art .badge{
-  position:absolute;
-  bottom:8px;right:8px;
-  width:44px;height:44px;
-  border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;
-  border:3px solid var(--c-bg);
-}
-.slide-1 .hero-art{background:linear-gradient(135deg,#FFE0A3 0%,#FFCDD2 100%);}
-.slide-1 .badge{background:var(--c-grape);}
-.slide-2 .hero-art{background:linear-gradient(135deg,#B3E5FC 0%,#C8E6C9 100%);}
-.slide-2 .badge{background:var(--c-coral);}
-.slide-3 .hero-art{background:linear-gradient(135deg,#E1BEE7 0%,#F8BBD0 100%);}
-.slide-3 .badge{background:var(--c-sky);}
-.slide-4 .hero-art{background:linear-gradient(135deg,#FFF9C4 0%,#F0F4C3 100%);}
-.slide-4 .badge{background:var(--c-sun);}
-.intro-tag{
-  font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;
-  color:var(--c-grape);margin-bottom:10px;
-}
-.intro-h1{
-  font-family:'Fredoka One',cursive;
-  font-size:30px;line-height:1.15;
-  color:var(--c-text);
-  text-align:center;margin-bottom:12px;
-}
-.intro-p{
-  font-size:15px;line-height:1.65;
-  color:var(--c-text2);
-  text-align:center;
-  max-width:320px;
-}
-.intro-footer{
-  padding:0 32px 36px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:14px;
-}
-.intro-dots{
-  display:flex;gap:7px;
-}
-.intro-dot{
-  width:8px;height:8px;border-radius:50%;
-  background:var(--c-border);
-  transition:all 0.2s;
-  cursor:pointer;
-}
-.intro-dot.active{width:22px;border-radius:4px;background:var(--c-grape);}
-.btn-primary{
-  width:100%;max-width:340px;
-  padding:16px;border-radius:50px;
-  background:var(--c-grape);color:#fff;
-  font-family:'Fredoka One',cursive;
-  font-size:17px;letter-spacing:0.3px;
-  border:none;cursor:pointer;
-  box-shadow:var(--shadow-grape);
-  transition:transform 0.15s,box-shadow 0.15s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(155,93,229,0.38);}
-.btn-primary:active{transform:scale(0.98);}
-.btn-secondary{
-  background:none;border:none;cursor:pointer;
-  font-size:13px;font-weight:700;color:var(--c-text2);
-  padding:4px;
-  transition:color 0.15s;
-}
-.btn-secondary:hover{color:var(--c-grape);}
-.intro-logo{
-  font-family:'Fredoka One',cursive;
-  font-size:26px;color:var(--c-grape);
-  padding-top:28px;padding-left:32px;
-  display:flex;align-items:center;gap:6px;
-}
-.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--c-coral);}
-.intro-skip{
-  position:absolute;top:24px;right:24px;
-  background:none;border:none;cursor:pointer;
-  font-size:12px;font-weight:800;color:var(--c-text2);
-  letter-spacing:0.5px;text-transform:uppercase;
-  padding:6px 12px;border-radius:50px;
-  background:var(--c-softgray);
-  transition:background 0.15s;
-}
-.intro-skip:hover{background:var(--c-border);}
-.intro-back-btn{
-  position:absolute;top:24px;left:24px;
-  background:var(--c-softgray);border:none;cursor:pointer;
-  width:36px;height:36px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  transition:background 0.15s;
-}
-.intro-back-btn:hover{background:var(--c-border);}
-.intro-back-btn svg{width:16px;height:16px;stroke:var(--c-text);stroke-width:2.5;fill:none;}
+/* ══════════════════════════════════════
+   TYPOGRAPHY HELPERS
+══════════════════════════════════════ */
+.fredoka{font-family:'Fredoka One',cursive;}
+.caption{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
 
-/* ═══════════════════════════════════════════
-   MAIN APP SCREEN
-═══════════════════════════════════════════ */
-#screen-app{
-  background:var(--c-bg);
-  padding-bottom:var(--nav-h);
+/* ══════════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════════ */
+.bot-nav{
+  position:absolute;bottom:0;left:0;right:0;
+  height:var(--nav);background:var(--card);
+  border-top:1.5px solid var(--border);
+  display:flex;align-items:stretch;z-index:50;
+  transition:background .3s;
 }
-.top-nav{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:20px 20px 14px;
-  position:sticky;top:0;z-index:40;
-  background:var(--c-bg);
-  border-bottom:1.5px solid var(--c-border);
-  transition:background 0.3s;
+.bnav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;border:none;background:none;
+  font-size:10px;font-weight:800;letter-spacing:.4px;
+  text-transform:uppercase;color:var(--muted);
+  transition:color .18s;padding-bottom:4px;
 }
-.logo{
-  font-family:'Fredoka One',cursive;
-  font-size:22px;color:var(--c-grape);
-  display:flex;align-items:center;gap:7px;
+.bnav-item.active{color:var(--accent);}
+.bnav-item svg{width:22px;height:22px;stroke:currentColor;stroke-width:2;fill:none;}
+.bnav-fab{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-start;padding-top:2px;
 }
-.nav-actions{display:flex;gap:10px;align-items:center;}
-.nav-btn{
-  width:38px;height:38px;border-radius:50%;
-  border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:transform 0.15s,background 0.15s;
-}
-.nav-btn:hover{transform:scale(1.08);}
-.nav-btn.add{background:var(--c-coral);box-shadow:var(--shadow-fab);}
-.nav-btn.add svg{stroke:#fff;stroke-width:2.5;width:18px;height:18px;fill:none;}
-.nav-btn.settings{background:var(--c-softgray);}
-.nav-btn.settings svg{stroke:var(--c-text);stroke-width:2;width:18px;height:18px;fill:none;}
-
-/* ─── Child Tabs ─── */
-.child-tabs{
-  display:flex;gap:10px;
-  padding:14px 20px 0;
-  overflow-x:auto;scrollbar-width:none;
-}
-.child-tabs::-webkit-scrollbar{display:none;}
-.child-chip{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 16px;border-radius:50px;
-  background:var(--c-softgray);border:2px solid transparent;
-  cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap;
-  color:var(--c-muted);transition:all 0.18s;
-}
-.child-chip.active{
-  background:var(--c-grape);color:#fff;border-color:var(--c-grape);
-  box-shadow:var(--shadow-grape);
-}
-.chip-av{
-  width:22px;height:22px;border-radius:50%;font-size:11px;
-  font-weight:900;display:flex;align-items:center;justify-content:center;
-}
-.av-leo{background:#FFD166;color:#7A5B00;}
-.av-mia{background:#FF6B6B;color:#7A0000;}
-.av-all{background:rgba(155,93,229,0.15);color:var(--c-grape);}
-
-/* ─── Section Header ─── */
-.sec-head{
-  padding:20px 20px 8px;
-  display:flex;align-items:baseline;justify-content:space-between;
-}
-.sec-title{font-family:'Fredoka One',cursive;font-size:18px;color:var(--c-text);}
-.sec-link{font-size:12px;font-weight:700;color:var(--c-sky);cursor:pointer;background:none;border:none;}
-
-/* ─── Carousel ─── */
-.carousel-area{
-  display:flex;align-items:center;justify-content:center;
-  height:300px;overflow:hidden;position:relative;
-  perspective:900px;
-}
-.art-card{
-  position:absolute;background:var(--c-card);
-  border-radius:var(--radius);overflow:hidden;
-  cursor:pointer;transition:all 0.4s cubic-bezier(0.34,1.2,0.64,1);
-  box-shadow:var(--shadow-card);
-  border:1.5px solid var(--c-border);
-}
-.art-card.center{
-  width:210px;height:260px;
-  transform:translateX(0) rotateY(0) scale(1);
-  z-index:10;box-shadow:0 12px 40px rgba(44,44,84,0.18);
-}
-.art-card.left{
-  width:170px;height:210px;
-  transform:translateX(-155px) rotateY(22deg) scale(0.85);
-  opacity:0.45;z-index:5;
-}
-.art-card.right{
-  width:170px;height:210px;
-  transform:translateX(155px) rotateY(-22deg) scale(0.85);
-  opacity:0.45;z-index:5;
-}
-.art-fill{
-  width:100%;height:calc(100% - 68px);
-  display:flex;align-items:center;justify-content:center;
-  font-size:52px;position:relative;
-}
-.art-fav{
-  position:absolute;top:8px;right:8px;
-  background:rgba(255,255,255,0.9);border-radius:50%;
-  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
-  font-size:14px;cursor:pointer;
-  transition:transform 0.15s;border:none;
-}
-.art-fav:hover{transform:scale(1.2);}
-.art-plaque{
-  padding:8px 12px 10px;background:var(--c-card);
-  border-top:1.5px solid var(--c-border);
-}
-.art-title-text{
-  font-family:'Fredoka One',cursive;font-size:14px;
-  color:var(--c-text);line-height:1.2;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.art-meta{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
-.meta-pill{
-  font-size:10px;font-weight:700;padding:2px 8px;
-  border-radius:50px;line-height:1.5;
-}
-.pill-age{background:#FFF0D6;color:#8A5800;}
-.pill-grade{background:#E8F8F7;color:#0F6E56;}
-.pill-date{background:#F0EBFF;color:#5B3FA0;}
-[data-theme="dark"] .pill-age{background:#3D2E00;color:#FFD166;}
-[data-theme="dark"] .pill-grade{background:#0A2E28;color:#4ECDC4;}
-[data-theme="dark"] .pill-date{background:#200A4A;color:#C499FF;}
-
-.fill-1{background:linear-gradient(135deg,#FFE0A3,#FFCDD2);}
-.fill-2{background:linear-gradient(135deg,#B3E5FC,#C8E6C9);}
-.fill-3{background:linear-gradient(135deg,#E1BEE7,#F8BBD0);}
-.fill-4{background:linear-gradient(135deg,#DCEDC8,#B2EBF2);}
-.fill-5{background:linear-gradient(135deg,#FFE0B2,#FFCCBC);}
-
-.carousel-dots{display:flex;justify-content:center;gap:6px;padding:4px 0 12px;}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--c-border);cursor:pointer;transition:all 0.2s;}
-.dot.active{width:20px;border-radius:4px;background:var(--c-grape);}
-
-/* ─── Stats Row ─── */
-.stats-row{display:flex;gap:10px;padding:4px 20px 20px;}
-.stat-card{
-  flex:1;background:var(--c-card);border-radius:var(--radius-sm);
-  padding:14px 12px;text-align:center;
-  border:1.5px solid var(--c-border);
-  transition:background 0.3s;
-}
-.stat-num{font-family:'Fredoka One',cursive;font-size:28px;line-height:1;margin-bottom:4px;}
-.stat-label{font-size:11px;font-weight:700;color:var(--c-muted);text-transform:uppercase;letter-spacing:0.5px;}
-.num-coral{color:var(--c-coral);}
-.num-grape{color:var(--c-grape);}
-.num-sky{color:var(--c-sky);}
-
-/* ─── Upload Strip ─── */
-.upload-strip{
-  margin:0 20px 24px;
-  background:var(--c-grape);border-radius:var(--radius);
-  padding:18px 20px;display:flex;align-items:center;gap:14px;
-  cursor:pointer;box-shadow:var(--shadow-grape);
-  transition:transform 0.15s;
-}
-.upload-strip:hover{transform:translateY(-1px);}
-.upload-icon{
-  width:48px;height:48px;border-radius:50%;
-  background:rgba(255,255,255,0.2);
-  display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;
-}
-.upload-text .ut-title{font-family:'Fredoka One',cursive;font-size:16px;color:#fff;margin-bottom:2px;}
-.upload-text .ut-sub{font-size:12px;color:rgba(255,255,255,0.75);font-weight:600;}
-.upload-arrow{
-  margin-left:auto;width:32px;height:32px;border-radius:50%;
-  background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;
-}
-.upload-arrow svg{width:16px;height:16px;stroke:#fff;stroke-width:2.5;fill:none;}
-
-/* ─── Timeline Grid ─── */
-.timeline-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 20px 32px;}
-.timeline-item{
-  background:var(--c-card);border-radius:var(--radius-sm);overflow:hidden;
-  border:1.5px solid var(--c-border);cursor:pointer;
-  transition:transform 0.18s,background 0.3s;
-}
-.timeline-item:hover{transform:translateY(-2px);}
-.ti-thumb{height:100px;display:flex;align-items:center;justify-content:center;font-size:36px;}
-.ti-info{padding:8px 10px 10px;}
-.ti-era{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:3px;}
-.ti-name{font-family:'Fredoka One',cursive;font-size:13px;color:var(--c-text);line-height:1.3;}
-.era-pre{color:var(--c-coral);}
-.era-k{color:var(--c-grape);}
-.era-1st{color:var(--c-sky);}
-.era-2nd{color:#F4A261;}
-
-/* ─── Bottom Nav ─── */
-.bottom-nav{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:430px;
-  background:var(--c-card);
-  border-top:1.5px solid var(--c-border);
-  display:flex;padding:10px 0 14px;z-index:40;
-  transition:background 0.3s;
-}
-.nav-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
-  cursor:pointer;opacity:0.42;transition:opacity 0.15s;
-  font-size:10px;font-weight:700;color:var(--c-text);letter-spacing:0.3px;text-transform:uppercase;
-}
-.nav-item.active{opacity:1;}
-.nav-item.active svg{stroke:var(--c-grape);}
-.nav-item svg{width:22px;height:22px;stroke:var(--c-text);stroke-width:2;fill:none;}
-.nav-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;}
 .fab{
-  width:52px;height:52px;border-radius:50%;background:var(--c-coral);
+  width:50px;height:50px;border-radius:50%;
+  background:var(--coral);border:none;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:var(--shadow-fab);margin-top:-18px;
-  transition:transform 0.15s;border:none;cursor:pointer;
+  box-shadow:var(--shcoral);margin-top:-16px;
+  transition:transform .15s;
 }
-.fab:hover{transform:scale(1.08);}
+.fab:hover{transform:scale(1.07);}
 .fab svg{width:24px;height:24px;stroke:#fff;stroke-width:2.5;fill:none;}
 
-/* ═══════════════════════════════════════════
-   SETTINGS MODAL
-═══════════════════════════════════════════ */
-.modal-overlay{
-  display:none;position:fixed;inset:0;
-  background:var(--c-overlay);z-index:200;
-  align-items:flex-end;justify-content:center;
-  backdrop-filter:blur(3px);
-  animation:fadeIn 0.2s ease both;
-}
-.modal-overlay.open{display:flex;}
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-.modal-sheet{
-  width:100%;max-width:430px;
-  background:var(--c-card);
-  border-radius:28px 28px 0 0;
-  padding:0 0 40px;
-  max-height:92vh;overflow-y:auto;
-  animation:slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1) both;
-  scrollbar-width:thin;
-  transition:background 0.3s;
-}
-@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
-.modal-handle{
-  width:40px;height:4px;border-radius:2px;
-  background:var(--c-border);margin:14px auto 0;
-}
-.modal-top{
-  display:flex;align-items:center;padding:20px 24px 0;
-  gap:12px;
-}
-.modal-title{font-family:'Fredoka One',cursive;font-size:22px;color:var(--c-text);}
-.modal-close{
-  margin-left:auto;width:34px;height:34px;border-radius:50%;
-  background:var(--c-softgray);border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:background 0.15s;
-}
-.modal-close:hover{background:var(--c-border);}
-.modal-close svg{width:14px;height:14px;stroke:var(--c-text);stroke-width:2.5;fill:none;}
-
-.settings-section{padding:20px 24px 0;}
-.settings-label{
-  font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;
-  color:var(--c-muted);margin-bottom:12px;
-}
-.setting-row{
+/* ══════════════════════════════════════
+   TOP NAV
+══════════════════════════════════════ */
+.top-bar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:14px 0;
-  border-bottom:1px solid var(--c-border);
+  padding:18px 20px 12px;
+  background:var(--bg);
+  border-bottom:1.5px solid var(--border);
+  transition:background .3s;flex-shrink:0;
+  position:relative;z-index:20;
 }
-.setting-row:last-child{border-bottom:none;}
-.setting-info .s-name{font-size:15px;font-weight:700;color:var(--c-text);}
-.setting-info .s-desc{font-size:12px;color:var(--c-text2);margin-top:2px;max-width:220px;}
-
-/* Toggle */
-.toggle-wrap{position:relative;width:48px;height:26px;flex-shrink:0;}
-.toggle-wrap input{opacity:0;width:0;height:0;position:absolute;}
-.toggle-track{
-  position:absolute;inset:0;
-  background:var(--c-border);border-radius:13px;
-  cursor:pointer;transition:background 0.22s;
+.logo{
+  font-family:'Fredoka One',cursive;font-size:22px;
+  color:var(--accent);display:flex;align-items:center;gap:6px;
 }
-.toggle-thumb{
-  position:absolute;top:3px;left:3px;
-  width:20px;height:20px;border-radius:50%;
-  background:#fff;transition:transform 0.22s cubic-bezier(0.34,1.2,0.64,1);
-  pointer-events:none;
-}
-.toggle-wrap input:checked ~ .toggle-track{background:var(--c-grape);}
-.toggle-wrap input:checked ~ .toggle-thumb{transform:translateX(22px);}
-
-/* Select */
-.setting-select{
-  background:var(--c-input);border:1.5px solid var(--c-inputborder);
-  color:var(--c-text);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
-  padding:7px 12px;border-radius:var(--radius-xs);cursor:pointer;
-  outline:none;transition:border-color 0.15s;
-}
-.setting-select:focus{border-color:var(--c-grape);}
-
-/* Kids list in settings */
-.kids-list{display:flex;flex-direction:column;gap:10px;}
-.kid-row{
-  display:flex;align-items:center;gap:12px;
-  background:var(--c-softgray);
-  border-radius:var(--radius-sm);padding:12px 14px;
-  border:1.5px solid var(--c-border);
-}
-.kid-av{
-  width:40px;height:40px;border-radius:50%;
-  font-size:16px;font-weight:900;
+.logo-dot{width:9px;height:9px;border-radius:50%;background:var(--coral);}
+.top-actions{display:flex;gap:10px;}
+.icon-btn{
+  width:38px;height:38px;border-radius:50%;border:none;
   display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
+  transition:transform .15s,background .15s;
 }
-.kid-info .k-name{font-size:15px;font-weight:800;color:var(--c-text);}
-.kid-info .k-meta{font-size:12px;color:var(--c-text2);margin-top:1px;}
-.kid-edit{
-  margin-left:auto;background:var(--c-card);
-  border:1.5px solid var(--c-border);
-  border-radius:var(--radius-xs);padding:6px 12px;
-  font-size:12px;font-weight:700;color:var(--c-text2);cursor:pointer;
-  transition:background 0.15s;
+.icon-btn:hover{transform:scale(1.07);}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;}
+.icon-btn.settings-btn{background:var(--soft);color:var(--text);}
+.icon-btn.add-btn{background:var(--coral);color:#fff;box-shadow:var(--shcoral);}
+.icon-btn.add-btn svg{stroke:#fff;stroke-width:2.5;}
+.back-btn{
+  width:36px;height:36px;border-radius:50%;background:var(--soft);border:none;
+  display:flex;align-items:center;justify-content:center;color:var(--text);
+  transition:background .15s;
 }
-.kid-edit:hover{background:var(--c-border);}
+.back-btn:hover{background:var(--border2);}
+.back-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.5;fill:none;}
 
-.add-kid-btn{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  border:2px dashed var(--c-inputborder);
-  border-radius:var(--radius-sm);padding:12px;
-  cursor:pointer;color:var(--c-grape);font-weight:700;font-size:13px;
-  background:none;width:100%;
-  transition:border-color 0.15s,background 0.15s;
+/* ══════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════ */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:14px 24px;border-radius:50px;border:none;font-size:15px;font-weight:700;
+  transition:transform .15s,box-shadow .15s;cursor:pointer;
 }
-.add-kid-btn:hover{border-color:var(--c-grape);background:rgba(155,93,229,0.05);}
-.add-kid-btn svg{width:16px;height:16px;stroke:var(--c-grape);stroke-width:2.5;fill:none;}
+.btn:hover{transform:translateY(-1px);}
+.btn:active{transform:scale(.98);}
+.btn-accent{background:var(--accent);color:#fff;box-shadow:var(--sha);}
+.btn-soft{background:var(--soft);color:var(--text2);}
+.btn-danger{background:rgba(255,107,107,.1);color:var(--coral);border:1.5px solid rgba(255,107,107,.3);}
+.btn-danger:hover{background:rgba(255,107,107,.18);}
+.btn-outline{background:none;border:1.5px dashed var(--inpborder);color:var(--accent);}
+.btn-outline:hover{background:rgba(155,93,229,.05);border-color:var(--accent);}
+.btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.2;fill:none;}
+.btn-full{width:100%;}
 
-/* Danger zone */
-.danger-btn{
-  width:100%;padding:13px;border-radius:var(--radius-sm);
-  background:none;border:1.5px solid rgba(255,107,107,0.4);
-  color:var(--c-coral);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;
-  cursor:pointer;transition:all 0.15s;margin-bottom:10px;
+/* ══════════════════════════════════════
+   FORM ELEMENTS
+══════════════════════════════════════ */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.field label{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;}
+.field input,.field select{
+  background:var(--inp);border:1.5px solid var(--inpborder);
+  color:var(--text);padding:11px 14px;border-radius:var(--rs);
+  font-size:14px;font-weight:600;outline:none;
+  transition:border-color .15s;width:100%;
 }
-.danger-btn:hover{background:rgba(255,107,107,0.08);border-color:var(--c-coral);}
-.modal-version{text-align:center;font-size:11px;color:var(--c-muted);padding-top:8px;}
+.field input:focus,.field select:focus{border-color:var(--accent);}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239990AA' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;}
 
-/* Back to Intro btn in settings */
-.back-intro-btn{
-  width:100%;padding:13px;border-radius:var(--radius-sm);
-  background:var(--c-softgray);border:1.5px solid var(--c-border);
-  color:var(--c-text2);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
-  cursor:pointer;transition:all 0.15s;
-  display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:10px;
-}
-.back-intro-btn:hover{background:var(--c-border);color:var(--c-text);}
-.back-intro-btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:2.5;fill:none;}
+/* ══════════════════════════════════════
+   TOGGLE
+══════════════════════════════════════ */
+.tog{position:relative;width:46px;height:25px;flex-shrink:0;display:inline-block;}
+.tog input{opacity:0;width:0;height:0;position:absolute;}
+.tog-track{position:absolute;inset:0;background:var(--border2);border-radius:13px;cursor:pointer;transition:background .22s;}
+.tog-thumb{position:absolute;top:2.5px;left:2.5px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .22s cubic-bezier(.34,1.2,.64,1);pointer-events:none;}
+.tog input:checked~.tog-track{background:var(--accent);}
+.tog input:checked~.tog-thumb{transform:translateX(21px);}
 
-/* ═══════════════════════════════════════════
-   PRINT / SHARE MODAL
-═══════════════════════════════════════════ */
-.print-modal-overlay{
-  display:none;position:fixed;inset:0;
-  background:var(--c-overlay);z-index:300;
-  align-items:center;justify-content:center;
-  backdrop-filter:blur(4px);
-}
-.print-modal-overlay.open{display:flex;}
-.print-modal{
-  width:calc(100% - 32px);max-width:380px;
-  background:var(--c-card);border-radius:var(--radius);
-  padding:28px 24px 24px;
-  animation:scaleIn 0.3s cubic-bezier(0.34,1.2,0.64,1) both;
-  transition:background 0.3s;
-}
-@keyframes scaleIn{from{transform:scale(0.88);opacity:0;}to{transform:scale(1);opacity:1;}}
-.pm-title{font-family:'Fredoka One',cursive;font-size:20px;color:var(--c-text);margin-bottom:6px;}
-.pm-sub{font-size:13px;color:var(--c-text2);margin-bottom:20px;}
-.print-preview{
-  border-radius:var(--radius-sm);overflow:hidden;
-  border:2px solid var(--c-border);margin-bottom:20px;
-  background:#fff;
-}
-.print-frame{
-  padding:20px;background:#fff;
-  display:flex;flex-direction:column;align-items:center;
-}
-.print-art{
-  width:100%;max-width:260px;height:180px;
-  border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:72px;margin-bottom:14px;
-}
-.print-name{
-  font-family:'Fredoka One',cursive;
-  font-size:22px;color:#2C2C54;text-align:center;margin-bottom:6px;
-}
-.print-badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:8px;}
-.print-badge{
-  font-size:11px;font-weight:800;padding:3px 10px;
-  border-radius:50px;
-}
-.print-watermark{font-size:10px;font-weight:700;color:#9B5DE5;letter-spacing:0.8px;margin-top:6px;}
-.pm-actions{display:flex;gap:10px;}
-.pm-btn{
-  flex:1;padding:13px;border-radius:var(--radius-sm);
-  font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;
-  cursor:pointer;border:none;transition:all 0.15s;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-}
-.pm-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;}
-.pm-btn.cancel{background:var(--c-softgray);color:var(--c-text2);}
-.pm-btn.cancel:hover{background:var(--c-border);}
-.pm-btn.download{background:var(--c-grape);color:#fff;box-shadow:var(--shadow-grape);}
-.pm-btn.download:hover{transform:translateY(-1px);}
+/* ══════════════════════════════════════
+   CARDS & ROWS
+══════════════════════════════════════ */
+.card{background:var(--card);border-radius:var(--r);border:1.5px solid var(--border);padding:16px;transition:background .3s;}
+.card-sm{background:var(--card);border-radius:var(--rs);border:1.5px solid var(--border);padding:14px;transition:background .3s;}
+.row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);}
+.row:last-child{border-bottom:none;}
+.row-info .rn{font-size:15px;font-weight:700;color:var(--text);}
+.row-info .rd{font-size:12px;color:var(--text2);margin-top:2px;max-width:230px;line-height:1.45;}
 
-/* ═══════════════════════════════════════════
+/* ══════════════════════════════════════
+   SECTION HEADER
+══════════════════════════════════════ */
+.sec{display:flex;align-items:baseline;justify-content:space-between;padding:18px 20px 8px;}
+.sec-t{font-family:'Fredoka One',cursive;font-size:18px;color:var(--text);}
+.sec-link{font-size:12px;font-weight:700;color:var(--sky);background:none;border:none;}
+
+/* ══════════════════════════════════════
+   PILLS
+══════════════════════════════════════ */
+.pill{font-size:10px;font-weight:700;padding:2px 9px;border-radius:50px;line-height:1.6;}
+.pill-age{background:#FFF0D6;color:#8A5800;}
+.pill-grade{background:#E8F8F7;color:#0A5C52;}
+.pill-date{background:#F0EBFF;color:#5B3FA0;}
+[data-theme=dark] .pill-age{background:#3D2E00;color:#FFD166;}
+[data-theme=dark] .pill-grade{background:#0A2E28;color:#4ECDC4;}
+[data-theme=dark] .pill-date{background:#200A4A;color:#C499FF;}
+
+/* ══════════════════════════════════════
+   AVATAR
+══════════════════════════════════════ */
+.av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;flex-shrink:0;}
+.av-sm{width:28px;height:28px;font-size:11px;}
+.av-lg{width:56px;height:56px;font-size:22px;}
+
+/* ══════════════════════════════════════
    TOASTER
-═══════════════════════════════════════════ */
-.toaster-container{
-  position:fixed;top:24px;left:50%;transform:translateX(-50%);
-  z-index:500;display:flex;flex-direction:column;align-items:center;gap:10px;
-  width:calc(100% - 32px);max-width:380px;pointer-events:none;
+══════════════════════════════════════ */
+#toaster{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  z-index:9999;display:flex;flex-direction:column;gap:9px;
+  width:calc(100% - 32px);max-width:390px;pointer-events:none;
 }
 .toast{
-  display:flex;align-items:center;gap:10px;
-  padding:12px 16px;border-radius:var(--radius-sm);
-  background:var(--c-toastbg);color:var(--c-toasttext);
-  font-size:14px;font-weight:700;
-  box-shadow:0 8px 24px rgba(0,0,0,0.25);
+  display:flex;align-items:flex-start;gap:10px;
+  padding:12px 14px;border-radius:var(--rs);
+  background:var(--tbg);color:var(--ttxt);
+  font-size:13px;font-weight:700;box-shadow:0 8px 28px rgba(0,0,0,.22);
   pointer-events:all;width:100%;
-  animation:toastIn 0.3s cubic-bezier(0.34,1.2,0.64,1) both;
-  transition:all 0.25s ease;
+  animation:tIn .28s cubic-bezier(.34,1.2,.64,1) both;
 }
-.toast.out{animation:toastOut 0.25s ease both;}
-@keyframes toastIn{from{transform:translateY(-16px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-@keyframes toastOut{to{transform:translateY(-16px);opacity:0;}}
-.toast-icon{font-size:18px;flex-shrink:0;}
+.toast.out{animation:tOut .22s ease both;}
+@keyframes tIn{from{transform:translateY(-14px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes tOut{to{transform:translateY(-14px);opacity:0;}}
+.toast-ico{font-size:18px;margin-top:1px;flex-shrink:0;}
 .toast-body{flex:1;}
 .toast-title{font-size:13px;font-weight:800;}
-.toast-msg{font-size:12px;font-weight:600;opacity:0.8;margin-top:1px;}
-.toast-close{
-  background:none;border:none;cursor:pointer;
-  color:var(--c-toasttext);opacity:0.6;font-size:16px;padding:2px;
-  flex-shrink:0;
-}
-.toast-close:hover{opacity:1;}
-.toast.success .toast-icon::before{content:'✅';}
-.toast.warning .toast-icon::before{content:'⚠️';}
-.toast.info .toast-icon::before{content:'💡';}
-.toast.error .toast-icon::before{content:'❌';}
-.toast.art .toast-icon::before{content:'🎨';}
+.toast-msg{font-size:11px;font-weight:600;opacity:.78;margin-top:1px;line-height:1.4;}
+.toast-x{background:none;border:none;color:var(--ttxt);opacity:.55;font-size:15px;padding:2px;margin-left:2px;cursor:pointer;flex-shrink:0;}
+.toast-x:hover{opacity:1;}
 
-/* ═══════════════════════════════════════════
-   BEFOREUNLOAD MODAL
-═══════════════════════════════════════════ */
-.beforeunload-overlay{
-  display:none;position:fixed;inset:0;
-  background:var(--c-overlay);z-index:600;
-  align-items:center;justify-content:center;
-  backdrop-filter:blur(4px);
+/* ══════════════════════════════════════
+   MODAL / SHEET
+══════════════════════════════════════ */
+.overlay{
+  display:none;position:fixed;inset:0;background:var(--overlay);
+  z-index:200;backdrop-filter:blur(4px);
+  animation:oFade .2s ease both;
 }
-.beforeunload-overlay.open{display:flex;}
-.beforeunload-card{
-  width:calc(100% - 32px);max-width:340px;
-  background:var(--c-card);border-radius:var(--radius);
-  padding:28px 24px 20px;
-  animation:scaleIn 0.3s cubic-bezier(0.34,1.2,0.64,1) both;
-  text-align:center;transition:background 0.3s;
+.overlay.open{display:flex;}
+@keyframes oFade{from{opacity:0;}to{opacity:1;}}
+.sheet{
+  width:100%;max-width:430px;margin:auto auto 0;
+  background:var(--card);border-radius:28px 28px 0 0;
+  max-height:92dvh;overflow-y:auto;
+  animation:shUp .32s cubic-bezier(.34,1.2,.64,1) both;
+  transition:background .3s;
 }
-.bu-emoji{font-size:44px;margin-bottom:12px;}
-.bu-title{font-family:'Fredoka One',cursive;font-size:22px;color:var(--c-text);margin-bottom:8px;}
-.bu-msg{font-size:14px;color:var(--c-text2);line-height:1.5;margin-bottom:22px;}
-.bu-actions{display:flex;flex-direction:column;gap:10px;}
-.bu-btn{
-  width:100%;padding:14px;border-radius:var(--radius-sm);
-  font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;
-  cursor:pointer;border:none;transition:all 0.15s;
-}
-.bu-btn.stay{background:var(--c-grape);color:#fff;box-shadow:var(--shadow-grape);}
-.bu-btn.stay:hover{transform:translateY(-1px);}
-.bu-btn.leave{background:var(--c-softgray);color:var(--c-text2);}
-.bu-btn.leave:hover{background:var(--c-border);}
+@keyframes shUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.sheet-handle{width:38px;height:4px;border-radius:2px;background:var(--border2);margin:13px auto 0;}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:18px 22px 0;}
+.sheet-title{font-family:'Fredoka One',cursive;font-size:21px;color:var(--text);}
+.sheet-close{margin-left:auto;width:32px;height:32px;border-radius:50%;background:var(--soft);border:none;display:flex;align-items:center;justify-content:center;color:var(--text);transition:background .15s;}
+.sheet-close:hover{background:var(--border2);}
+.sheet-close svg{width:13px;height:13px;stroke:currentColor;stroke-width:2.5;fill:none;}
+.sheet-sec{padding:18px 22px 0;}
+.sheet-sec .caption{margin-bottom:10px;display:block;}
 
-/* ═══════════════════════════════════════════
+/* Center modal */
+.modal-wrap{
+  display:none;position:fixed;inset:0;background:var(--overlay);
+  z-index:300;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);animation:oFade .2s ease both;
+}
+.modal-wrap.open{display:flex;}
+.modal-box{
+  width:calc(100% - 40px);max-width:360px;
+  background:var(--card);border-radius:var(--r);padding:28px 22px 22px;
+  animation:mPop .28s cubic-bezier(.34,1.2,.64,1) both;
+  transition:background .3s;
+}
+@keyframes mPop{from{transform:scale(.86);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal-ico{font-size:44px;text-align:center;margin-bottom:12px;}
+.modal-title{font-family:'Fredoka One',cursive;font-size:21px;text-align:center;color:var(--text);margin-bottom:8px;}
+.modal-msg{font-size:14px;color:var(--text2);text-align:center;line-height:1.55;margin-bottom:22px;}
+.modal-btns{display:flex;flex-direction:column;gap:10px;}
+
+/* ══════════════════════════════════════
+   INTRO SCREEN
+══════════════════════════════════════ */
+#scr-intro{background:var(--bg);z-index:20;}
+.intro-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.intro-track{display:flex;height:100%;transition:transform .42s cubic-bezier(.4,0,.2,1);}
+.intro-slide{min-width:100%;display:flex;flex-direction:column;align-items:center;padding:0 32px 16px;}
+.intro-hero{
+  width:200px;height:200px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:80px;position:relative;margin:32px 0 24px;flex-shrink:0;
+}
+.intro-hero .ibadge{
+  position:absolute;bottom:8px;right:8px;width:42px;height:42px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:20px;border:3px solid var(--bg);
+}
+.s0 .intro-hero{background:linear-gradient(135deg,#FFE0A3,#FFCDD2);}
+.s0 .ibadge{background:var(--grape);}
+.s1 .intro-hero{background:linear-gradient(135deg,#B3E5FC,#C8E6C9);}
+.s1 .ibadge{background:var(--coral);}
+.s2 .intro-hero{background:linear-gradient(135deg,#E1BEE7,#F8BBD0);}
+.s2 .ibadge{background:var(--sky);}
+.s3 .intro-hero{background:linear-gradient(135deg,#FFF9C4,#F0F4C3);}
+.s3 .ibadge{background:var(--sun);}
+.intro-tag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.1px;color:var(--accent);margin-bottom:9px;}
+.intro-h1{font-family:'Fredoka One',cursive;font-size:28px;line-height:1.2;color:var(--text);text-align:center;margin-bottom:12px;}
+.intro-p{font-size:14px;line-height:1.65;color:var(--text2);text-align:center;max-width:310px;}
+.intro-foot{padding:0 32px 36px;display:flex;flex-direction:column;align-items:center;gap:13px;}
+.idots{display:flex;gap:7px;}
+.idot{width:8px;height:8px;border-radius:50%;background:var(--border2);cursor:pointer;transition:all .2s;}
+.idot.active{width:22px;border-radius:4px;background:var(--accent);}
+.intro-logo{font-family:'Fredoka One',cursive;font-size:24px;color:var(--accent);padding:24px 28px 0;display:flex;align-items:center;gap:6px;}
+.intro-skip-btn{position:absolute;top:22px;right:22px;background:var(--soft);border:none;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;padding:6px 14px;border-radius:50px;cursor:pointer;}
+.intro-back-btn{position:absolute;top:22px;left:22px;width:34px;height:34px;background:var(--soft);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.intro-back-btn svg{width:15px;height:15px;stroke:var(--text);stroke-width:2.5;fill:none;}
+
+/* ══════════════════════════════════════
+   GALLERY SCREEN
+══════════════════════════════════════ */
+.child-tabs{display:flex;gap:9px;padding:13px 18px 0;overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
+.child-tabs::-webkit-scrollbar{display:none;}
+.ctab{
+  display:flex;align-items:center;gap:7px;padding:7px 15px;
+  border-radius:50px;background:var(--soft);border:2px solid transparent;
+  font-size:13px;font-weight:700;white-space:nowrap;color:var(--muted);cursor:pointer;
+  transition:all .18s;
+}
+.ctab.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:var(--sha);}
+.ctab-av{width:20px;height:20px;border-radius:50%;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;}
+
+/* Carousel */
+.carousel-wrap{height:288px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0;perspective:900px;}
+.art-card{
+  position:absolute;background:var(--card);border-radius:var(--r);
+  overflow:hidden;border:1.5px solid var(--border);
+  transition:all .38s cubic-bezier(.34,1.2,.64,1);
+  box-shadow:var(--sh);cursor:pointer;
+}
+.art-card.center{width:205px;height:256px;transform:translateX(0) rotateY(0) scale(1);z-index:10;box-shadow:0 14px 42px rgba(44,44,84,.16);}
+.art-card.left{width:165px;height:206px;transform:translateX(-152px) rotateY(20deg) scale(.86);opacity:.42;z-index:5;}
+.art-card.right{width:165px;height:206px;transform:translateX(152px) rotateY(-20deg) scale(.86);opacity:.42;z-index:5;}
+.art-thumb{width:100%;height:calc(100% - 66px);display:flex;align-items:center;justify-content:center;position:relative;}
+.art-thumb-img{width:100%;height:100%;object-fit:cover;}
+.art-thumb-emoji{font-size:56px;}
+.art-fav-btn{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.88);border:none;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;}
+.art-fav-btn:hover{transform:scale(1.2);}
+.art-share-btn{position:absolute;bottom:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.88);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;}
+.art-share-btn:hover{transform:scale(1.15);}
+.art-share-btn svg{width:14px;height:14px;stroke:var(--text);stroke-width:2;fill:none;}
+.art-plaque{padding:8px 11px 10px;background:var(--card);border-top:1.5px solid var(--border);}
+.art-ptitle{font-family:'Fredoka One',cursive;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.art-pmeta{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;}
+.cdots{display:flex;justify-content:center;gap:6px;padding:4px 0 10px;flex-shrink:0;}
+.cdot{width:7px;height:7px;border-radius:50%;background:var(--border2);cursor:pointer;transition:all .2s;}
+.cdot.active{width:20px;border-radius:4px;background:var(--accent);}
+
+/* Stats */
+.stats-row{display:flex;gap:10px;padding:4px 18px 16px;flex-shrink:0;}
+.stat-c{flex:1;background:var(--card);border-radius:var(--rs);padding:13px 10px;text-align:center;border:1.5px solid var(--border);transition:background .3s;}
+.stat-n{font-family:'Fredoka One',cursive;font-size:26px;line-height:1;margin-bottom:3px;}
+
+/* Upload strip */
+.upload-strip{
+  margin:2px 18px 16px;background:var(--accent);border-radius:var(--r);
+  padding:16px 18px;display:flex;align-items:center;gap:13px;
+  cursor:pointer;box-shadow:var(--sha);transition:transform .15s;flex-shrink:0;
+}
+.upload-strip:hover{transform:translateY(-1px);}
+.us-ico{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.us-t{font-family:'Fredoka One',cursive;font-size:15px;color:#fff;margin-bottom:2px;}
+.us-s{font-size:11px;color:rgba(255,255,255,.76);font-weight:600;}
+.us-arr{margin-left:auto;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;}
+.us-arr svg{width:14px;height:14px;stroke:#fff;stroke-width:2.5;fill:none;}
+
+/* Timeline grid */
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:4px 18px 24px;}
+.titem{background:var(--card);border-radius:var(--rs);overflow:hidden;border:1.5px solid var(--border);cursor:pointer;transition:transform .18s,background .3s;}
+.titem:hover{transform:translateY(-2px);}
+.tthumb{height:95px;display:flex;align-items:center;justify-content:center;font-size:34px;}
+.tinfo{padding:8px 10px 10px;}
+.tera{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px;}
+.tname{font-family:'Fredoka One',cursive;font-size:13px;color:var(--text);line-height:1.3;}
+.era-pre{color:var(--coral);}
+.era-k{color:var(--grape);}
+.era-1st{color:var(--sky);}
+.era-2nd{color:#F4A261;}
+
+/* Art fill gradients */
+.g1{background:linear-gradient(135deg,#FFE0A3,#FFCDD2);}
+.g2{background:linear-gradient(135deg,#B3E5FC,#C8E6C9);}
+.g3{background:linear-gradient(135deg,#E1BEE7,#F8BBD0);}
+.g4{background:linear-gradient(135deg,#DCEDC8,#B2EBF2);}
+.g5{background:linear-gradient(135deg,#FFE0B2,#FFCCBC);}
+.g6{background:linear-gradient(135deg,#F8BBD0,#E1BEE7);}
+.g7{background:linear-gradient(135deg,#C8E6C9,#B3E5FC);}
+.g8{background:linear-gradient(135deg,#FFF9C4,#DCEDC8);}
+
+/* ══════════════════════════════════════
+   KIDS SCREEN
+══════════════════════════════════════ */
+#scr-kids .no-kids{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  flex:1;padding:40px 32px;text-align:center;gap:14px;
+}
+.no-kids-ico{font-size:64px;}
+.no-kids-t{font-family:'Fredoka One',cursive;font-size:22px;color:var(--text);}
+.no-kids-d{font-size:14px;color:var(--text2);line-height:1.6;}
+.kid-card{
+  display:flex;align-items:center;gap:13px;
+  background:var(--card);border-radius:var(--rs);
+  padding:14px 15px;border:1.5px solid var(--border);
+  margin:0 18px 10px;cursor:pointer;transition:transform .15s,background .3s;
+}
+.kid-card:hover{transform:translateX(2px);}
+.kid-info .kn{font-size:15px;font-weight:800;color:var(--text);}
+.kid-info .km{font-size:12px;color:var(--text2);margin-top:2px;}
+.kid-card-arrow{margin-left:auto;color:var(--muted);}
+.kid-card-arrow svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;}
+
+/* ══════════════════════════════════════
+   STUDIO / EXHIBIT SCREEN
+══════════════════════════════════════ */
+#scr-studio{background:#080818;}
+#scr-studio .top-bar{background:rgba(8,8,24,0.92);border-color:rgba(155,93,229,.18);backdrop-filter:blur(12px);}
+#scr-studio .logo{color:#EEE8FF;}
+#scr-studio .back-btn{background:rgba(155,93,229,.18);color:#C499FF;border:1px solid rgba(155,93,229,.25);}
+#scr-studio .back-btn:hover{background:rgba(155,93,229,.30);}
+.studio-stage{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;background:#080818;
+}
+.studio-stage::before{
+  content:'';position:absolute;
+  width:360px;height:360px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(155,93,229,.30) 0%,rgba(155,93,229,.10) 52%,transparent 72%);
+  top:50%;left:50%;transform:translate(-50%,-54%);
+  pointer-events:none;
+  animation:glowPulse 4.5s ease-in-out infinite;
+}
+.studio-stage::after{
+  content:'';position:absolute;
+  width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(78,205,196,.13) 0%,transparent 68%);
+  top:25%;left:22%;pointer-events:none;
+  animation:glowPulse 7s ease-in-out infinite reverse;
+}
+@keyframes glowPulse{
+  0%,100%{opacity:.7;transform:translate(-50%,-54%) scale(1);}
+  50%{opacity:1;transform:translate(-50%,-54%) scale(1.09);}
+}
+.museum-frame-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  padding:14px 14px 0;width:100%;position:relative;z-index:2;
+}
+.museum-frame-glow{
+  position:relative;width:calc(100% - 8px);max-width:356px;
+  padding:9px 9px 0;border-radius:24px;
+  background:linear-gradient(155deg,rgba(155,93,229,.20) 0%,rgba(90,40,180,.12) 60%,rgba(78,205,196,.07) 100%);
+  border:1px solid rgba(155,93,229,.38);
+  box-shadow:
+    0 0 0 1px rgba(155,93,229,.14),
+    0 0 44px rgba(155,93,229,.38),
+    0 0 88px rgba(155,93,229,.20),
+    0 36px 72px rgba(0,0,0,.82);
+  animation:framePulse 5s ease-in-out infinite;
+}
+@keyframes framePulse{
+  0%,100%{box-shadow:0 0 0 1px rgba(155,93,229,.14),0 0 44px rgba(155,93,229,.38),0 0 88px rgba(155,93,229,.20),0 36px 72px rgba(0,0,0,.82);}
+  50%{box-shadow:0 0 0 1px rgba(155,93,229,.26),0 0 66px rgba(155,93,229,.55),0 0 120px rgba(155,93,229,.28),0 36px 72px rgba(0,0,0,.82);}
+}
+.museum-frame{
+  position:relative;width:100%;
+  border-radius:16px 16px 0 0;overflow:hidden;
+}
+.museum-art{
+  width:100%;height:250px;background:#0E0E22;
+  display:flex;align-items:center;justify-content:center;
+  font-size:100px;position:relative;
+}
+.museum-art-img{width:100%;height:100%;object-fit:cover;}
+.studio-edit-overlay{
+  position:absolute;inset:0;background:rgba(8,8,24,.52);
+  display:none;align-items:center;justify-content:center;
+  cursor:pointer;backdrop-filter:blur(1px);
+  transition:opacity .2s;
+}
+.studio-edit-overlay.visible{display:flex;}
+.studio-edit-inner{
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  background:rgba(155,93,229,.22);border:1.5px solid rgba(155,93,229,.52);
+  border-radius:16px;padding:15px 28px;
+}
+.studio-edit-inner svg{width:26px;height:26px;stroke:#C499FF;stroke-width:2;fill:none;}
+.studio-edit-inner span{font-size:12px;font-weight:800;color:#C499FF;letter-spacing:.5px;text-transform:uppercase;}
+.museum-plaque{
+  background:linear-gradient(180deg,#130E28 0%,#080818 100%);
+  padding:14px 18px 18px;
+  border-top:1.5px solid rgba(155,93,229,.32);
+  border-radius:0 0 16px 16px;
+}
+.plaque-title{font-family:'Fredoka One',cursive;font-size:22px;color:#EEE8FF;margin-bottom:9px;letter-spacing:.2px;}
+.plaque-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px;}
+.plaque-badge{font-size:11px;font-weight:700;padding:3px 11px;border-radius:50px;}
+.pb-age{background:rgba(255,209,102,.14);color:#FFD166;border:1px solid rgba(255,209,102,.26);}
+.pb-grade{background:rgba(78,205,196,.12);color:#4ECDC4;border:1px solid rgba(78,205,196,.22);}
+.pb-date{background:rgba(155,93,229,.18);color:#C499FF;border:1px solid rgba(155,93,229,.30);}
+.plaque-notes{font-size:12px;color:rgba(238,232,255,.48);line-height:1.55;font-style:italic;margin-top:3px;min-height:16px;}
+.plaque-edit-btn{
+  display:none;align-items:center;gap:5px;margin-top:11px;
+  padding:6px 14px;border-radius:50px;cursor:pointer;width:fit-content;
+  background:rgba(155,93,229,.14);border:1px solid rgba(155,93,229,.32);
+  font-size:11px;font-weight:800;color:#C499FF;letter-spacing:.4px;text-transform:uppercase;
+  transition:background .15s;
+}
+.plaque-edit-btn.visible{display:flex;}
+.plaque-edit-btn:hover{background:rgba(155,93,229,.28);}
+.plaque-edit-btn svg{width:12px;height:12px;stroke:#C499FF;stroke-width:2.5;fill:none;}
+.studio-controls{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 22px 18px;
+  background:rgba(8,8,24,.97);
+  border-top:1px solid rgba(155,93,229,.14);
+  flex-shrink:0;position:relative;z-index:2;
+}
+.studio-nav-btn{
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(155,93,229,.12);border:1.5px solid rgba(155,93,229,.30);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all .18s;
+}
+.studio-nav-btn:hover{background:rgba(155,93,229,.26);border-color:rgba(155,93,229,.55);}
+.studio-nav-btn:active{transform:scale(.93);}
+.studio-nav-btn svg{width:20px;height:20px;stroke:#C499FF;stroke-width:2;fill:none;}
+.studio-center-actions{display:flex;gap:11px;align-items:center;}
+.studio-act-btn{
+  width:44px;height:44px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.11);background:rgba(255,255,255,.05);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all .15s;font-size:18px;
+}
+.studio-act-btn:hover{background:rgba(155,93,229,.22);border-color:rgba(155,93,229,.42);}
+.studio-act-btn:active{transform:scale(.91);}
+.studio-act-btn svg{width:18px;height:18px;stroke:#EEE8FF;stroke-width:2;fill:none;}
+.studio-counter{
+  font-size:11px;font-weight:700;color:rgba(196,153,255,.42);
+  letter-spacing:.6px;text-align:center;padding:4px 0 6px;
+  background:rgba(8,8,24,.97);flex-shrink:0;position:relative;z-index:2;
+}
+
+/* ══════════════════════════════════════
+   UPLOAD / BOX CLEARER SCREEN
+══════════════════════════════════════ */
+#scr-upload .upload-hero{
+  display:flex;flex-direction:column;align-items:center;
+  padding:28px 24px 0;text-align:center;
+}
+.upload-session-bar{
+  margin:14px 18px;background:var(--card);border-radius:var(--rs);
+  border:1.5px solid var(--border);padding:14px 16px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  transition:background .3s;
+}
+.usb-tag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:4px;}
+.usb-val{font-size:14px;font-weight:700;color:var(--text);}
+.usb-sep{width:1px;height:36px;background:var(--border2);}
+.upload-drop{
+  margin:0 18px;border:2px dashed var(--inpborder);border-radius:var(--r);
+  padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;
+  cursor:pointer;transition:border-color .15s,background .15s;
+  background:var(--soft);
+}
+.upload-drop:hover,.upload-drop.drag{border-color:var(--accent);background:rgba(155,93,229,.05);}
+.upload-drop-ico{font-size:48px;margin-bottom:4px;}
+.upload-drop-t{font-family:'Fredoka One',cursive;font-size:17px;color:var(--text);}
+.upload-drop-s{font-size:13px;color:var(--text2);}
+.upload-queue{padding:14px 18px;}
+.uq-item{
+  display:flex;align-items:center;gap:11px;
+  background:var(--card);border-radius:var(--rs);
+  padding:11px 13px;margin-bottom:9px;border:1.5px solid var(--border);
+}
+.uq-thumb{width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.uq-thumb img{width:100%;height:100%;object-fit:cover;border-radius:10px;}
+.uq-info{flex:1;}
+.uq-name{font-size:13px;font-weight:700;color:var(--text);}
+.uq-saved{font-size:11px;color:var(--sky);font-weight:700;margin-top:2px;}
+.uq-del{background:none;border:none;color:var(--coral);font-size:18px;padding:4px;cursor:pointer;}
+
+/* ══════════════════════════════════════
+   SETTINGS SHEET
+══════════════════════════════════════ */
+.settings-nav{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 22px 0;}
+.snav-card{
+  background:var(--soft);border-radius:var(--rs);padding:14px;cursor:pointer;
+  border:1.5px solid var(--border);display:flex;flex-direction:column;gap:4px;
+  transition:background .15s;
+}
+.snav-card:hover{background:var(--border);}
+.snav-ico{font-size:22px;margin-bottom:2px;}
+.snav-t{font-size:13px;font-weight:800;color:var(--text);}
+.snav-d{font-size:11px;color:var(--text2);}
+
+/* ══════════════════════════════════════
+   KID FORM SHEET
+══════════════════════════════════════ */
+#kidFormSheet .emoji-picker{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;}
+.ep-opt{
+  width:42px;height:42px;border-radius:50%;background:var(--soft);
+  border:2px solid transparent;font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.ep-opt.selected{border-color:var(--accent);background:rgba(155,93,229,.1);}
+
+/* ══════════════════════════════════════
+   PRINT FRAME
+══════════════════════════════════════ */
+#printModal .print-preview{border-radius:var(--rs);overflow:hidden;border:2px solid var(--border);margin-bottom:18px;}
+.print-frame-inner{padding:20px;background:#fff;display:flex;flex-direction:column;align-items:center;}
+.pf-art{width:220px;height:160px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.pf-art-img{width:100%;height:100%;object-fit:cover;border-radius:12px;}
+.pf-title{font-family:'Fredoka One',cursive;font-size:20px;color:#2C2C54;text-align:center;margin-bottom:7px;}
+.pf-badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:6px;}
+.pf-wm{font-size:10px;font-weight:700;color:#9B5DE5;letter-spacing:.9px;margin-top:4px;}
+
+/* ══════════════════════════════════════
+   BEFORE UNLOAD MODAL
+══════════════════════════════════════ */
+#buModal{z-index:9000;}
+
+/* ══════════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════════ */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:48px 32px;text-align:center;gap:12px;
+}
+.empty-ico{font-size:56px;}
+.empty-t{font-family:'Fredoka One',cursive;font-size:20px;color:var(--text);}
+.empty-d{font-size:13px;color:var(--text2);line-height:1.6;max-width:260px;}
+
+/* ══════════════════════════════════════
    SCROLLBAR
-═══════════════════════════════════════════ */
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--c-border);border-radius:2px;}
-
+══════════════════════════════════════ */
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
 </head>
 <body>
+<div id="app">
 
-<!-- ══════════════════════════════════════
-     TOASTER CONTAINER
-══════════════════════════════════════ -->
-<div class="toaster-container" id="toaster"></div>
+<!-- ════════════════════════════════════
+     TOASTER
+════════════════════════════════════ -->
+<div id="toaster"></div>
 
-<!-- ══════════════════════════════════════
+<!-- ════════════════════════════════════
      BEFORE-UNLOAD MODAL
-══════════════════════════════════════ -->
-<div class="beforeunload-overlay" id="beforeunloadOverlay">
-  <div class="beforeunload-card">
-    <div class="bu-emoji">🎨</div>
-    <div class="bu-title">Wait — don't go!</div>
-    <div class="bu-msg">You have unsaved masterpieces here. Leo's and Mia's artwork collection will stay right here when you come back.</div>
-    <div class="bu-actions">
-      <button class="bu-btn stay" id="buStay">Stay & Keep Creating</button>
-      <button class="bu-btn leave" id="buLeave">Leave Anyway</button>
+════════════════════════════════════ -->
+<div class="modal-wrap" id="buModal">
+  <div class="modal-box">
+    <div class="modal-ico">🎨</div>
+    <div class="modal-title">Hold on — don't leave!</div>
+    <div class="modal-msg">Your gallery lives right here. Everything is saved locally — come back anytime and your kids' artwork will be waiting.</div>
+    <div class="modal-btns">
+      <button class="btn btn-accent btn-full" id="buStay">Stay & Keep Creating</button>
+      <button class="btn btn-soft btn-full" id="buLeave">Leave Anyway</button>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
+<!-- ════════════════════════════════════
      INTRO SCREEN
-══════════════════════════════════════ -->
-<div id="screen-intro" class="screen active">
-  <div class="intro-logo">
-    <span class="logo-dot"></span>LittlePicasso
+════════════════════════════════════ -->
+<div class="screen right" id="scr-intro">
+  <div style="position:relative;flex-shrink:0;">
+    <div class="intro-logo"><span class="logo-dot"></span>CanvasKeep</div>
+    <button class="intro-back-btn" id="iBackBtn" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button class="intro-skip-btn" id="iSkipBtn" style="display:none">Skip</button>
   </div>
-  <button class="intro-skip" id="introSkipBtn" style="display:none">Skip</button>
-  <button class="intro-back-btn" id="introBackBtn" style="display:none">
-    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-  </button>
-
-  <div class="intro-viewport">
-    <div class="intro-slides-track" id="introTrack">
-
-      <!-- Slide 1 -->
-      <div class="intro-slide slide-1">
-        <div class="intro-hero">
-          <div class="hero-art">🎨<span class="badge">✨</span></div>
-        </div>
-        <div class="intro-tag">Welcome to LittlePicasso</div>
-        <h1 class="intro-h1">Every scribble tells a story worth keeping</h1>
-        <p class="intro-p">Your child's artwork is a window into their world. We help you preserve every crayon masterpiece — automatically dated, labeled by grade, and beautiful forever.</p>
+  <div class="intro-wrap">
+    <div class="intro-track" id="iTrack">
+      <div class="intro-slide s0">
+        <div class="intro-hero">🎨<span class="ibadge">✨</span></div>
+        <div class="intro-tag">Welcome to CanvasKeep</div>
+        <h1 class="intro-h1">Every scribble deserves a forever home</h1>
+        <p class="intro-p">Your child's artwork is a window into their world. We help you preserve every crayon masterpiece — auto-dated, labeled by grade, and beautiful forever.</p>
       </div>
-
-      <!-- Slide 2 -->
-      <div class="intro-slide slide-2">
-        <div class="intro-hero">
-          <div class="hero-art">📸<span class="badge">📦</span></div>
-        </div>
+      <div class="intro-slide s1">
+        <div class="intro-hero">📸<span class="ibadge">📦</span></div>
         <div class="intro-tag">Box Clearer Mode</div>
         <h1 class="intro-h1">Clear years of art boxes in one afternoon</h1>
-        <p class="intro-p">Set a date, snap, crop, save — and the camera reopens instantly. No typing, no fuss. One sitting to digitize an entire childhood.</p>
+        <p class="intro-p">Set a date, snap, crop, save — camera reopens instantly. No typing, no fuss. One sitting to digitize an entire childhood.</p>
       </div>
-
-      <!-- Slide 3 -->
-      <div class="intro-slide slide-3">
-        <div class="intro-hero">
-          <div class="hero-art">🏛️<span class="badge">⭐</span></div>
-        </div>
-        <div class="intro-tag">Smart Timeline</div>
-        <h1 class="intro-h1">From Preschool squiggles to 2nd Grade portraits</h1>
-        <p class="intro-p">Age and grade are calculated automatically. Watch your child's style evolve — every piece stamped with exactly how old they were and what grade they were in.</p>
+      <div class="intro-slide s2">
+        <div class="intro-hero">🏛️<span class="ibadge">⭐</span></div>
+        <div class="intro-tag">Museum Studio</div>
+        <h1 class="intro-h1">A private museum for your family's little Picasso</h1>
+        <p class="intro-p">View any piece in fullscreen museum mode with a glowing plaque showing age and grade — exactly when they made it.</p>
       </div>
-
-      <!-- Slide 4 -->
-      <div class="intro-slide slide-4">
-        <div class="intro-hero">
-          <div class="hero-art">📺<span class="badge">🏠</span></div>
-        </div>
-        <div class="intro-tag">Art TV Mode</div>
-        <h1 class="intro-h1">Turn your TV into a rotating gallery wall</h1>
-        <p class="intro-p">Cast your favorite pieces straight to your TV or Home Assistant dashboard. A living museum of your child — no frame required.</p>
+      <div class="intro-slide s3">
+        <div class="intro-hero">📺<span class="ibadge">🏠</span></div>
+        <div class="intro-tag">Always Safe</div>
+        <h1 class="intro-h1">Export, backup, and share with confidence</h1>
+        <p class="intro-p">Export to JSON, save to Google Drive, or download a PNG to share or print. Your data is always yours — stored locally, backed up your way.</p>
       </div>
-
     </div>
   </div>
-
-  <div class="intro-footer">
-    <div class="intro-dots" id="introDots">
-      <div class="intro-dot active" data-idx="0"></div>
-      <div class="intro-dot" data-idx="1"></div>
-      <div class="intro-dot" data-idx="2"></div>
-      <div class="intro-dot" data-idx="3"></div>
+  <div class="intro-foot">
+    <div class="idots" id="iDots">
+      <div class="idot active" data-i="0"></div>
+      <div class="idot" data-i="1"></div>
+      <div class="idot" data-i="2"></div>
+      <div class="idot" data-i="3"></div>
     </div>
-    <button class="btn-primary" id="introCTA">Get Started →</button>
-    <button class="btn-secondary" id="introSecondary">Already have an account? Sign in</button>
+    <button class="btn btn-accent btn-full" id="iCTA" style="max-width:340px">Get Started →</button>
+    <button class="btn btn-soft" id="iSecondary" style="font-size:13px">Already set up? Import my backup</button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     MAIN APP SCREEN
-══════════════════════════════════════ -->
-<div id="screen-app" class="screen">
-
-  <!-- Top Nav -->
-  <nav class="top-nav">
-    <div class="logo">
-      <span class="logo-dot"></span>LittlePicasso
-    </div>
-    <div class="nav-actions">
-      <button class="nav-btn add" id="addArtBtn" title="Add artwork">
-        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </button>
-      <button class="nav-btn settings" id="settingsBtn" title="Settings">
+<!-- ════════════════════════════════════
+     GALLERY SCREEN
+════════════════════════════════════ -->
+<div class="screen right" id="scr-gallery">
+  <div class="top-bar">
+    <div class="logo"><span class="logo-dot"></span>CanvasKeep</div>
+    <div class="top-actions">
+      <button class="icon-btn settings-btn" id="gallerySettingsBtn" title="Settings">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       </button>
-    </div>
-  </nav>
-
-  <!-- Child Tabs -->
-  <div class="child-tabs">
-    <div class="child-chip active" data-kid="leo">
-      <div class="chip-av av-leo">L</div>Leo
-    </div>
-    <div class="child-chip" data-kid="mia">
-      <div class="chip-av av-mia">M</div>Mia
-    </div>
-    <div class="child-chip" data-kid="all">
-      <div class="chip-av av-all">✦</div>All Kids
-    </div>
-  </div>
-
-  <!-- Studio -->
-  <div class="sec-head">
-    <span class="sec-title" id="studioTitle">🖼️ Leo's Studio</span>
-    <button class="sec-link">View all →</button>
-  </div>
-
-  <div class="carousel-area" id="carousel">
-    <div class="art-card left" id="card-left"></div>
-    <div class="art-card center" id="card-center">
-      <button class="art-fav" id="favBtn" title="Toggle favorite">♡</button>
-    </div>
-    <div class="art-card right" id="card-right"></div>
-  </div>
-  <div class="carousel-dots" id="carouselDots"></div>
-
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-num num-coral" id="statArt">47</div><div class="stat-label">Artworks</div></div>
-    <div class="stat-card"><div class="stat-num num-grape" id="statFav">12</div><div class="stat-label">Favorites</div></div>
-    <div class="stat-card"><div class="stat-num num-sky" id="statYrs">6</div><div class="stat-label">Yrs of Art</div></div>
-  </div>
-
-  <!-- Upload Strip -->
-  <div class="upload-strip" id="uploadStrip">
-    <div class="upload-icon">📸</div>
-    <div class="upload-text">
-      <div class="ut-title">Box Clearer Mode</div>
-      <div class="ut-sub">Snap · Crop · Save · Repeat</div>
-    </div>
-    <div class="upload-arrow">
-      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-    </div>
-  </div>
-
-  <!-- Timeline -->
-  <div class="sec-head">
-    <span class="sec-title">📅 Timeline</span>
-    <button class="sec-link">Filter →</button>
-  </div>
-  <div class="timeline-grid" id="timelineGrid"></div>
-
-  <!-- Bottom Nav -->
-  <nav class="bottom-nav">
-    <div class="nav-item" onclick="showToast('info','Home','Coming soon in the next update!',2800)">
-      <svg viewBox="0 0 24 24"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/><path d="M3 12v9h18v-9"/></svg>
-      Home
-    </div>
-    <div class="nav-item active">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-      Gallery
-    </div>
-    <div class="nav-center">
-      <button class="fab" id="fabBtn">
+      <button class="icon-btn add-btn" id="galleryAddBtn" title="Add artwork">
         <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
     </div>
-    <div class="nav-item" onclick="showToast('info','Kids','Manage your kids profiles in Settings ⚙️',2800)">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-      Kids
+  </div>
+  <div class="scr-body padnav" id="galleryBody">
+    <!-- dynamic -->
+  </div>
+  <nav class="bot-nav" id="galleryNav">
+    <button class="bnav-item active" data-screen="gallery">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Gallery
+    </button>
+    <button class="bnav-item" data-screen="studio">
+      <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M8 6V4a2 2 0 014 0v2M16 6V4a2 2 0 00-4 0v2"/><path d="M12 12v4M10 14h4"/></svg>Studio
+    </button>
+    <div class="bnav-fab">
+      <button class="fab" id="galleryFab">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
     </div>
-    <div class="nav-item" onclick="showToast('info','Cast Mode','Connect your TV in Settings → Cast & Display',2800)">
-      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M17 2l5 5M7 2l-5 5M12 12v6M9 18h6"/></svg>
-      Cast
-    </div>
+    <button class="bnav-item" data-screen="kids">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 21c0-4 3.1-7 7-7s7 3 7 7"/><path d="M17 13c2.5 0 5 1.5 5 5"/></svg>Kids
+    </button>
+    <button class="bnav-item" data-screen="upload">
+      <svg viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1115.71 8h1.79a4.5 4.5 0 012.5 8.242"/><path d="M12 12v9M8 17l4-4 4 4"/></svg>Upload
+    </button>
   </nav>
 </div>
 
-<!-- ══════════════════════════════════════
-     SETTINGS MODAL
-══════════════════════════════════════ -->
-<div class="modal-overlay" id="settingsOverlay">
-  <div class="modal-sheet" id="settingsSheet">
-    <div class="modal-handle"></div>
-    <div class="modal-top">
-      <span style="font-size:22px">⚙️</span>
-      <div class="modal-title">Settings</div>
-      <button class="modal-close" id="settingsClose">
+<!-- ════════════════════════════════════
+     KIDS SCREEN
+════════════════════════════════════ -->
+<div class="screen right" id="scr-kids">
+  <div class="top-bar">
+    <div class="logo"><span class="logo-dot"></span>Kids</div>
+    <div class="top-actions">
+      <button class="icon-btn settings-btn" id="kidsSettingsBtn" title="Settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+      <button class="icon-btn add-btn" id="addKidBtn" title="Add child">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="scr-body padnav" id="kidsBody" style="padding-top:14px"></div>
+  <nav class="bot-nav">
+    <button class="bnav-item" data-screen="gallery">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Gallery
+    </button>
+    <button class="bnav-item" data-screen="studio">
+      <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M8 6V4a2 2 0 014 0v2M16 6V4a2 2 0 00-4 0v2"/><path d="M12 12v4M10 14h4"/></svg>Studio
+    </button>
+    <div class="bnav-fab">
+      <button class="fab" onclick="navigate('upload')">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+    <button class="bnav-item active" data-screen="kids">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 21c0-4 3.1-7 7-7s7 3 7 7"/><path d="M17 13c2.5 0 5 1.5 5 5"/></svg>Kids
+    </button>
+    <button class="bnav-item" data-screen="upload">
+      <svg viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1115.71 8h1.79a4.5 4.5 0 012.5 8.242"/><path d="M12 12v9M8 17l4-4 4 4"/></svg>Upload
+    </button>
+  </nav>
+</div>
+
+<!-- ════════════════════════════════════
+     STUDIO SCREEN
+════════════════════════════════════ -->
+<div class="screen right" id="scr-studio">
+  <div class="top-bar" style="padding:14px 18px 10px">
+    <button class="back-btn" onclick="navigate('gallery')">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="logo" style="font-size:18px;margin:0 auto;color:#EEE8FF"><span class="logo-dot"></span>Studio</div>
+    <div style="width:36px"></div>
+  </div>
+  <div class="studio-stage" id="studioStage">
+    <div class="museum-frame-wrap" id="museumFrameWrap">
+      <div class="museum-frame-glow" id="museumFrameGlow">
+        <div class="museum-frame" id="museumFrame">
+          <div class="museum-art" id="museumArt"><span style="font-size:100px">🎨</span></div>
+          <div class="studio-edit-overlay" id="studioEditOverlay" onclick="studioEditCurrent()">
+            <div class="studio-edit-inner">
+              <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <span>Edit Artwork</span>
+            </div>
+          </div>
+        </div>
+        <div class="museum-plaque" id="museumPlaque">
+          <div class="plaque-title" id="plaqueTitle">Artwork</div>
+          <div class="plaque-badges" id="plaqueBadges"></div>
+          <div class="plaque-notes" id="plaqueNotes"></div>
+          <button class="plaque-edit-btn" id="plaqueEditBtn" onclick="studioEditCurrent()">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit this artwork
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="studio-counter" id="studioCounter">1 of 1</div>
+  <div class="studio-controls">
+    <button class="studio-nav-btn" id="studioPrev">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="studio-center-actions">
+      <button class="studio-act-btn" id="studioFav" title="Favorite">❤️</button>
+      <button class="studio-act-btn" id="studioShare" title="Share/Print">
+        <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+      </button>
+      <button class="studio-act-btn" id="studioDelete" title="Delete">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+      </button>
+    </div>
+    <button class="studio-nav-btn" id="studioNext">
+      <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     UPLOAD SCREEN
+════════════════════════════════════ -->
+<div class="screen right" id="scr-upload">
+  <div class="top-bar">
+    <div class="logo"><span class="logo-dot"></span>Upload</div>
+  </div>
+  <div class="scr-body padnav" id="uploadBody">
+    <div class="upload-hero">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:6px">Box Clearer Mode</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--text);margin-bottom:6px">Session Settings</div>
+      <div style="font-size:13px;color:var(--text2);text-align:center;line-height:1.5;max-width:300px">Lock your child and date, then snap photos in a loop — no metadata entry needed each time.</div>
+    </div>
+
+    <div style="padding:14px 18px 0">
+      <div class="field"><label>Child</label>
+        <select id="uploadKidSel"><option value="">— select child —</option></select>
+      </div>
+      <div class="field"><label>Default Date</label>
+        <input type="date" id="uploadDate">
+      </div>
+    </div>
+
+    <div style="padding:0 18px 10px">
+      <div class="upload-session-bar" id="uploadSessionBar" style="display:none">
+        <div><div class="usb-tag">Child</div><div class="usb-val" id="usbKid">—</div></div>
+        <div class="usb-sep"></div>
+        <div><div class="usb-tag">Date</div><div class="usb-val" id="usbDate">—</div></div>
+        <div class="usb-sep"></div>
+        <div><div class="usb-tag">Saved</div><div class="usb-val" id="usbCount" style="color:var(--sky)">0</div></div>
+      </div>
+    </div>
+
+    <!-- Drop zone -->
+    <label class="upload-drop" id="uploadDrop" for="fileInput">
+      <div class="upload-drop-ico">📸</div>
+      <div class="upload-drop-t">Tap to snap or choose files</div>
+      <div class="upload-drop-s">JPG, PNG, HEIC supported</div>
+    </label>
+    <input type="file" id="fileInput" accept="image/*" multiple capture="environment" style="display:none">
+
+    <div class="upload-queue" id="uploadQueue"></div>
+  </div>
+  <nav class="bot-nav">
+    <button class="bnav-item" data-screen="gallery">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Gallery
+    </button>
+    <button class="bnav-item" data-screen="studio">
+      <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M8 6V4a2 2 0 014 0v2M16 6V4a2 2 0 00-4 0v2"/><path d="M12 12v4M10 14h4"/></svg>Studio
+    </button>
+    <div class="bnav-fab">
+      <button class="fab" onclick="document.getElementById('fileInput').click()">
+        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </button>
+    </div>
+    <button class="bnav-item" data-screen="kids">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 21c0-4 3.1-7 7-7s7 3 7 7"/><path d="M17 13c2.5 0 5 1.5 5 5"/></svg>Kids
+    </button>
+    <button class="bnav-item active" data-screen="upload">
+      <svg viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1115.71 8h1.79a4.5 4.5 0 012.5 8.242"/><path d="M12 12v9M8 17l4-4 4 4"/></svg>Upload
+    </button>
+  </nav>
+</div>
+
+<!-- ════════════════════════════════════
+     SETTINGS SHEET
+════════════════════════════════════ -->
+<div class="overlay" id="settingsOverlay" style="align-items:flex-end;justify-content:center">
+  <div class="sheet" id="settingsSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <span style="font-size:20px">⚙️</span>
+      <div class="sheet-title">Settings</div>
+      <button class="sheet-close" id="settingsClose">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
 
+    <!-- Quick Nav Cards -->
+    <div class="settings-nav">
+      <div class="snav-card" onclick="navigate('kids');closeSettings()">
+        <div class="snav-ico">👧</div><div class="snav-t">Kids</div><div class="snav-d">Add or edit profiles</div>
+      </div>
+      <div class="snav-card" onclick="navigate('studio');closeSettings()">
+        <div class="snav-ico">🏛️</div><div class="snav-t">Studio</div><div class="snav-d">Museum exhibit mode</div>
+      </div>
+      <div class="snav-card" onclick="navigate('upload');closeSettings()">
+        <div class="snav-ico">📸</div><div class="snav-t">Upload</div><div class="snav-d">Box Clearer Mode</div>
+      </div>
+      <div class="snav-card" onclick="replayIntro()">
+        <div class="snav-ico">👋</div><div class="snav-t">Walkthrough</div><div class="snav-d">Replay intro slides</div>
+      </div>
+    </div>
+
     <!-- Appearance -->
-    <div class="settings-section">
-      <div class="settings-label">Appearance</div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">🌙 Dark Mode</div>
-          <div class="s-desc">Easier on the eyes at night. Great for dads doing late-night scroll sessions.</div>
-        </div>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="darkToggle">
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
-        </label>
+    <div class="sheet-sec">
+      <span class="caption">Appearance</span>
+      <div class="row">
+        <div class="row-info"><div class="rn">🌙 Dark Mode</div><div class="rd">Easier on the eyes. Great for dads doing late-night scroll sessions.</div></div>
+        <label class="tog"><input type="checkbox" id="darkToggle"><div class="tog-track"></div><div class="tog-thumb"></div></label>
       </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">🎨 Theme Color</div>
-          <div class="s-desc">Choose your gallery's accent color.</div>
-        </div>
-        <select class="setting-select" id="themeSelect">
-          <option value="grape">Grape 🍇</option>
-          <option value="coral">Coral 🪸</option>
-          <option value="sky">Teal 🌊</option>
-          <option value="sun">Sunny 🌻</option>
+      <div class="row">
+        <div class="row-info"><div class="rn">🎨 Accent Color</div><div class="rd">The app's primary color.</div></div>
+        <select class="field" style="width:auto;margin:0;" id="accentSel">
+          <option value="grape">Grape</option><option value="coral">Coral</option>
+          <option value="sky">Teal</option><option value="sun">Sunny</option>
         </select>
       </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">📝 Font Size</div>
-          <div class="s-desc">Adjust text size across the app.</div>
+    </div>
+
+    <!-- Edit / Unlock -->
+    <div class="sheet-sec" style="margin-top:6px">
+      <span class="caption">Edit Mode</span>
+      <div class="row">
+        <div class="row-info">
+          <div class="rn">🔓 Unlock Editing</div>
+          <div class="rd">Show edit controls in the Studio so you can update notes, retake a photo, or change the title of any artwork.</div>
         </div>
-        <select class="setting-select" id="fontSelect">
-          <option value="normal">Normal</option>
-          <option value="large">Large</option>
-        </select>
+        <label class="tog"><input type="checkbox" id="unlockToggle"><div class="tog-track"></div><div class="tog-thumb"></div></label>
+      </div>
+      <div id="unlockModeInfo" style="display:none;padding:10px 0 4px">
+        <div style="background:rgba(155,93,229,.10);border:1px solid rgba(155,93,229,.25);border-radius:10px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start">
+          <span style="font-size:16px;flex-shrink:0">✏️</span>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5">Unlock mode is <strong style="color:var(--accent)">on</strong>. In the Studio, tap the art image or the "Edit this artwork" button on the plaque to edit notes, retake the photo, or rename.</div>
+        </div>
       </div>
     </div>
 
     <!-- Notifications -->
-    <div class="settings-section" style="margin-top:8px">
-      <div class="settings-label">Notifications</div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">📅 Monthly Recap</div>
-          <div class="s-desc">Get a summary of this month's new art every 1st.</div>
-        </div>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="recapToggle" checked>
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
-        </label>
+    <div class="sheet-sec" style="margin-top:6px">
+      <span class="caption">Notifications</span>
+      <div class="row">
+        <div class="row-info"><div class="rn">📅 Monthly Recap</div><div class="rd">Summary of new art on the 1st of each month.</div></div>
+        <label class="tog"><input type="checkbox" id="recapTog" checked><div class="tog-track"></div><div class="tog-thumb"></div></label>
       </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">⭐ Favorites Reminder</div>
-          <div class="s-desc">Weekly nudge to mark your favorite pieces.</div>
-        </div>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="favReminderToggle">
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
-        </label>
-      </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">🎂 Birthday Flashback</div>
-          <div class="s-desc">On each child's birthday, resurface art from that same day in past years.</div>
-        </div>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="bdayToggle" checked>
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
-        </label>
+      <div class="row">
+        <div class="row-info"><div class="rn">🎂 Birthday Flashback</div><div class="rd">Resurface art from the same birthday in past years.</div></div>
+        <label class="tog"><input type="checkbox" id="bdayTog" checked><div class="tog-track"></div><div class="tog-thumb"></div></label>
       </div>
     </div>
 
-    <!-- Children Profiles -->
-    <div class="settings-section" style="margin-top:8px">
-      <div class="settings-label">Children Profiles</div>
-      <div class="kids-list">
-        <div class="kid-row">
-          <div class="kid-av" style="background:#FFD166;color:#7A5B00;">L</div>
-          <div class="kid-info">
-            <div class="k-name">Leo</div>
-            <div class="k-meta">Born Apr 15, 2018 · Kindergarten 2023 · 47 artworks</div>
-          </div>
-          <button class="kid-edit" onclick="showToast('info','Edit Profile','Profile editor coming in v1.1!',2500)">Edit</button>
+    <!-- Backup & Export -->
+    <div class="sheet-sec" style="margin-top:6px">
+      <span class="caption">Backup & Export</span>
+      <div class="row">
+        <div class="row-info"><div class="rn">📦 Export All Data</div><div class="rd">Download a full JSON backup of kids + artwork metadata.</div></div>
+        <button class="btn btn-soft" style="padding:8px 14px;font-size:12px" onclick="exportJSON()">Export</button>
+      </div>
+      <div class="row">
+        <div class="row-info"><div class="rn">📂 Import Backup</div><div class="rd">Load a previously exported CanvasKeep JSON file.</div></div>
+        <button class="btn btn-soft" style="padding:8px 14px;font-size:12px" onclick="document.getElementById('importInput').click()">Import</button>
+      </div>
+      <input type="file" id="importInput" accept=".json" style="display:none" onchange="importJSON(this)">
+      <div class="row">
+        <div class="row-info">
+          <div class="rn">☁️ Google Drive</div>
+          <div class="rd">Export your JSON backup directly to Google Drive.</div>
         </div>
-        <div class="kid-row">
-          <div class="kid-av" style="background:#FF6B6B;color:#7A0000;">M</div>
-          <div class="kid-info">
-            <div class="k-name">Mia</div>
-            <div class="k-meta">Born Sep 2, 2020 · Preschool 2024 · 23 artworks</div>
-          </div>
-          <button class="kid-edit" onclick="showToast('info','Edit Profile','Profile editor coming in v1.1!',2500)">Edit</button>
+        <button class="btn btn-soft" style="padding:8px 14px;font-size:12px" onclick="exportGoogleDrive()">Save</button>
+      </div>
+      <div class="row">
+        <div class="row-info">
+          <div class="rn">🍎 iCloud Drive</div>
+          <div class="rd">Download the backup, then drag it into your iCloud Drive folder manually — browsers can't write to iCloud directly.</div>
         </div>
-        <button class="add-kid-btn" onclick="showToast('art','Add Child','Tap + in the top nav to add a new child profile!',3000)">
-          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add another child
-        </button>
+        <button class="btn btn-soft" style="padding:8px 14px;font-size:12px" onclick="exportJSON('icloud')">Download</button>
       </div>
     </div>
 
-    <!-- Storage & Backup -->
-    <div class="settings-section" style="margin-top:8px">
-      <div class="settings-label">Storage & Backup</div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">☁️ iCloud Backup</div>
-          <div class="s-desc">Sync artwork to iCloud so nothing is lost.</div>
+    <!-- Data Management -->
+    <div class="sheet-sec" style="margin-top:6px">
+      <span class="caption">Data Management</span>
+      <div class="row">
+        <div class="row-info">
+          <div class="rn" style="color:var(--coral)">🗑️ Clear Sample Data</div>
+          <div class="rd">Remove the demo kids and artworks loaded on first launch.</div>
         </div>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="icloudToggle" checked>
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
-        </label>
+        <button class="btn btn-danger" style="padding:8px 14px;font-size:12px;white-space:nowrap" onclick="confirmClearSamples()">Clear</button>
       </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">🗜️ Image Quality</div>
-          <div class="s-desc">Balance storage space vs. image clarity.</div>
+      <div class="row">
+        <div class="row-info">
+          <div class="rn" style="color:var(--coral)">💣 Wipe All Data</div>
+          <div class="rd">Permanently delete everything — kids, artwork, settings.</div>
         </div>
-        <select class="setting-select" id="qualitySelect">
-          <option value="high">High</option>
-          <option value="medium" selected>Medium</option>
-          <option value="low">Low</option>
-        </select>
-      </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">💾 Local Storage Used</div>
-          <div class="s-desc">3.2 GB of 5 GB used across 70 artworks.</div>
-        </div>
-        <span style="font-size:12px;font-weight:700;color:var(--c-sky);">Manage →</span>
+        <button class="btn btn-danger" style="padding:8px 14px;font-size:12px;white-space:nowrap" onclick="confirmWipeAll()">Wipe</button>
       </div>
     </div>
 
-    <!-- Cast & Display -->
-    <div class="settings-section" style="margin-top:8px">
-      <div class="settings-label">Cast & Display</div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">📺 Art TV Mode</div>
-          <div class="s-desc">Enable fullscreen display mode for casting to your TV.</div>
-        </div>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="tvToggle">
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
-        </label>
-      </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">⏱️ Slideshow Interval</div>
-          <div class="s-desc">How long each piece displays on TV.</div>
-        </div>
-        <select class="setting-select" id="slideshowSelect">
-          <option value="10">10 sec</option>
-          <option value="30" selected>30 sec</option>
-          <option value="60">1 min</option>
-          <option value="300">5 min</option>
-        </select>
-      </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">🏠 Home Assistant</div>
-          <div class="s-desc">Expose local feed endpoint for HA dashboards.</div>
-        </div>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="haToggle">
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
-        </label>
-      </div>
-    </div>
-
-    <!-- Privacy -->
-    <div class="settings-section" style="margin-top:8px">
-      <div class="settings-label">Privacy & Security</div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">🔒 App Lock</div>
-          <div class="s-desc">Require Face ID or PIN to open the app.</div>
-        </div>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="lockToggle">
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
-        </label>
-      </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">🌐 Display Mode PIN</div>
-          <div class="s-desc">Protect the TV/cast view from public access.</div>
-        </div>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="displayPinToggle" checked>
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
-        </label>
-      </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">📊 Analytics</div>
-          <div class="s-desc">Share anonymous usage data to improve LittlePicasso.</div>
-        </div>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="analyticsToggle" checked>
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
-        </label>
-      </div>
-    </div>
-
-    <!-- Account -->
-    <div class="settings-section" style="margin-top:8px">
-      <div class="settings-label">Account</div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">👤 Profile</div>
-          <div class="s-desc">jessica.miller@email.com · Pro Plan</div>
-        </div>
-        <span style="font-size:12px;font-weight:700;color:var(--c-grape);cursor:pointer;">Edit →</span>
-      </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="s-name">💳 Subscription</div>
-          <div class="s-desc">LittlePicasso Pro · $3.99/month · Renews Jun 1</div>
-        </div>
-        <span style="font-size:12px;font-weight:700;color:var(--c-sky);cursor:pointer;">Manage →</span>
-      </div>
-    </div>
-
-    <!-- About & Navigation -->
-    <div class="settings-section" style="margin-top:16px">
-      <div class="settings-label">About</div>
-      <button class="back-intro-btn" id="backToIntroBtn">
-        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-        Replay the intro walkthrough
-      </button>
-      <button class="danger-btn" onclick="showToast('warning','Export','Preparing your full archive export... (demo)',3000)">
-        📦 Export All Artwork
-      </button>
-      <button class="danger-btn" onclick="showToast('error','Delete Account','This action cannot be undone. (demo only)',3500)">
-        🗑️ Delete Account & Data
-      </button>
-      <div class="modal-version">LittlePicasso v1.0.0 · Made with ♥ for families</div>
-    </div>
-
+    <div style="padding:20px 22px 8px;font-size:11px;color:var(--muted);text-align:center">CanvasKeep v1.0 · All data stored locally in your browser</div>
+    <div style="height:20px"></div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     PRINT / SHARE MODAL
-══════════════════════════════════════ -->
-<div class="print-modal-overlay" id="printOverlay">
-  <div class="print-modal">
-    <div class="pm-title">Share this Artwork 🖼️</div>
-    <div class="pm-sub">Save as PNG to share or print.</div>
-    <div class="print-preview">
-      <div class="print-frame" id="printFrame">
-        <div class="print-art fill-1" id="printArtEmoji">🚀</div>
-        <div class="print-name" id="printArtTitle">Laser Dinosaur</div>
-        <div class="print-badges">
-          <span class="print-badge pill-age" id="printAge">4 yrs 5 mo</span>
-          <span class="print-badge pill-grade" id="printGrade">Kindergarten</span>
-          <span class="print-badge pill-date" id="printDate">Oct 2022</span>
+<!-- ════════════════════════════════════
+     KID FORM SHEET
+════════════════════════════════════ -->
+<div class="overlay" id="kidFormOverlay" style="align-items:flex-end;justify-content:center">
+  <div class="sheet" id="kidFormSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <span style="font-size:20px" id="kidFormIco">👧</span>
+      <div class="sheet-title" id="kidFormTitle">Add Child</div>
+      <button class="sheet-close" onclick="closeKidForm()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-sec">
+      <div class="field"><label>Name</label><input type="text" id="kfName" placeholder="e.g. Leo"></div>
+      <div class="field"><label>Birthday</label><input type="date" id="kfBday"></div>
+      <div class="field"><label>School Start Date</label><input type="date" id="kfSchool" placeholder="First day of kindergarten"></div>
+      <div class="field"><label>Avatar Emoji</label>
+        <div class="emoji-picker" id="emojiPicker">
+          <div class="ep-opt selected" data-e="🦁">🦁</div>
+          <div class="ep-opt" data-e="🐻">🐻</div>
+          <div class="ep-opt" data-e="🐼">🐼</div>
+          <div class="ep-opt" data-e="🦊">🦊</div>
+          <div class="ep-opt" data-e="🐯">🐯</div>
+          <div class="ep-opt" data-e="🐧">🐧</div>
+          <div class="ep-opt" data-e="🦋">🦋</div>
+          <div class="ep-opt" data-e="🌸">🌸</div>
+          <div class="ep-opt" data-e="⭐">⭐</div>
+          <div class="ep-opt" data-e="🌈">🌈</div>
+          <div class="ep-opt" data-e="🚀">🚀</div>
+          <div class="ep-opt" data-e="🎸">🎸</div>
         </div>
-        <div class="print-watermark">✦ LittlePicasso</div>
+      </div>
+      <div class="field"><label>Avatar Color</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;padding:4px 0">
+          <div class="av-color-opt" data-c="#FFD166,#7A5B00" style="width:32px;height:32px;border-radius:50%;background:#FFD166;cursor:pointer;border:2px solid transparent" onclick="selectAvColor(this)"></div>
+          <div class="av-color-opt" data-c="#FF6B6B,#7A0000" style="width:32px;height:32px;border-radius:50%;background:#FF6B6B;cursor:pointer;border:2px solid transparent" onclick="selectAvColor(this)"></div>
+          <div class="av-color-opt" data-c="#4ECDC4,#0A3D38" style="width:32px;height:32px;border-radius:50%;background:#4ECDC4;cursor:pointer;border:2px solid transparent" onclick="selectAvColor(this)"></div>
+          <div class="av-color-opt" data-c="#9B5DE5,#3A1680" style="width:32px;height:32px;border-radius:50%;background:#9B5DE5;cursor:pointer;border:2px solid transparent" onclick="selectAvColor(this)"></div>
+          <div class="av-color-opt" data-c="#FFA07A,#6B2800" style="width:32px;height:32px;border-radius:50%;background:#FFA07A;cursor:pointer;border:2px solid transparent" onclick="selectAvColor(this)"></div>
+          <div class="av-color-opt" data-c="#A8E063,#2A5200" style="width:32px;height:32px;border-radius:50%;background:#A8E063;cursor:pointer;border:2px solid transparent" onclick="selectAvColor(this)"></div>
+        </div>
+      </div>
+      <input type="hidden" id="kfEditId">
+      <div style="display:flex;gap:10px;padding-bottom:24px;">
+        <button class="btn btn-soft btn-full" onclick="closeKidForm()">Cancel</button>
+        <button class="btn btn-accent btn-full" onclick="saveKid()">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:#fff;stroke-width:2.5;fill:none"><path d="M20 6L9 17l-5-5"/></svg>
+          Save
+        </button>
+      </div>
+      <div id="kfDeleteWrap" style="display:none;padding-bottom:24px;">
+        <button class="btn btn-danger btn-full" onclick="deleteKid(document.getElementById('kfEditId').value)">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:var(--coral);stroke-width:2;fill:none"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+          Delete this child & all their artwork
+        </button>
       </div>
     </div>
-    <div class="pm-actions">
-      <button class="pm-btn cancel" id="printCancel">
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     ART DETAIL SHEET (edit/add)
+════════════════════════════════════ -->
+<div class="overlay" id="artFormOverlay" style="align-items:flex-end;justify-content:center">
+  <div class="sheet" id="artFormSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <span style="font-size:20px">🖼️</span>
+      <div class="sheet-title" id="artFormTitle">Add Artwork</div>
+      <button class="sheet-close" onclick="document.getElementById('artFormOverlay').classList.remove('open')">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        Cancel
       </button>
-      <button class="pm-btn download" id="printDownload">
+    </div>
+    <div class="sheet-sec">
+      <div style="width:100%;height:160px;border-radius:var(--rs);overflow:hidden;margin-bottom:14px;background:var(--soft);display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px dashed var(--inpborder)" id="artImgPreview" onclick="document.getElementById('artImgInput').click()">
+        <div style="text-align:center;color:var(--muted)">
+          <div style="font-size:36px;margin-bottom:6px">📷</div>
+          <div style="font-size:12px;font-weight:700">Tap to choose image</div>
+        </div>
+      </div>
+      <input type="file" id="artImgInput" accept="image/*" style="display:none" onchange="previewArtImg(this)">
+      <div class="field"><label>Title</label><input type="text" id="afTitle" placeholder="e.g. Laser Dinosaur"></div>
+      <div class="field"><label>Child</label><select id="afKid"></select></div>
+      <div class="field"><label>Date Created</label><input type="date" id="afDate"></div>
+      <div class="field"><label>Notes / Story</label><textarea id="afNotes" style="background:var(--inp);border:1.5px solid var(--inpborder);color:var(--text);padding:11px 14px;border-radius:var(--rs);font-size:14px;font-weight:600;outline:none;width:100%;resize:none;height:72px" placeholder="Ask your child to tell you the story..."></textarea></div>
+      <input type="hidden" id="afEditId">
+      <div style="display:flex;gap:10px;padding-bottom:24px">
+        <button class="btn btn-soft btn-full" onclick="document.getElementById('artFormOverlay').classList.remove('open')">Cancel</button>
+        <button class="btn btn-accent btn-full" onclick="saveArtwork()">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:#fff;stroke-width:2.5;fill:none"><path d="M20 6L9 17l-5-5"/></svg>Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     PRINT MODAL
+════════════════════════════════════ -->
+<div class="modal-wrap" id="printModal">
+  <div class="modal-box">
+    <div class="modal-title" style="text-align:left;margin-bottom:4px">Share Artwork 🖼️</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Save as high-res PNG to share or print.</div>
+    <div class="print-preview">
+      <div class="print-frame-inner" id="printFrameInner">
+        <div class="pf-art" id="pfArt"><span id="pfEmoji" style="font-size:72px">🎨</span></div>
+        <div class="pf-title" id="pfTitle">Artwork</div>
+        <div class="pf-badges" id="pfBadges"></div>
+        <div class="pf-wm">✦ CanvasKeep</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-soft" style="flex:1" onclick="document.getElementById('printModal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-accent" style="flex:1" id="downloadPng">
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Save PNG
       </button>
@@ -1203,347 +1179,847 @@ html,body{height:100%;background:var(--c-bg);color:var(--c-text);font-family:'Nu
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════ -->
-<script>
-/* ─── DATA ─── */
-const ARTWORKS = [
-  {title:"Laser Dinosaur",emoji:"🚀",fill:"fill-1",age:"4 yrs 5 mo",grade:"Kindergarten",date:"Oct 2022",kid:"leo",fav:false,tags:["dinosaurs","markers"]},
-  {title:"Rainbow T-Rex",emoji:"🦖",fill:"fill-3",age:"3 yrs 2 mo",grade:"Preschool",date:"Jun 2021",kid:"leo",fav:true,tags:["dinosaurs","crayons"]},
-  {title:"Ocean Friends",emoji:"🌊",fill:"fill-2",age:"5 yrs 1 mo",grade:"1st Grade",date:"Mar 2023",kid:"leo",fav:false,tags:["ocean","watercolor"]},
-  {title:"Sunny Day",emoji:"☀️",fill:"fill-4",age:"4 yrs 9 mo",grade:"Kindergarten",date:"Jan 2023",kid:"leo",fav:false,tags:["nature"]},
-  {title:"Space Ship",emoji:"🛸",fill:"fill-5",age:"6 yrs 0 mo",grade:"2nd Grade",date:"Sep 2024",kid:"leo",fav:true,tags:["space","markers"]},
-  {title:"My Family",emoji:"👨‍👩‍👧",fill:"fill-1",age:"2 yrs 8 mo",grade:"Preschool",date:"May 2023",kid:"mia",fav:true,tags:["family"]},
-  {title:"Rainbow Cat",emoji:"🌈",fill:"fill-3",age:"3 yrs 1 mo",grade:"Preschool",date:"Oct 2023",kid:"mia",fav:false,tags:["animals","crayons"]},
-  {title:"Princess Castle",emoji:"🏰",fill:"fill-2",age:"3 yrs 7 mo",grade:"Preschool",date:"Apr 2024",kid:"mia",fav:true,tags:["fantasy"]},
-];
-const TIMELINE_DATA = [
-  {era:"Preschool",eraClass:"era-pre",emoji:"🎨",fill:"fill-4",name:"My Family Portrait",kid:"leo"},
-  {era:"Kindergarten",eraClass:"era-k",emoji:"🦋",fill:"fill-5",name:"Butterfly Garden",kid:"leo"},
-  {era:"1st Grade",eraClass:"era-1st",emoji:"🏰",fill:"fill-3",name:"Dragon Castle",kid:"leo"},
-  {era:"2nd Grade",eraClass:"era-2nd",emoji:"🐬",fill:"fill-2",name:"Deep Sea World",kid:"leo"},
-];
-
-let curKid = "leo";
-let filteredArt = [];
-let curIdx = 0;
-let introIdx = 0;
-const INTRO_TOTAL = 4;
-
-/* ─── SCREENS ─── */
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>{
-    s.classList.remove('active');
-    s.style.animation='none';
-  });
-  const el = document.getElementById('screen-'+id);
-  el.style.animation='';
-  el.classList.add('active');
-}
-
-/* ─── INTRO ─── */
-function updateIntroSlide(){
-  const track = document.getElementById('introTrack');
-  track.style.transform=`translateX(-${introIdx*100}%)`;
-  document.querySelectorAll('.intro-dot').forEach((d,i)=>{
-    d.classList.toggle('active',i===introIdx);
-  });
-  const backBtn = document.getElementById('introBackBtn');
-  const skipBtn = document.getElementById('introSkipBtn');
-  backBtn.style.display = introIdx > 0 ? 'flex' : 'none';
-  skipBtn.style.display = introIdx < INTRO_TOTAL-1 ? 'block' : 'none';
-  const cta = document.getElementById('introCTA');
-  if(introIdx === INTRO_TOTAL-1){
-    cta.textContent = "Let's Go! 🎨";
-  } else {
-    cta.textContent = "Next →";
-  }
-}
-document.getElementById('introCTA').addEventListener('click',()=>{
-  if(introIdx < INTRO_TOTAL-1){ introIdx++; updateIntroSlide(); }
-  else { launchApp(); }
-});
-document.getElementById('introBackBtn').addEventListener('click',()=>{
-  if(introIdx > 0){ introIdx--; updateIntroSlide(); }
-});
-document.getElementById('introSkipBtn').addEventListener('click', launchApp);
-document.getElementById('introSecondary').addEventListener('click',()=>{
-  showToast('info','Sign In','Account sign-in coming soon! For now, enjoy the demo.',3000);
-});
-document.querySelectorAll('.intro-dot').forEach(d=>{
-  d.addEventListener('click',()=>{ introIdx=parseInt(d.dataset.idx); updateIntroSlide(); });
-});
-function launchApp(){
-  showScreen('app');
-  showToast('art','Welcome to LittlePicasso!','Your gallery is ready. Tap a card to explore. 🎨',3500);
-}
-updateIntroSlide();
-
-/* ─── TOASTER ─── */
-function showToast(type, title, msg, duration=3000){
-  const container = document.getElementById('toaster');
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.innerHTML=`
-    <span class="toast-icon" aria-hidden="true"></span>
-    <div class="toast-body">
-      <div class="toast-title">${title}</div>
-      ${msg?`<div class="toast-msg">${msg}</div>`:''}
+<!-- ════════════════════════════════════
+     CONFIRM MODAL
+════════════════════════════════════ -->
+<div class="modal-wrap" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-ico" id="confirmIco">⚠️</div>
+    <div class="modal-title" id="confirmTitle">Are you sure?</div>
+    <div class="modal-msg" id="confirmMsg">This cannot be undone.</div>
+    <div class="modal-btns">
+      <button class="btn btn-danger btn-full" id="confirmYes">Confirm</button>
+      <button class="btn btn-soft btn-full" onclick="document.getElementById('confirmModal').classList.remove('open')">Cancel</button>
     </div>
-    <button class="toast-close" onclick="dismissToast(this.parentElement)">✕</button>
-  `;
-  container.appendChild(toast);
-  setTimeout(()=>dismissToast(toast), duration);
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     GOOGLE DRIVE MODAL
+════════════════════════════════════ -->
+<div class="modal-wrap" id="driveModal">
+  <div class="modal-box">
+    <div class="modal-ico">☁️</div>
+    <div class="modal-title">Save to Google Drive</div>
+    <div class="modal-msg">Enter your Google account email — a JSON backup file will download and you can upload it to your Drive at <strong>drive.google.com</strong>.<br><br><em>Note: Full Drive API integration requires an OAuth app setup in Google Cloud Console — this is the frictionless alternative that works everywhere.</em></div>
+    <div class="field" style="text-align:left"><label>Your Google Email (for reference)</label><input type="email" id="driveEmail" placeholder="you@gmail.com"></div>
+    <div class="modal-btns">
+      <button class="btn btn-accent btn-full" onclick="driveDownload()">Download Backup File</button>
+      <button class="btn btn-soft btn-full" onclick="document.getElementById('driveModal').classList.remove('open')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════ -->
+<script>
+/* ══ CONSTANTS ══ */
+const GRADS=['Preschool','Preschool','Preschool','Kindergarten','1st Grade','2nd Grade','3rd Grade','4th Grade','5th Grade','6th Grade','7th Grade','8th Grade'];
+const FILLS=['g1','g2','g3','g4','g5','g6','g7','g8'];
+const ACCENT_VARS={grape:'#9B5DE5',coral:'#FF6B6B',sky:'#4ECDC4',sun:'#FFD166'};
+const SAMPLE_KIDS=[
+  {id:'kid_sample_1',name:'Leo',emoji:'🦁',color:'#FFD166',colorText:'#7A5B00',bday:'2018-04-15',schoolStart:'2023-09-05',isSample:true},
+  {id:'kid_sample_2',name:'Mia',emoji:'🌸',color:'#FF6B6B',colorText:'#7A0000',bday:'2020-09-02',schoolStart:'2025-09-03',isSample:true}
+];
+const SAMPLE_ARTS=[
+  {id:'art_s1',kidId:'kid_sample_1',title:'Laser Dinosaur',emoji:'🚀',fill:'g1',date:'2022-10-12',notes:'Flying a helicopter over a volcano.',fav:false,isSample:true},
+  {id:'art_s2',kidId:'kid_sample_1',title:'Rainbow T-Rex',emoji:'🦖',fill:'g3',date:'2021-06-03',notes:'The dinosaur loves rainbows.',fav:true,isSample:true},
+  {id:'art_s3',kidId:'kid_sample_1',title:'Ocean Friends',emoji:'🌊',fill:'g2',date:'2023-03-15',notes:'All the fish have names.',fav:false,isSample:true},
+  {id:'art_s4',kidId:'kid_sample_2',title:'My Family',emoji:'👨‍👩‍👧',fill:'g1',date:'2023-05-10',notes:'Mia drew everyone smiling.',fav:true,isSample:true},
+  {id:'art_s5',kidId:'kid_sample_2',title:'Rainbow Cat',emoji:'🌈',fill:'g3',date:'2023-10-20',notes:'',fav:false,isSample:true},
+];
+
+/* ══ STATE ══ */
+let DB={kids:[],arts:[],settings:{dark:false,accent:'grape',recap:true,bday:true}};
+let curScreen='gallery';
+let curKidFilter='all';
+let carouselIdx=0;
+let studioIdx=0;
+let studioArtList=[];
+let selectedEmoji='🦁';
+let selectedAvColor='#FFD166,#7A5B00';
+let artImgData=null;
+let uploadSavedCount=0;
+
+/* ══ LOCAL STORAGE ══ */
+function save(){localStorage.setItem('ck_db',JSON.stringify(DB));}
+function load(){
+  try{
+    const raw=localStorage.getItem('ck_db');
+    if(raw){DB=JSON.parse(raw);return true;}
+  }catch(e){}
+  return false;
 }
-function dismissToast(el){
-  if(!el||!el.parentElement) return;
-  el.classList.add('out');
-  setTimeout(()=>el.remove(), 260);
+function isOnboarded(){return!!localStorage.getItem('ck_onboarded');}
+function setOnboarded(){localStorage.setItem('ck_onboarded','1');}
+
+/* ══ HELPERS ══ */
+function uid(){return 'id_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);}
+function fmt(dateStr){if(!dateStr)return'—';const d=new Date(dateStr+'T00:00:00');return d.toLocaleDateString('en-US',{month:'short',year:'numeric'});}
+function ageAt(bday,date){
+  if(!bday||!date)return'—';
+  const b=new Date(bday+'T00:00:00'),d=new Date(date+'T00:00:00');
+  let y=d.getFullYear()-b.getFullYear(),m=d.getMonth()-b.getMonth();
+  if(m<0){y--;m+=12;}
+  return y>0?`${y} yr${y!==1?'s':''} ${m} mo`:`${m} mo`;
+}
+function gradeAt(schoolStart,date){
+  if(!schoolStart||!date)return'—';
+  const s=new Date(schoolStart+'T00:00:00'),d=new Date(date+'T00:00:00');
+  if(d<s)return'Pre-School';
+  let y=d.getFullYear()-s.getFullYear();
+  if(d.getMonth()<s.getMonth()||(d.getMonth()===s.getMonth()&&d.getDate()<s.getDate()))y--;
+  return GRADS[Math.min(y+3,GRADS.length-1)]||'Graduate';
+}
+function kidById(id){return DB.kids.find(k=>k.id===id);}
+function artsForKid(id){return DB.arts.filter(a=>a.kidId===id);}
+function filteredArts(){return curKidFilter==='all'?DB.arts:DB.arts.filter(a=>a.kidId===curKidFilter);}
+function gradClass(g){
+  const m={'Pre-School':'pre','Preschool':'pre','Kindergarten':'k','1st Grade':'1st','2nd Grade':'2nd'};
+  return 'era-'+(m[g]||'pre');
 }
 
-/* ─── CAROUSEL ─── */
-function filterArt(){
-  filteredArt = curKid==='all' ? ARTWORKS : ARTWORKS.filter(a=>a.kid===curKid);
-  if(filteredArt.length===0) filteredArt = ARTWORKS;
-  curIdx = Math.min(curIdx, filteredArt.length-1);
+/* ══ TOASTER ══ */
+function toast(type,title,msg,ms=3000){
+  const icons={success:'✅',info:'💡',warning:'⚠️',error:'❌',art:'🎨',save:'💾'};
+  const t=document.createElement('div');
+  t.className='toast';
+  t.innerHTML=`<span class="toast-ico">${icons[type]||'💡'}</span><div class="toast-body"><div class="toast-title">${title}</div>${msg?`<div class="toast-msg">${msg}</div>`:''}</div><button class="toast-x" onclick="this.parentElement.classList.add('out');setTimeout(()=>this.parentElement.remove(),240)">✕</button>`;
+  document.getElementById('toaster').appendChild(t);
+  setTimeout(()=>{if(t.parentElement){t.classList.add('out');setTimeout(()=>t.remove(),240);}},ms);
 }
-function renderCardEl(el, art, isCenterEl){
-  if(!art){ el.innerHTML=''; return; }
-  el.innerHTML=`
-    <div class="art-fill ${art.fill}">${art.emoji}
-      ${isCenterEl?`<button class="art-fav" title="Toggle favorite">${art.fav?'❤️':'♡'}</button>`:''}
+
+/* ══ SCREEN NAVIGATION ══ */
+const SCREENS={gallery:'scr-gallery',kids:'scr-kids',studio:'scr-studio',upload:'scr-upload',intro:'scr-intro'};
+function navigate(to){
+  const fromEl=document.getElementById(SCREENS[curScreen]);
+  const toEl=document.getElementById(SCREENS[to]);
+  if(!toEl||to===curScreen)return;
+  // direction: studio is a "push right" feel
+  const pushScreens=['studio'];
+  if(pushScreens.includes(to)){
+    toEl.classList.remove('active','left');toEl.classList.add('right');
+    requestAnimationFrame(()=>{fromEl.classList.add('left');toEl.classList.add('active');});
+  } else {
+    toEl.classList.remove('active','right');toEl.classList.add('right');
+    requestAnimationFrame(()=>{fromEl.classList.add('left');toEl.classList.add('active');});
+  }
+  setTimeout(()=>{fromEl.classList.remove('active','left','right');},380);
+  curScreen=to;
+  if(to==='gallery')renderGallery();
+  if(to==='kids')renderKids();
+  if(to==='studio')renderStudio();
+  if(to==='upload')renderUploadKids();
+}
+
+/* ══ INTRO ══ */
+let introIdx=0;
+const INTRO_MAX=4;
+function updateIntro(){
+  document.getElementById('iTrack').style.transform=`translateX(-${introIdx*100}%)`;
+  document.querySelectorAll('.idot').forEach((d,i)=>d.classList.toggle('active',i===introIdx));
+  document.getElementById('iBackBtn').style.display=introIdx>0?'flex':'none';
+  document.getElementById('iSkipBtn').style.display=introIdx<INTRO_MAX-1?'block':'none';
+  document.getElementById('iCTA').textContent=introIdx===INTRO_MAX-1?"Let's Go! 🎨":"Next →";
+}
+document.getElementById('iCTA').addEventListener('click',()=>{
+  if(introIdx<INTRO_MAX-1){introIdx++;updateIntro();}
+  else{setOnboarded();navigate('gallery');}
+});
+document.getElementById('iBackBtn').addEventListener('click',()=>{if(introIdx>0){introIdx--;updateIntro();}});
+document.getElementById('iSkipBtn').addEventListener('click',()=>{setOnboarded();navigate('gallery');});
+document.getElementById('iSecondary').addEventListener('click',()=>{document.getElementById('importInput').click();});
+document.querySelectorAll('.idot').forEach(d=>d.addEventListener('click',()=>{introIdx=parseInt(d.dataset.i);updateIntro();}));
+function replayIntro(){closeSettings();introIdx=0;updateIntro();navigate('intro');}
+
+/* ══ GALLERY ══ */
+function renderGallery(){
+  const arts=filteredArts();
+  if(carouselIdx>=arts.length)carouselIdx=0;
+  const body=document.getElementById('galleryBody');
+  body.innerHTML='';
+
+  // Child tabs
+  const tabs=document.createElement('div');tabs.className='child-tabs';
+  let tabHtml=`<div class="ctab${curKidFilter==='all'?' active':''}" data-kid="all"><span class="ctab-av" style="background:rgba(155,93,229,.15);color:var(--accent)">✦</span>All</div>`;
+  DB.kids.forEach(k=>{
+    tabHtml+=`<div class="ctab${curKidFilter===k.id?' active':''}" data-kid="${k.id}"><span class="ctab-av" style="background:${k.color};color:${k.colorText}">${k.emoji}</span>${k.name}</div>`;
+  });
+  tabs.innerHTML=tabHtml;
+  tabs.querySelectorAll('.ctab').forEach(t=>t.addEventListener('click',()=>{
+    curKidFilter=t.dataset.kid;carouselIdx=0;renderGallery();
+  }));
+  body.appendChild(tabs);
+
+  if(DB.kids.length===0){
+    body.innerHTML+=`<div class="empty-state"><div class="empty-ico">👧</div><div class="empty-t">No kids yet</div><div class="empty-d">Add your first child to start building their art gallery.</div><button class="btn btn-accent" onclick="navigate('kids')" style="margin-top:8px">Add a Child</button></div>`;
+    return;
+  }
+
+  // Section header
+  const kidName=curKidFilter==='all'?'All':'';
+  const kid=kidById(curKidFilter);
+  const hdr=document.createElement('div');hdr.className='sec';
+  hdr.innerHTML=`<span class="sec-t">🖼️ ${kid?kid.name+"'s":'All'} Gallery</span><button class="sec-link" onclick="navigate('studio')">Studio →</button>`;
+  body.appendChild(hdr);
+
+  if(arts.length===0){
+    body.innerHTML+='<div class="empty-state"><div class="empty-ico">🎨</div><div class="empty-t">No artwork yet</div><div class="empty-d">Upload your first piece using Box Clearer Mode.</div><button class="btn btn-accent" onclick="navigate(\'upload\')" style="margin-top:8px">Upload Now</button></div>';
+    return;
+  }
+
+  // Carousel
+  const cWrap=document.createElement('div');cWrap.className='carousel-wrap';
+  const n=arts.length;
+  const prev=arts[(carouselIdx-1+n)%n];
+  const cur=arts[carouselIdx];
+  const next=arts[(carouselIdx+1)%n];
+  cWrap.innerHTML=`
+    ${buildArtCard(prev,'left',false)}
+    ${buildArtCard(cur,'center',true)}
+    ${buildArtCard(next,'right',false)}
+  `;
+  body.appendChild(cWrap);
+
+  // Dots
+  const dots=document.createElement('div');dots.className='cdots';
+  dots.innerHTML=arts.map((_,i)=>`<div class="cdot${i===carouselIdx?' active':''}" data-i="${i}"></div>`).join('');
+  dots.querySelectorAll('.cdot').forEach(d=>d.addEventListener('click',()=>{carouselIdx=parseInt(d.dataset.i);renderGallery();}));
+  body.appendChild(dots);
+
+  // Click handlers on cards
+  body.querySelector('.art-card.left')?.addEventListener('click',()=>{carouselIdx=(carouselIdx-1+n)%n;renderGallery();});
+  body.querySelector('.art-card.right')?.addEventListener('click',()=>{carouselIdx=(carouselIdx+1)%n;renderGallery();});
+  body.querySelector('.art-card.center')?.addEventListener('click',()=>{
+    studioArtList=arts;studioIdx=carouselIdx;navigate('studio');
+  });
+  body.querySelector('.art-fav-btn')?.addEventListener('click',(e)=>{
+    e.stopPropagation();
+    cur.fav=!cur.fav;save();
+    body.querySelector('.art-fav-btn').textContent=cur.fav?'❤️':'♡';
+    toast(cur.fav?'success':'info',cur.fav?'Added to Favorites':'Removed',cur.title,2000);
+    updateStats(body,arts);
+  });
+  body.querySelector('.art-share-btn')?.addEventListener('click',(e)=>{
+    e.stopPropagation();openPrintModal(cur);
+  });
+
+  // Touch swipe
+  let sx=0;
+  cWrap.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
+  cWrap.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-sx;
+    if(Math.abs(dx)>44){carouselIdx=dx<0?(carouselIdx+1)%n:(carouselIdx-1+n)%n;renderGallery();}
+  });
+
+  // Stats
+  const statsDiv=document.createElement('div');statsDiv.className='stats-row';statsDiv.id='statsRow';
+  body.appendChild(statsDiv);
+  updateStats(body,arts);
+
+  // Upload strip
+  const us=document.createElement('div');us.className='upload-strip';
+  us.innerHTML=`<div class="us-ico">📸</div><div><div class="us-t">Box Clearer Mode</div><div class="us-s">Snap · Crop · Save · Repeat</div></div><div class="us-arr"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>`;
+  us.addEventListener('click',()=>navigate('upload'));
+  body.appendChild(us);
+
+  // Timeline
+  const th=document.createElement('div');th.className='sec';
+  th.innerHTML=`<span class="sec-t">📅 Timeline</span><span class="sec-link">All Eras</span>`;
+  body.appendChild(th);
+  const tg=document.createElement('div');tg.className='tgrid';
+  const recent=[...arts].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,4);
+  recent.forEach(a=>{
+    const k=kidById(a.kidId);
+    const g=gradeAt(k?.schoolStart,a.date);
+    const gc=gradClass(g);
+    const d=document.createElement('div');d.className='titem';
+    d.innerHTML=`<div class="tthumb ${a.fill}">${a.imageData?`<img src="${a.imageData}" style="width:100%;height:100%;object-fit:cover">`:`<span>${a.emoji||'🎨'}</span>`}</div><div class="tinfo"><div class="tera ${gc}">${g}</div><div class="tname">${a.title}</div></div>`;
+    d.addEventListener('click',()=>{studioArtList=arts;studioIdx=arts.indexOf(a);navigate('studio');});
+    tg.appendChild(d);
+  });
+  body.appendChild(tg);
+}
+function buildArtCard(art,pos,isCenter){
+  if(!art)return'';
+  return`<div class="art-card ${pos}">
+    <div class="art-thumb ${art.fill||'g1'}">
+      ${art.imageData?`<img class="art-thumb-img" src="${art.imageData}">`:`<span class="art-thumb-emoji">${art.emoji||'🎨'}</span>`}
+      ${isCenter?`<button class="art-fav-btn" title="Favorite">${art.fav?'❤️':'♡'}</button><button class="art-share-btn" title="Share"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg></button>`:''}
     </div>
     <div class="art-plaque">
-      <div class="art-title-text">${art.title}</div>
-      <div class="art-meta">
-        <span class="meta-pill pill-age">${art.age}</span>
-        <span class="meta-pill pill-grade">${art.grade}</span>
-        <span class="meta-pill pill-date">${art.date}</span>
-      </div>
+      <div class="art-ptitle">${art.title}</div>
+      ${isCenter?artMeta(art):''}
     </div>
+  </div>`;
+}
+function artMeta(a){
+  const k=kidById(a.kidId);
+  const age=ageAt(k?.bday,a.date);
+  const grade=gradeAt(k?.schoolStart,a.date);
+  return`<div class="art-pmeta"><span class="pill pill-age">${age}</span><span class="pill pill-grade">${grade}</span><span class="pill pill-date">${fmt(a.date)}</span></div>`;
+}
+function updateStats(body,arts){
+  const row=body.querySelector('#statsRow');
+  if(!row)return;
+  row.innerHTML=`
+    <div class="stat-c"><div class="stat-n" style="color:var(--coral)">${arts.length}</div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Artworks</div></div>
+    <div class="stat-c"><div class="stat-n" style="color:var(--accent)">${arts.filter(a=>a.fav).length}</div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Favorites</div></div>
+    <div class="stat-c"><div class="stat-n" style="color:var(--sky)">${DB.kids.length}</div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Kids</div></div>
   `;
-  if(isCenterEl){
-    const favBtn = el.querySelector('.art-fav');
-    if(favBtn) favBtn.addEventListener('click',(e)=>{
-      e.stopPropagation();
-      art.fav=!art.fav;
-      favBtn.textContent=art.fav?'❤️':'♡';
-      showToast(art.fav?'success':'info', art.fav?'Favorited!':'Removed from favorites', art.title, 2000);
-      updateStats();
-    });
+}
+
+/* ══ KIDS SCREEN ══ */
+function renderKids(){
+  const body=document.getElementById('kidsBody');
+  body.innerHTML='';
+  if(DB.kids.length===0){
+    body.innerHTML=`<div class="empty-state"><div class="empty-ico">👧</div><div class="empty-t">No children added yet</div><div class="empty-d">Add your first child to start building their permanent art gallery.</div><button class="btn btn-accent" style="margin-top:10px" onclick="openKidForm()">Add First Child</button></div>`;
+    return;
   }
-}
-function renderCarousel(){
-  filterArt();
-  const n = filteredArt.length;
-  renderCardEl(document.getElementById('card-left'), filteredArt[(curIdx-1+n)%n], false);
-  renderCardEl(document.getElementById('card-center'), filteredArt[curIdx], true);
-  renderCardEl(document.getElementById('card-right'), filteredArt[(curIdx+1)%n], false);
-  // dots
-  const dc = document.getElementById('carouselDots');
-  dc.innerHTML = filteredArt.map((_,i)=>`<div class="dot${i===curIdx?' active':''}" data-i="${i}"></div>`).join('');
-  dc.querySelectorAll('.dot').forEach(d=>d.addEventListener('click',()=>{curIdx=parseInt(d.dataset.i);renderCarousel();}));
-  // print preview sync
-  syncPrintPreview();
-}
-function navigate(dir){
-  curIdx=(curIdx+dir+filteredArt.length)%filteredArt.length;
-  renderCarousel();
-}
-document.getElementById('card-left').addEventListener('click',()=>navigate(-1));
-document.getElementById('card-right').addEventListener('click',()=>navigate(1));
-// swipe
-let touchStartX=0;
-document.getElementById('carousel').addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;},{passive:true});
-document.getElementById('carousel').addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-touchStartX;
-  if(Math.abs(dx)>40) navigate(dx<0?1:-1);
-});
-
-/* ─── CHILD TABS ─── */
-document.querySelectorAll('.child-chip').forEach(chip=>{
-  chip.addEventListener('click',()=>{
-    document.querySelectorAll('.child-chip').forEach(c=>c.classList.remove('active'));
-    chip.classList.add('active');
-    curKid=chip.dataset.kid;
-    curIdx=0;
-    const titles={'leo':"🖼️ Leo's Studio",'mia':"🖼️ Mia's Studio",'all':"🖼️ All Artwork"};
-    document.getElementById('studioTitle').textContent=titles[curKid]||"🖼️ Gallery";
-    updateStats();
-    renderCarousel();
-  });
-});
-
-/* ─── STATS ─── */
-function updateStats(){
-  filterArt();
-  document.getElementById('statArt').textContent=filteredArt.length;
-  document.getElementById('statFav').textContent=filteredArt.filter(a=>a.fav).length;
-  document.getElementById('statYrs').textContent=curKid==='mia'?3:6;
-}
-
-/* ─── TIMELINE ─── */
-function renderTimeline(){
-  const grid = document.getElementById('timelineGrid');
-  const items = curKid==='all' ? TIMELINE_DATA : TIMELINE_DATA.filter(t=>t.kid===curKid||curKid==='all');
-  grid.innerHTML = (items.length?items:TIMELINE_DATA).map(t=>`
-    <div class="timeline-item" onclick="showToast('art','${t.name}','${t.era} · Long-press to share',2500)">
-      <div class="ti-thumb ${t.fill}">${t.emoji}</div>
-      <div class="ti-info">
-        <div class="ti-era ${t.eraClass}">${t.era}</div>
-        <div class="ti-name">${t.name}</div>
+  DB.kids.forEach(k=>{
+    const arts=artsForKid(k.id);
+    const d=document.createElement('div');d.className='kid-card';
+    d.innerHTML=`
+      <div class="av" style="background:${k.color};color:${k.colorText}">${k.emoji}</div>
+      <div class="kid-info">
+        <div class="kn">${k.name}</div>
+        <div class="km">Born ${k.bday?new Date(k.bday+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—'} · ${arts.length} artwork${arts.length!==1?'s':''}</div>
       </div>
-    </div>
-  `).join('');
+      <div class="kid-card-arrow"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+    `;
+    d.addEventListener('click',()=>openKidForm(k));
+    body.appendChild(d);
+  });
+  const addBtn=document.createElement('div');addBtn.style.cssText='padding:4px 18px 16px';
+  addBtn.innerHTML=`<button class="btn btn-outline btn-full" onclick="openKidForm()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add another child</button>`;
+  body.appendChild(addBtn);
 }
 
-/* ─── SETTINGS MODAL ─── */
-const overlay = document.getElementById('settingsOverlay');
-document.getElementById('settingsBtn').addEventListener('click',()=>{
-  overlay.classList.add('open');
-});
-function closeSettings(){
-  overlay.classList.remove('open');
-  showToast('success','Settings saved','Your preferences have been updated.',2200);
+/* ══ KID FORM ══ */
+function openKidForm(kid){
+  document.getElementById('kfEditId').value=kid?kid.id:'';
+  document.getElementById('kfName').value=kid?kid.name:'';
+  document.getElementById('kfBday').value=kid?kid.bday:'';
+  document.getElementById('kfSchool').value=kid?kid.schoolStart||'':'';
+  document.getElementById('kidFormTitle').textContent=kid?'Edit Child':'Add Child';
+  document.getElementById('kidFormIco').textContent=kid?kid.emoji:'👧';
+  document.getElementById('kfDeleteWrap').style.display=kid?'block':'none';
+  selectedEmoji=kid?kid.emoji:'🦁';
+  selectedAvColor=kid?`${kid.color},${kid.colorText}`:'#FFD166,#7A5B00';
+  document.querySelectorAll('.ep-opt').forEach(o=>o.classList.toggle('selected',o.dataset.e===selectedEmoji));
+  document.querySelectorAll('.av-color-opt').forEach(o=>{
+    const sel=o.dataset.c===selectedAvColor;
+    o.style.borderColor=sel?'var(--accent)':'transparent';
+    o.style.transform=sel?'scale(1.15)':'';
+  });
+  document.getElementById('kidFormOverlay').classList.add('open');
 }
-document.getElementById('settingsClose').addEventListener('click',closeSettings);
-overlay.addEventListener('click',(e)=>{
-  if(e.target===overlay) closeSettings();
+function closeKidForm(){document.getElementById('kidFormOverlay').classList.remove('open');}
+function saveKid(){
+  const name=document.getElementById('kfName').value.trim();
+  if(!name){toast('error','Name required','Please enter the child\'s name.',2500);return;}
+  const colors=selectedAvColor.split(',');
+  const id=document.getElementById('kfEditId').value;
+  if(id){
+    const k=DB.kids.find(k=>k.id===id);
+    if(k){Object.assign(k,{name,emoji:selectedEmoji,color:colors[0],colorText:colors[1]||'#fff',bday:document.getElementById('kfBday').value,schoolStart:document.getElementById('kfSchool').value,isSample:false});}
+    toast('success','Profile Updated',name+"'s profile has been saved.",2200);
+  } else {
+    DB.kids.push({id:uid(),name,emoji:selectedEmoji,color:colors[0],colorText:colors[1]||'#fff',bday:document.getElementById('kfBday').value,schoolStart:document.getElementById('kfSchool').value,isSample:false});
+    toast('art','Child Added',name+' is ready for their gallery! 🎨',2500);
+  }
+  save();closeKidForm();renderKids();renderGallery();
+}
+function deleteKid(id){
+  showConfirm('🗑️','Delete this child?','This will also delete ALL their artwork. This cannot be undone.',()=>{
+    DB.kids=DB.kids.filter(k=>k.id!==id);
+    DB.arts=DB.arts.filter(a=>a.kidId!==id);
+    if(curKidFilter===id)curKidFilter='all';
+    save();closeKidForm();renderKids();renderGallery();
+    toast('info','Child Removed','All associated artwork has been deleted.',2500);
+  });
+}
+// Emoji picker
+document.querySelectorAll('.ep-opt').forEach(o=>o.addEventListener('click',()=>{
+  selectedEmoji=o.dataset.e;
+  document.querySelectorAll('.ep-opt').forEach(x=>x.classList.remove('selected'));
+  o.classList.add('selected');
+  document.getElementById('kidFormIco').textContent=selectedEmoji;
+}));
+function selectAvColor(el){
+  selectedAvColor=el.dataset.c;
+  document.querySelectorAll('.av-color-opt').forEach(o=>{
+    const sel=o.dataset.c===selectedAvColor;
+    o.style.borderColor=sel?'var(--accent)':'transparent';
+    o.style.transform=sel?'scale(1.15)':'';
+  });
+}
+
+/* ══ STUDIO SCREEN ══ */
+function renderStudio(){
+  if(studioArtList.length===0){studioArtList=filteredArts();}
+  if(studioArtList.length===0){
+    document.getElementById('plaqueTitle').textContent='No artwork yet';
+    document.getElementById('studioCounter').textContent='0 of 0';
+    return;
+  }
+  if(studioIdx>=studioArtList.length)studioIdx=0;
+  const art=studioArtList[studioIdx];
+  const k=kidById(art.kidId);
+  const artEl=document.getElementById('museumArt');
+  if(art.imageData){
+    artEl.innerHTML=`<img class="museum-art-img" src="${art.imageData}">`;
+  } else {
+    artEl.innerHTML=`<span style="font-size:100px">${art.emoji||'🎨'}</span>`;
+  }
+  document.getElementById('plaqueTitle').textContent=art.title;
+  const age=ageAt(k?.bday,art.date);
+  const grade=gradeAt(k?.schoolStart,art.date);
+  document.getElementById('plaqueBadges').innerHTML=`
+    <span class="plaque-badge pb-age">${k?k.name:'?' } · ${age}</span>
+    <span class="plaque-badge pb-grade">${grade}</span>
+    <span class="plaque-badge pb-date">${fmt(art.date)}</span>
+  `;
+  document.getElementById('plaqueNotes').textContent=art.notes||'';
+  document.getElementById('studioCounter').textContent=`${studioIdx+1} of ${studioArtList.length}`;
+  document.getElementById('studioFav').textContent=art.fav?'❤️':'🤍';
+  // Unlock mode overlays
+  const unlocked=DB.settings.unlockEdit;
+  document.getElementById('studioEditOverlay').classList.toggle('visible',!!unlocked);
+  document.getElementById('plaqueEditBtn').classList.toggle('visible',!!unlocked);
+}
+function studioEditCurrent(){
+  const art=studioArtList[studioIdx];
+  if(!art)return;
+  openArtForm(art);
+}
+document.getElementById('studioPrev').addEventListener('click',()=>{
+  studioIdx=(studioIdx-1+studioArtList.length)%studioArtList.length;renderStudio();
 });
-// Dark mode
-document.getElementById('darkToggle').addEventListener('change',function(){
-  document.documentElement.setAttribute('data-theme',this.checked?'dark':'');
-  showToast(this.checked?'info':'success',this.checked?'Dark Mode On':'Light Mode On',this.checked?'Easier on the eyes. Great for late nights.':'Back to the bright side!',2500);
+document.getElementById('studioNext').addEventListener('click',()=>{
+  studioIdx=(studioIdx+1)%studioArtList.length;renderStudio();
 });
-// Theme color
-document.getElementById('themeSelect').addEventListener('change',function(){
-  const colors={grape:'#9B5DE5',coral:'#FF6B6B',sky:'#4ECDC4',sun:'#FFD166'};
-  document.documentElement.style.setProperty('--c-grape',colors[this.value]||colors.grape);
-  showToast('art','Theme Updated','New color applied across the app.',2000);
+document.getElementById('studioFav').addEventListener('click',()=>{
+  const art=studioArtList[studioIdx];if(!art)return;
+  art.fav=!art.fav;save();renderStudio();
+  toast(art.fav?'success':'info',art.fav?'Favorited!':'Unfavorited',art.title,2000);
 });
-// Font size
-document.getElementById('fontSelect').addEventListener('change',function(){
-  document.documentElement.style.fontSize=this.value==='large'?'18px':'16px';
-  showToast('info','Font Size','Text size updated.',1800);
+document.getElementById('studioShare').addEventListener('click',()=>{
+  const art=studioArtList[studioIdx];if(art)openPrintModal(art);
 });
-// Other toggles
-['recapToggle','favReminderToggle','bdayToggle','icloudToggle','tvToggle','haToggle','lockToggle','displayPinToggle','analyticsToggle'].forEach(id=>{
-  const el=document.getElementById(id);
-  if(el) el.addEventListener('change',function(){
-    const labels={
-      recapToggle:['Monthly recaps off','Monthly recap emails on'],
-      favReminderToggle:['Favorites reminders off','Favorites reminder on'],
-      bdayToggle:['Birthday flashbacks off','Birthday flashbacks on 🎂'],
-      icloudToggle:['iCloud backup paused','iCloud backup active ☁️'],
-      tvToggle:['Art TV mode off','Art TV mode enabled 📺'],
-      haToggle:['Home Assistant off','Home Assistant feed enabled 🏠'],
-      lockToggle:['App lock off','App lock enabled 🔒'],
-      displayPinToggle:['Display PIN off','Display PIN enabled 🔒'],
-      analyticsToggle:['Analytics opt-out','Thanks for helping us improve!'],
-    };
-    const msgs=labels[id]||['Off','On'];
-    showToast('info',msgs[this.checked?1:0],'',1800);
+document.getElementById('studioDelete').addEventListener('click',()=>{
+  const art=studioArtList[studioIdx];if(!art)return;
+  showConfirm('🗑️',`Delete "${art.title}"?`,'This artwork will be permanently removed.',()=>{
+    DB.arts=DB.arts.filter(a=>a.id!==art.id);
+    studioArtList=studioArtList.filter(a=>a.id!==art.id);
+    if(studioIdx>=studioArtList.length)studioIdx=Math.max(0,studioArtList.length-1);
+    save();renderStudio();toast('info','Artwork Deleted','',2000);
   });
 });
-// Back to intro from settings
-document.getElementById('backToIntroBtn').addEventListener('click',()=>{
-  overlay.classList.remove('open');
-  introIdx=0;
-  updateIntroSlide();
-  showScreen('intro');
-  showToast('info','Intro Walkthrough','Swipe through the slides again anytime.',2500);
-});
-
-/* ─── PRINT / SHARE ─── */
-const printOverlay = document.getElementById('printOverlay');
-function syncPrintPreview(){
-  const art=filteredArt[curIdx];
-  if(!art) return;
-  document.getElementById('printArtEmoji').className=`print-art ${art.fill}`;
-  document.getElementById('printArtEmoji').textContent=art.emoji;
-  document.getElementById('printArtTitle').textContent=art.title;
-  document.getElementById('printAge').textContent=art.age;
-  document.getElementById('printGrade').textContent=art.grade;
-  document.getElementById('printDate').textContent=art.date;
-}
-document.getElementById('card-center').addEventListener('dblclick',()=>{
-  syncPrintPreview();
-  printOverlay.classList.add('open');
-});
-// Also from FAB long-press or button
-document.getElementById('fabBtn').addEventListener('click',()=>{
-  syncPrintPreview();
-  printOverlay.classList.add('open');
-});
-document.getElementById('addArtBtn').addEventListener('click',()=>{
-  showToast('art','Add Artwork','Camera upload coming in the full native build!',3000);
-});
-document.getElementById('printCancel').addEventListener('click',()=>{
-  printOverlay.classList.remove('open');
-});
-printOverlay.addEventListener('click',(e)=>{
-  if(e.target===printOverlay) printOverlay.classList.remove('open');
-});
-document.getElementById('printDownload').addEventListener('click',async()=>{
-  const frame=document.getElementById('printFrame');
-  const btn=document.getElementById('printDownload');
-  btn.textContent='Generating…';btn.disabled=true;
-  try{
-    const canvas=await html2canvas(frame,{
-      scale:3,useCORS:true,
-      backgroundColor:'#ffffff',
-      logging:false,
-    });
-    const link=document.createElement('a');
-    const art=filteredArt[curIdx];
-    link.download=`${(art?art.title:'artwork').replace(/\s+/g,'-').toLowerCase()}-littlepicasso.png`;
-    link.href=canvas.toDataURL('image/png');
-    link.click();
-    printOverlay.classList.remove('open');
-    showToast('success','PNG Saved!','Your artwork card is ready to share or print. 🖼️',3000);
-  }catch(err){
-    showToast('error','Export Failed','Try again or screenshot manually.',2500);
-    console.error(err);
+// Studio swipe
+let stsx=0;
+document.getElementById('studioStage').addEventListener('touchstart',e=>{stsx=e.touches[0].clientX;},{passive:true});
+document.getElementById('studioStage').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-stsx;
+  if(Math.abs(dx)>44){
+    studioIdx=dx<0?(studioIdx+1)%studioArtList.length:(studioIdx-1+studioArtList.length)%studioArtList.length;
+    renderStudio();
   }
-  btn.textContent='Save PNG';btn.disabled=false;
 });
 
-/* ─── UPLOAD STRIP ─── */
-document.getElementById('uploadStrip').addEventListener('click',()=>{
-  showToast('info','Box Clearer Mode','Session-lock your date, then snap-crop-save in a loop. (Native camera in PWA build)',3500);
+/* ══ ARTWORK FORM ══ */
+function openArtForm(art){
+  document.getElementById('artFormTitle').textContent=art?'Edit Artwork':'Add Artwork';
+  document.getElementById('afTitle').value=art?art.title:'';
+  document.getElementById('afDate').value=art?art.date:new Date().toISOString().split('T')[0];
+  document.getElementById('afNotes').value=art?art.notes:'';
+  document.getElementById('afEditId').value=art?art.id:'';
+  artImgData=art?art.imageData:null;
+  const prev=document.getElementById('artImgPreview');
+  prev.innerHTML=artImgData?`<img src="${artImgData}" style="width:100%;height:100%;object-fit:cover">`:`<div style="text-align:center;color:var(--muted)"><div style="font-size:36px;margin-bottom:6px">📷</div><div style="font-size:12px;font-weight:700">Tap to choose image</div></div>`;
+  // Populate kid select
+  const sel=document.getElementById('afKid');
+  sel.innerHTML=DB.kids.map(k=>`<option value="${k.id}" ${art&&art.kidId===k.id?'selected':''}>${k.emoji} ${k.name}</option>`).join('');
+  document.getElementById('artFormOverlay').classList.add('open');
+}
+function previewArtImg(input){
+  if(!input.files[0])return;
+  const r=new FileReader();
+  r.onload=async e=>{
+    const cropped=await autoCropImage(e.target.result);
+    artImgData=cropped;
+    document.getElementById('artImgPreview').innerHTML=`<img src="${artImgData}" style="width:100%;height:100%;object-fit:cover">`;
+    toast('info','Auto-cropped','White borders trimmed automatically. Looks good!',2200);
+  };
+  r.readAsDataURL(input.files[0]);
+}
+function saveArtwork(){
+  const title=document.getElementById('afTitle').value.trim();
+  const kidId=document.getElementById('afKid').value;
+  const date=document.getElementById('afDate').value;
+  if(!title){toast('error','Title required','',2000);return;}
+  if(!kidId){toast('error','Select a child','',2000);return;}
+  const id=document.getElementById('afEditId').value;
+  const fills=['g1','g2','g3','g4','g5','g6','g7','g8'];
+  if(id){
+    const a=DB.arts.find(a=>a.id===id);
+    if(a){Object.assign(a,{title,kidId,date,notes:document.getElementById('afNotes').value,imageData:artImgData});}
+    toast('success','Artwork Updated','',2000);
+  } else {
+    DB.arts.push({id:uid(),kidId,title,date,notes:document.getElementById('afNotes').value,emoji:'🎨',fill:fills[DB.arts.length%fills.length],fav:false,imageData:artImgData,isSample:false});
+    toast('art','Artwork Saved!','',2200);
+  }
+  save();
+  document.getElementById('artFormOverlay').classList.remove('open');
+  renderGallery();
+}
+
+/* ══ UPLOAD SCREEN ══ */
+function renderUploadKids(){
+  const sel=document.getElementById('uploadKidSel');
+  sel.innerHTML='<option value="">— select child —</option>'+DB.kids.map(k=>`<option value="${k.id}">${k.emoji} ${k.name}</option>`).join('');
+  document.getElementById('uploadDate').value=new Date().toISOString().split('T')[0];
+  uploadSavedCount=0;
+  document.getElementById('usbCount').textContent='0';
+  document.getElementById('uploadSessionBar').style.display='none';
+  document.getElementById('uploadQueue').innerHTML='';
+}
+function updateSessionBar(){
+  const kid=DB.kids.find(k=>k.id===document.getElementById('uploadKidSel').value);
+  const date=document.getElementById('uploadDate').value;
+  if(kid&&date){
+    document.getElementById('uploadSessionBar').style.display='flex';
+    document.getElementById('usbKid').textContent=kid.emoji+' '+kid.name;
+    document.getElementById('usbDate').textContent=new Date(date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    document.getElementById('usbCount').textContent=uploadSavedCount;
+  }
+}
+document.getElementById('uploadKidSel').addEventListener('change',updateSessionBar);
+document.getElementById('uploadDate').addEventListener('change',updateSessionBar);
+document.getElementById('fileInput').addEventListener('change',async function(){
+  const kid=DB.kids.find(k=>k.id===document.getElementById('uploadKidSel').value);
+  const date=document.getElementById('uploadDate').value;
+  if(!kid){toast('warning','Select a child first','',2500);this.value='';return;}
+  if(!date){toast('warning','Set a date first','',2500);this.value='';return;}
+  const files=Array.from(this.files);
+  for(const file of files){
+    const raw=await fileToDataURL(file);
+    const imgData=await autoCropImage(raw);
+    const artId=uid();
+    const fills=['g1','g2','g3','g4','g5','g6','g7','g8'];
+    DB.arts.push({id:artId,kidId:kid.id,title:file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' '),date,notes:'',emoji:'🎨',fill:fills[DB.arts.length%fills.length],fav:false,imageData:imgData,isSample:false});
+    uploadSavedCount++;
+    addToQueue(artId,imgData,file.name,date);
+  }
+  save();
+  document.getElementById('usbCount').textContent=uploadSavedCount;
+  document.getElementById('uploadSessionBar').style.display='flex';
+  document.getElementById('usbKid').textContent=kid.emoji+' '+kid.name;
+  document.getElementById('usbDate').textContent=new Date(date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  toast('save',`${files.length} artwork${files.length>1?'s':''} saved!`,'Tap the title to rename.',2800);
+  this.value='';
+});
+function fileToDataURL(file){
+  return new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
+}
+
+/* Smart auto-crop: detects content bounds, removes white/light borders,
+   then outputs a square-ish cropped JPEG at max 1200px */
+function autoCropImage(dataURL){
+  return new Promise((resolve)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const W=img.width, H=img.height;
+      // Draw to canvas to read pixels
+      const c=document.createElement('canvas');
+      c.width=W; c.height=H;
+      const ctx=c.getContext('2d');
+      ctx.drawImage(img,0,0);
+      const data=ctx.getImageData(0,0,W,H).data;
+
+      // Helper: is pixel at (x,y) "background"? (light/white/near-white)
+      function isBg(x,y){
+        if(x<0||y<0||x>=W||y>=H)return true;
+        const i=(y*W+x)*4;
+        const r=data[i],g=data[i+1],b=data[i+2];
+        // Light threshold: all channels > 220 = background
+        return r>220&&g>220&&b>220;
+      }
+
+      // Scan for content bounds
+      let top=0,bottom=H-1,left=0,right=W-1;
+      // Top
+      outer:for(let y=0;y<H;y++){for(let x=0;x<W;x++){if(!isBg(x,y)){top=Math.max(0,y-4);break outer;}}}
+      // Bottom
+      outer:for(let y=H-1;y>=0;y--){for(let x=0;x<W;x++){if(!isBg(x,y)){bottom=Math.min(H-1,y+4);break outer;}}}
+      // Left
+      outer:for(let x=0;x<W;x++){for(let y=0;y<H;y++){if(!isBg(x,y)){left=Math.max(0,x-4);break outer;}}}
+      // Right
+      outer:for(let x=W-1;x>=0;x--){for(let y=0;y<H;y++){if(!isBg(x,y)){right=Math.min(W-1,x+4);break outer;}}}
+
+      let cw=right-left, ch=bottom-top;
+      // If crop found less than 20% of image, likely no whitespace — use full image
+      if(cw<W*0.2||ch<H*0.2){left=0;top=0;cw=W;ch=H;}
+
+      // Output: max 1200px on longest side, JPEG 0.88 quality
+      const scale=Math.min(1,1200/Math.max(cw,ch));
+      const ow=Math.round(cw*scale), oh=Math.round(ch*scale);
+      const out=document.createElement('canvas');
+      out.width=ow; out.height=oh;
+      const octx=out.getContext('2d');
+      octx.drawImage(img, left, top, cw, ch, 0, 0, ow, oh);
+      resolve(out.toDataURL('image/jpeg',0.88));
+    };
+    img.onerror=()=>resolve(dataURL); // fallback: use original
+    img.src=dataURL;
+  });
+}
+function addToQueue(artId,imgData,name,date){
+  const q=document.getElementById('uploadQueue');
+  const item=document.createElement('div');item.className='uq-item';item.id='uq-'+artId;
+  const title=name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+  item.innerHTML=`
+    <div class="uq-thumb"><img src="${imgData}" alt="${title}"></div>
+    <div class="uq-info">
+      <div class="uq-name" contenteditable="true" onblur="renameQueueArt('${artId}',this.textContent)">${title}</div>
+      <div class="uq-saved">✓ Saved to gallery</div>
+    </div>
+    <button class="uq-del" onclick="removeQueueArt('${artId}')">✕</button>
+  `;
+  q.prepend(item);
+}
+function renameQueueArt(id,name){
+  const a=DB.arts.find(a=>a.id===id);
+  if(a){a.title=name.trim()||a.title;save();}
+}
+function removeQueueArt(id){
+  DB.arts=DB.arts.filter(a=>a.id!==id);
+  document.getElementById('uq-'+id)?.remove();
+  uploadSavedCount=Math.max(0,uploadSavedCount-1);
+  document.getElementById('usbCount').textContent=uploadSavedCount;
+  save();
+}
+// Drop zone drag
+const drop=document.getElementById('uploadDrop');
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag');});
+drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));
+drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('drag');document.getElementById('fileInput').files=e.dataTransfer.files;document.getElementById('fileInput').dispatchEvent(new Event('change'));});
+
+/* ══ PRINT / SHARE ══ */
+function openPrintModal(art){
+  const k=kidById(art.kidId);
+  const pfArt=document.getElementById('pfArt');
+  pfArt.className='pf-art '+(art.fill||'g1');
+  if(art.imageData){pfArt.innerHTML=`<img class="pf-art-img" src="${art.imageData}">`;}
+  else{pfArt.innerHTML=`<span id="pfEmoji" style="font-size:72px">${art.emoji||'🎨'}</span>`;}
+  document.getElementById('pfTitle').textContent=art.title;
+  const age=ageAt(k?.bday,art.date);
+  const grade=gradeAt(k?.schoolStart,art.date);
+  document.getElementById('pfBadges').innerHTML=`<span class="print-badge pill-age">${age}</span><span class="print-badge pill-grade">${grade}</span><span class="print-badge pill-date">${fmt(art.date)}</span>`;
+  document.getElementById('printModal').classList.add('open');
+  document.getElementById('downloadPng').dataset.artId=art.id;
+}
+document.getElementById('downloadPng').addEventListener('click',async function(){
+  this.textContent='Generating…';this.disabled=true;
+  try{
+    const frame=document.getElementById('printFrameInner');
+    const canvas=await html2canvas(frame,{scale:3,useCORS:true,backgroundColor:'#ffffff',logging:false});
+    const artId=this.dataset.artId;
+    const art=DB.arts.find(a=>a.id===artId);
+    const link=document.createElement('a');
+    link.download=`${(art?art.title:'artwork').replace(/\s+/g,'-').toLowerCase()}-canvaskeep.png`;
+    link.href=canvas.toDataURL('image/png');link.click();
+    document.getElementById('printModal').classList.remove('open');
+    toast('success','PNG Saved!','Ready to share or print. 🖼️',2800);
+  }catch(e){toast('error','Export failed','Try screenshotting instead.',2500);}
+  this.textContent='Save PNG';this.disabled=false;
 });
 
-/* ─── BEFORE UNLOAD ─── */
-let allowUnload=false;
-window.addEventListener('beforeunload',(e)=>{
-  if(allowUnload) return;
-  e.preventDefault();
-  e.returnValue='';
-  document.getElementById('beforeunloadOverlay').classList.add('open');
+/* ══ EXPORT / IMPORT ══ */
+function exportJSON(mode){
+  const blob=new Blob([JSON.stringify({version:'1.0',exportDate:new Date().toISOString(),kids:DB.kids,arts:DB.arts.map(a=>({...a,imageData:undefined}))},null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`canvaskeep-backup-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();URL.revokeObjectURL(url);
+  if(mode==='icloud'){toast('save','Backup Downloaded','Now drag this file into your iCloud Drive folder at icloud.com or in Finder.',4000);}
+  else{toast('save','Backup Exported','JSON file downloaded to your device.',2500);}
+}
+function importJSON(input){
+  if(!input.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!data.kids||!data.arts)throw new Error('Invalid format');
+      showConfirm('📂','Import Backup?',`This will ADD ${data.kids.length} kid(s) and ${data.arts.length} artwork(s) to your current data.`,()=>{
+        // Merge: avoid duplicates by id
+        const existKids=new Set(DB.kids.map(k=>k.id));
+        const existArts=new Set(DB.arts.map(a=>a.id));
+        data.kids.forEach(k=>{if(!existKids.has(k.id))DB.kids.push(k);});
+        data.arts.forEach(a=>{if(!existArts.has(a.id))DB.arts.push(a);});
+        save();renderGallery();renderKids();
+        toast('success','Backup Imported!',`Added ${data.kids.length} kids and ${data.arts.length} artworks.`,3500);
+      });
+    }catch{toast('error','Invalid File','This doesn\'t look like a CanvasKeep backup.',2500);}
+  };
+  r.readAsText(input.files[0]);
+  input.value='';
+}
+function exportGoogleDrive(){document.getElementById('driveModal').classList.add('open');}
+function driveDownload(){
+  const email=document.getElementById('driveEmail').value.trim();
+  document.getElementById('driveModal').classList.remove('open');
+  exportJSON();
+  toast('info','Download ready','Sign in to drive.google.com and upload the file to save it to your Drive.',5000);
+}
+
+/* ══ SETTINGS ══ */
+function openSettings(){document.getElementById('settingsOverlay').classList.add('open');}
+function closeSettings(){document.getElementById('settingsOverlay').classList.remove('open');}
+document.getElementById('settingsClose').addEventListener('click',closeSettings);
+document.getElementById('settingsOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('settingsOverlay'))closeSettings();});
+document.getElementById('gallerySettingsBtn').addEventListener('click',openSettings);
+document.getElementById('kidsSettingsBtn').addEventListener('click',openSettings);
+document.getElementById('darkToggle').addEventListener('change',function(){
+  DB.settings.dark=this.checked;
+  document.documentElement.setAttribute('data-theme',this.checked?'dark':'');
+  save();toast(this.checked?'info':'success',this.checked?'Dark Mode On':'Light Mode On','',2000);
+});
+document.getElementById('accentSel').addEventListener('change',function(){
+  DB.settings.accent=this.value;
+  const colors={grape:'#9B5DE5',coral:'#FF6B6B',sky:'#4ECDC4',sun:'#FFD166'};
+  document.documentElement.style.setProperty('--accent',colors[this.value]);
+  document.getElementById('themeColorMeta').content=colors[this.value];
+  save();toast('art','Color Updated','',1800);
+});
+['recapTog','bdayTog'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('change',function(){
+    save();toast('info',this.checked?'On':'Off','',1500);
+  });
+});
+document.getElementById('unlockToggle').addEventListener('change',function(){
+  DB.settings.unlockEdit=this.checked;
+  save();
+  document.getElementById('unlockModeInfo').style.display=this.checked?'block':'none';
+  if(curScreen==='studio')renderStudio();
+  toast(this.checked?'info':'success',
+    this.checked?'Edit Mode Unlocked 🔓':'Edit Mode Locked 🔒',
+    this.checked?'Tap artwork in the Studio to edit notes or retake.':'Studio is back to display-only.',
+    2800);
+});
+function confirmClearSamples(){
+  showConfirm('🧹','Clear Sample Data?','The demo kids (Leo, Mia) and their artwork will be removed. Your own data is safe.',()=>{
+    DB.kids=DB.kids.filter(k=>!k.isSample);
+    DB.arts=DB.arts.filter(a=>!a.isSample);
+    if(!DB.kids.find(k=>k.id===curKidFilter))curKidFilter='all';
+    save();renderGallery();renderKids();
+    toast('success','Sample Data Cleared','Your real gallery is ready.',2500);
+  });
+}
+function confirmWipeAll(){
+  showConfirm('💣','Wipe Everything?','ALL kids and artwork will be permanently deleted. This cannot be undone.',()=>{
+    DB={kids:[],arts:[],settings:{dark:false,accent:'grape',recap:true,bday:true}};
+    curKidFilter='all';carouselIdx=0;
+    save();localStorage.removeItem('ck_onboarded');
+    closeSettings();navigate('intro');
+    toast('info','All data cleared','Starting fresh.',2500);
+  });
+}
+
+/* ══ CONFIRM MODAL ══ */
+let confirmCb=null;
+function showConfirm(ico,title,msg,cb){
+  document.getElementById('confirmIco').textContent=ico;
+  document.getElementById('confirmTitle').textContent=title;
+  document.getElementById('confirmMsg').textContent=msg;
+  confirmCb=cb;
+  document.getElementById('confirmModal').classList.add('open');
+}
+document.getElementById('confirmYes').addEventListener('click',()=>{
+  document.getElementById('confirmModal').classList.remove('open');
+  if(confirmCb){confirmCb();confirmCb=null;}
+});
+
+/* ══ NAV BAR BUTTONS ══ */
+document.querySelectorAll('[data-screen]').forEach(btn=>{
+  btn.addEventListener('click',()=>navigate(btn.dataset.screen));
+});
+document.getElementById('galleryFab').addEventListener('click',()=>{
+  if(DB.kids.length===0){toast('warning','Add a child first','Go to Kids tab to add your first child.',3000);navigate('kids');return;}
+  openArtForm(null);
+});
+document.getElementById('galleryAddBtn').addEventListener('click',()=>{
+  if(DB.kids.length===0){navigate('kids');return;}
+  openArtForm(null);
+});
+document.getElementById('addKidBtn').addEventListener('click',()=>openKidForm());
+
+/* ══ BEFORE UNLOAD ══ */
+let allowLeave=false;
+window.addEventListener('beforeunload',e=>{
+  if(allowLeave)return;
+  e.preventDefault();e.returnValue='';
+  document.getElementById('buModal').classList.add('open');
   return '';
 });
 document.getElementById('buStay').addEventListener('click',()=>{
-  document.getElementById('beforeunloadOverlay').classList.remove('open');
-  showToast('success','Welcome back!','Your gallery is right where you left it.',2500);
+  document.getElementById('buModal').classList.remove('open');
+  toast('success','Welcome back!','Your gallery is right where you left it.',2000);
 });
 document.getElementById('buLeave').addEventListener('click',()=>{
-  allowUnload=true;
-  document.getElementById('beforeunloadOverlay').classList.remove('open');
-  showToast('info','See you soon!','Your art is saved locally. Come back anytime.',2000);
-  setTimeout(()=>{ try{window.close();}catch(e){} },600);
+  allowLeave=true;
+  document.getElementById('buModal').classList.remove('open');
+  setTimeout(()=>{try{window.close();}catch(e){}},400);
 });
 
-/* ─── INIT ─── */
-filterArt();
-renderCarousel();
-updateStats();
-renderTimeline();
+/* ══ APPLY SETTINGS ══ */
+function applySettings(){
+  if(DB.settings.dark){
+    document.documentElement.setAttribute('data-theme','dark');
+    document.getElementById('darkToggle').checked=true;
+  }
+  if(DB.settings.accent){
+    const colors={grape:'#9B5DE5',coral:'#FF6B6B',sky:'#4ECDC4',sun:'#FFD166'};
+    document.documentElement.style.setProperty('--accent',colors[DB.settings.accent]);
+    document.getElementById('accentSel').value=DB.settings.accent;
+  }
+  if(DB.settings.recap!==undefined)document.getElementById('recapTog').checked=DB.settings.recap;
+  if(DB.settings.bday!==undefined)document.getElementById('bdayTog').checked=DB.settings.bday;
+  if(DB.settings.unlockEdit){
+    document.getElementById('unlockToggle').checked=true;
+    document.getElementById('unlockModeInfo').style.display='block';
+  }
+}
 
-// Welcome toast with delay
-setTimeout(()=>{
-  showToast('art','Hi there! 👋','Swipe through the intro to get started.',3000);
-},600);
+/* ══ INIT ══ */
+(function init(){
+  const hasData=load();
+  applySettings();
+  if(!hasData||DB.kids.length===0&&DB.arts.length===0){
+    DB.kids=[...SAMPLE_KIDS];DB.arts=[...SAMPLE_ARTS];save();
+  }
+  const onboarded=isOnboarded();
+  if(onboarded){
+    document.getElementById('scr-intro').classList.remove('right');
+    document.getElementById('scr-gallery').classList.remove('right');
+    document.getElementById('scr-gallery').classList.add('active');
+    curScreen='gallery';renderGallery();
+  } else {
+    document.getElementById('scr-intro').classList.remove('right');
+    document.getElementById('scr-intro').classList.add('active');
+    curScreen='intro';
+  }
+  // Studio nav from gallery nav
+  document.querySelectorAll('[data-screen="studio"]').forEach(b=>b.addEventListener('click',()=>{
+    studioArtList=filteredArts();studioIdx=carouselIdx;
+    if(studioArtList.length===0){toast('warning','No artwork yet','Upload some pieces first.',2500);return;}
+    navigate('studio');
+  }));
+  setTimeout(()=>toast('art','Welcome to CanvasKeep','Your gallery is ready. Clear sample data in Settings when you\'re ready.',4000),800);
+})();
 </script>
 </body>
 </html>
