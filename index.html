@@ -342,27 +342,29 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 .ctab-av{width:20px;height:20px;border-radius:50%;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;}
 
 /* Carousel */
-.carousel-wrap{height:288px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0;perspective:900px;}
+.carousel-wrap{height:296px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;flex-shrink:0;perspective:900px;}
 .art-card{
   position:absolute;background:var(--card);border-radius:var(--r);
   overflow:hidden;border:1.5px solid var(--border);
   transition:all .38s cubic-bezier(.34,1.2,.64,1);
   box-shadow:var(--sh);cursor:pointer;
 }
-.art-card.center{width:205px;height:256px;transform:translateX(0) rotateY(0) scale(1);z-index:10;box-shadow:0 14px 42px rgba(44,44,84,.16);}
-.art-card.left{width:165px;height:206px;transform:translateX(-152px) rotateY(20deg) scale(.86);opacity:.42;z-index:5;}
-.art-card.right{width:165px;height:206px;transform:translateX(152px) rotateY(-20deg) scale(.86);opacity:.42;z-index:5;}
-.art-thumb{width:100%;height:calc(100% - 66px);display:flex;align-items:center;justify-content:center;position:relative;}
+.art-card.center{width:205px;height:auto;min-height:248px;transform:translateX(0) rotateY(0) scale(1);z-index:10;box-shadow:0 14px 42px rgba(44,44,84,.16);display:flex;flex-direction:column;}
+.art-card.left{width:165px;height:200px;transform:translateX(-152px) rotateY(20deg) scale(.86);opacity:.42;z-index:5;display:flex;flex-direction:column;}
+.art-card.right{width:165px;height:200px;transform:translateX(152px) rotateY(-20deg) scale(.86);opacity:.42;z-index:5;display:flex;flex-direction:column;}
+.art-thumb{width:100%;height:158px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;}
+.art-card.left .art-thumb,.art-card.right .art-thumb{height:126px;}
 .art-thumb-img{width:100%;height:100%;object-fit:cover;}
-.art-thumb-emoji{font-size:56px;}
-.art-fav-btn{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.88);border:none;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;}
+.art-thumb-emoji{font-size:52px;}
+.art-fav-btn{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.92);border:none;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;}
 .art-fav-btn:hover{transform:scale(1.2);}
-.art-share-btn{position:absolute;bottom:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.88);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;}
+.art-share-btn{position:absolute;bottom:7px;right:7px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.92);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;}
 .art-share-btn:hover{transform:scale(1.15);}
-.art-share-btn svg{width:14px;height:14px;stroke:var(--text);stroke-width:2;fill:none;}
-.art-plaque{padding:8px 11px 10px;background:var(--card);border-top:1.5px solid var(--border);}
-.art-ptitle{font-family:'Fredoka One',cursive;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.art-pmeta{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;}
+.art-share-btn svg{width:13px;height:13px;stroke:var(--text);stroke-width:2;fill:none;}
+.art-plaque{padding:8px 10px 10px;background:var(--card);border-top:1.5px solid var(--border);flex:1;min-height:0;}
+.art-ptitle{font-family:'Fredoka One',cursive;font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px;}
+.art-pmeta{display:flex;gap:3px;flex-wrap:wrap;row-gap:3px;}
+.art-pmeta .pill{font-size:9px;padding:1px 6px;line-height:1.7;}
 .cdots{display:flex;justify-content:center;gap:6px;padding:4px 0 10px;flex-shrink:0;}
 .cdot{width:7px;height:7px;border-radius:50%;background:var(--border2);cursor:pointer;transition:all .2s;}
 .cdot.active{width:20px;border-radius:4px;background:var(--accent);}
@@ -598,6 +600,8 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 .uq-name{font-size:13px;font-weight:700;color:var(--text);}
 .uq-saved{font-size:11px;color:var(--sky);font-weight:700;margin-top:2px;}
 .uq-del{background:none;border:none;color:var(--coral);font-size:18px;padding:4px;cursor:pointer;}
+.uq-name-temp{color:var(--accent);font-style:italic;}
+.uq-name-temp:empty::before{content:attr(data-placeholder);color:var(--muted);}
 
 /* ══════════════════════════════════════
    SETTINGS SHEET
@@ -652,6 +656,95 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 .empty-t{font-family:'Fredoka One',cursive;font-size:20px;color:var(--text);}
 .empty-d{font-size:13px;color:var(--text2);line-height:1.6;max-width:260px;}
 
+
+/* ══════════════════════════════════════
+   FAST SNAP SCREEN
+══════════════════════════════════════ */
+#scr-fastsnap{background:var(--bg);}
+.fsnap-mode-bar{
+  display:flex;gap:0;padding:12px 18px 0;flex-shrink:0;
+}
+.fsnap-mode-btn{
+  flex:1;padding:9px 0;font-size:12px;font-weight:800;border:none;cursor:pointer;
+  transition:all .18s;letter-spacing:.3px;
+}
+.fsnap-mode-btn:first-child{border-radius:50px 0 0 50px;}
+.fsnap-mode-btn:last-child{border-radius:0 50px 50px 0;}
+.fsnap-mode-btn.active{background:var(--accent);color:#fff;}
+.fsnap-mode-btn:not(.active){background:var(--soft);color:var(--muted);}
+.fsnap-config{padding:12px 18px 0;}
+.fsnap-drop{
+  margin:0 18px 10px;border:2px dashed var(--inpborder);border-radius:var(--r);
+  padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;
+  cursor:pointer;background:var(--soft);transition:all .15s;
+}
+.fsnap-drop:hover,.fsnap-drop.drag{border-color:var(--accent);background:rgba(155,93,229,.05);}
+.fsnap-drop-ico{font-size:38px;}
+.fsnap-drop-t{font-family:'Fredoka One',cursive;font-size:16px;color:var(--text);}
+.fsnap-drop-s{font-size:12px;color:var(--text2);}
+/* Review grid */
+.fsnap-review{padding:12px 18px 100px;}
+.fsnap-review-hd{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
+}
+.fsnap-review-title{font-family:'Fredoka One',cursive;font-size:17px;color:var(--text);}
+.fsnap-review-count{font-size:12px;font-weight:700;color:var(--muted);}
+.fsnap-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.fsnap-card{
+  background:var(--card);border-radius:var(--rs);overflow:hidden;
+  border:1.5px solid var(--border);
+  transition:background .3s;
+}
+.fsnap-img-wrap{position:relative;height:130px;background:var(--soft);overflow:hidden;}
+.fsnap-img-wrap img{width:100%;height:100%;object-fit:cover;}
+.fsnap-img-emoji{display:flex;align-items:center;justify-content:center;height:100%;font-size:40px;}
+/* crop overlay */
+.fsnap-recrop-btn{
+  position:absolute;bottom:5px;right:5px;
+  background:rgba(0,0,0,.55);border:none;border-radius:50px;
+  color:#fff;font-size:10px;font-weight:800;padding:4px 9px;cursor:pointer;
+  display:flex;align-items:center;gap:4px;
+}
+.fsnap-recrop-btn svg{width:11px;height:11px;stroke:#fff;stroke-width:2.5;fill:none;}
+.fsnap-del-btn{
+  position:absolute;top:5px;right:5px;
+  width:22px;height:22px;border-radius:50%;
+  background:rgba(255,107,107,.85);border:none;color:#fff;font-size:13px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;
+}
+.fsnap-info{padding:8px 10px 10px;}
+.fsnap-name-inp{
+  width:100%;background:var(--inp);border:1.5px solid var(--inpborder);
+  color:var(--text);padding:6px 9px;border-radius:var(--rx);
+  font-size:12px;font-weight:700;outline:none;margin-bottom:6px;
+  transition:border-color .15s;
+}
+.fsnap-name-inp:focus{border-color:var(--accent);}
+.fsnap-notes-inp{
+  width:100%;background:var(--inp);border:1.5px solid var(--inpborder);
+  color:var(--text);padding:6px 9px;border-radius:var(--rx);
+  font-size:11px;font-weight:600;outline:none;resize:none;height:54px;
+  font-family:'Nunito',sans-serif;transition:border-color .15s;
+}
+.fsnap-notes-inp:focus{border-color:var(--accent);}
+.fsnap-confirm-bar{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  padding:12px 18px 24px;background:var(--card);
+  border-top:1.5px solid var(--border);z-index:30;
+  display:flex;gap:10px;align-items:center;
+  transition:background .3s;
+}
+/* Crop modal */
+.crop-modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);
+  z-index:400;flex-direction:column;align-items:center;justify-content:center;
+}
+.crop-modal-overlay.open{display:flex;}
+.crop-canvas-wrap{position:relative;flex:1;display:flex;align-items:center;justify-content:center;width:100%;overflow:hidden;}
+#cropCanvas{border:2px solid rgba(155,93,229,.6);touch-action:none;max-width:100%;max-height:100%;}
+.crop-handle{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--grape);border:2px solid #fff;cursor:pointer;touch-action:none;}
+.crop-bar{display:flex;gap:10px;padding:14px 18px 28px;width:100%;max-width:430px;}
 /* ══════════════════════════════════════
    SCROLLBAR
 ══════════════════════════════════════ */
@@ -873,10 +966,22 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
   </div>
   <div class="scr-body padnav" id="uploadBody">
     <div class="upload-hero">
-      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:6px">Box Clearer Mode</div>
-      <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--text);margin-bottom:6px">Session Settings</div>
-      <div style="font-size:13px;color:var(--text2);text-align:center;line-height:1.5;max-width:300px">Lock your child and date, then snap photos in a loop — no metadata entry needed each time.</div>
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:6px">Upload Mode</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--text);margin-bottom:6px">Choose Your Flow</div>
+      <div style="font-size:13px;color:var(--text2);text-align:center;line-height:1.5;max-width:300px">One photo at a time, or batch 15 at once and review before saving.</div>
     </div>
+    <!-- Fast Snap card -->
+    <div onclick="navigate('fastsnap')" style="margin:10px 18px 0;background:linear-gradient(135deg,rgba(155,93,229,.15),rgba(78,205,196,.10));border:1.5px solid rgba(155,93,229,.30);border-radius:var(--rs);padding:14px 16px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:transform .15s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">⚡</div>
+      <div>
+        <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--text)">Fast Snap — Batch Mode</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">Snap 15 photos, add notes, fix crops, save all at once</div>
+      </div>
+      <div style="margin-left:auto;color:var(--muted)">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>
+    <div style="padding:14px 18px 0;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">Box Clearer — One at a Time</div>
 
     <div style="padding:14px 18px 0">
       <div class="field"><label>Child</label>
@@ -926,6 +1031,103 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
       <svg viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1115.71 8h1.79a4.5 4.5 0 012.5 8.242"/><path d="M12 12v9M8 17l4-4 4 4"/></svg>Upload
     </button>
   </nav>
+</div>
+
+<!-- ════════════════════════════════════
+     FAST SNAP SCREEN
+════════════════════════════════════ -->
+<div class="screen right" id="scr-fastsnap">
+  <div class="top-bar">
+    <button class="back-btn" id="fsnapBack">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="logo" style="font-size:18px;margin:0 auto"><span class="logo-dot"></span>Fast Snap</div>
+    <div style="width:36px"></div>
+  </div>
+
+  <!-- Mode toggle -->
+  <div class="fsnap-mode-bar">
+    <button class="fsnap-mode-btn active" id="fsnapModeSnap">📸 Snap New</button>
+    <button class="fsnap-mode-btn" id="fsnapModeFiles">🗂 Choose Files</button>
+  </div>
+
+  <!-- Config -->
+  <div class="fsnap-config">
+    <div style="display:flex;gap:10px">
+      <div class="field" style="flex:1"><label>Child</label>
+        <select id="fsnapKidSel"><option value="">— select —</option></select>
+      </div>
+      <div class="field" style="flex:1"><label>School Year</label>
+        <select id="fsnapYearSel">
+          <option value="">— year —</option>
+          <option value="2020-2021">2020–2021</option>
+          <option value="2021-2022">2021–2022</option>
+          <option value="2022-2023">2022–2023</option>
+          <option value="2023-2024">2023–2024</option>
+          <option value="2024-2025">2024–2025</option>
+          <option value="2025-2026">2025–2026</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Season / Notes (optional)</label>
+      <input type="text" id="fsnapSeason" placeholder="e.g. Fall semester, after-school art class…">
+    </div>
+  </div>
+
+  <!-- Drop zone -->
+  <label class="fsnap-drop" id="fsnapDrop" for="fsnapFileInput">
+    <div class="fsnap-drop-ico">📷</div>
+    <div class="fsnap-drop-t" id="fsnapDropTitle">Tap to snap photos</div>
+    <div class="fsnap-drop-s">Select all at once — review &amp; edit before saving</div>
+  </label>
+  <input type="file" id="fsnapFileInput" accept="image/*" multiple capture="environment" style="display:none">
+
+  <!-- Review grid (shown after images loaded) -->
+  <div class="scr-body" id="fsnapReviewArea" style="display:none;padding-bottom:90px">
+    <div class="fsnap-review">
+      <div class="fsnap-review-hd">
+        <div class="fsnap-review-title">Review &amp; Edit</div>
+        <div class="fsnap-review-count" id="fsnapCount">0 photos</div>
+      </div>
+      <div class="fsnap-grid" id="fsnapGrid"></div>
+      <button class="btn btn-outline btn-full" onclick="document.getElementById('fsnapFileInput').click()">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add more photos
+      </button>
+    </div>
+  </div>
+
+  <!-- Confirm bar -->
+  <div class="fsnap-confirm-bar" id="fsnapConfirmBar" style="display:none">
+    <div style="flex:1">
+      <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--text)" id="fsnapConfirmLabel">Save 0 artworks</div>
+      <div style="font-size:11px;color:var(--text2)">All cropped &amp; ready to go</div>
+    </div>
+    <button class="btn btn-soft" style="padding:11px 16px" onclick="fsnapReset()">Cancel</button>
+    <button class="btn btn-accent" style="padding:11px 20px" onclick="fsnapConfirm()">
+      <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+      Save All
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     CROP MODAL
+════════════════════════════════════ -->
+<div class="crop-modal-overlay" id="cropModal">
+  <div style="padding:14px 18px;color:rgba(255,255,255,.7);font-size:12px;font-weight:700;width:100%;text-align:center">
+    Drag handles to adjust crop · Pinch to zoom image
+  </div>
+  <div class="crop-canvas-wrap">
+    <canvas id="cropCanvas"></canvas>
+  </div>
+  <div class="crop-bar">
+    <button class="btn btn-soft btn-full" onclick="closeCropModal()">Cancel</button>
+    <button class="btn btn-accent btn-full" onclick="applyCrop()">
+      <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+      Apply Crop
+    </button>
+  </div>
 </div>
 
 <!-- ════════════════════════════════════
@@ -1291,7 +1493,7 @@ function toast(type,title,msg,ms=3000){
 }
 
 /* ══ SCREEN NAVIGATION ══ */
-const SCREENS={gallery:'scr-gallery',kids:'scr-kids',studio:'scr-studio',upload:'scr-upload',intro:'scr-intro'};
+const SCREENS={gallery:'scr-gallery',kids:'scr-kids',studio:'scr-studio',upload:'scr-upload',intro:'scr-intro',fastsnap:'scr-fastsnap'};
 function navigate(to){
   const fromEl=document.getElementById(SCREENS[curScreen]);
   const toEl=document.getElementById(SCREENS[to]);
@@ -1311,6 +1513,7 @@ function navigate(to){
   if(to==='kids')renderKids();
   if(to==='studio')renderStudio();
   if(to==='upload')renderUploadKids();
+  if(to==='fastsnap'){renderFsnapKids();fsnapReset();}
 }
 
 /* ══ INTRO ══ */
@@ -1396,10 +1599,12 @@ function renderGallery(){
   });
   body.querySelector('.art-fav-btn')?.addEventListener('click',(e)=>{
     e.stopPropagation();
-    cur.fav=!cur.fav;save();
-    body.querySelector('.art-fav-btn').textContent=cur.fav?'❤️':'♡';
-    toast(cur.fav?'success':'info',cur.fav?'Added to Favorites':'Removed',cur.title,2000);
-    updateStats(body,arts);
+    // Open favorites exhibit
+    const favs = filteredArts().filter(a=>a.fav);
+    if(favs.length===0){toast('info','No Favorites Yet','Tap ♡ on artwork in Studio to save favorites.',2800);return;}
+    studioArtList=favs;studioIdx=0;
+    navigate('studio');
+    toast('success','Favorites Exhibit','Showing '+favs.length+' favorite'+(favs.length!==1?'s':'')+(curKidFilter!=='all'?' for '+kidById(curKidFilter)?.name:'')+' ⭐',2500);
   });
   body.querySelector('.art-share-btn')?.addEventListener('click',(e)=>{
     e.stopPropagation();openPrintModal(cur);
@@ -1446,7 +1651,7 @@ function buildArtCard(art,pos,isCenter){
   return`<div class="art-card ${pos}">
     <div class="art-thumb ${art.fill||'g1'}">
       ${art.imageData?`<img class="art-thumb-img" src="${art.imageData}">`:`<span class="art-thumb-emoji">${art.emoji||'🎨'}</span>`}
-      ${isCenter?`<button class="art-fav-btn" title="Favorite">${art.fav?'❤️':'♡'}</button><button class="art-share-btn" title="Share"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg></button>`:''}
+      ${isCenter?`<button class="art-fav-btn" title="Favorites Exhibit">⭐</button><button class="art-share-btn" title="Share"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg></button>`:''}
     </div>
     <div class="art-plaque">
       <div class="art-ptitle">${art.title}</div>
@@ -1709,9 +1914,10 @@ document.getElementById('fileInput').addEventListener('change',async function(){
     const imgData=await autoCropImage(raw);
     const artId=uid();
     const fills=['g1','g2','g3','g4','g5','g6','g7','g8'];
-    DB.arts.push({id:artId,kidId:kid.id,title:file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' '),date,notes:'',emoji:'🎨',fill:fills[DB.arts.length%fills.length],fav:false,imageData:imgData,isSample:false});
+    const tempTitle=kid.name+'_Artwork_'+(uploadSavedCount+1);
+    DB.arts.push({id:artId,kidId:kid.id,title:tempTitle,date,notes:'',emoji:'🎨',fill:fills[DB.arts.length%fills.length],fav:false,imageData:imgData,isSample:false,isTemp:true});
     uploadSavedCount++;
-    addToQueue(artId,imgData,file.name,date);
+    addToQueue(artId,imgData,tempTitle,date);
   }
   save();
   document.getElementById('usbCount').textContent=uploadSavedCount;
@@ -1776,17 +1982,19 @@ function autoCropImage(dataURL){
     img.src=dataURL;
   });
 }
-function addToQueue(artId,imgData,name,date){
+function addToQueue(artId,imgData,title,date){
   const q=document.getElementById('uploadQueue');
   const item=document.createElement('div');item.className='uq-item';item.id='uq-'+artId;
-  const title=name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+  const isTemp=title.match(/_Artwork_\d+$/);
   item.innerHTML=`
     <div class="uq-thumb"><img src="${imgData}" alt="${title}"></div>
     <div class="uq-info">
-      <div class="uq-name" contenteditable="true" onblur="renameQueueArt('${artId}',this.textContent)">${title}</div>
-      <div class="uq-saved">✓ Saved to gallery</div>
+      <div class="uq-name${isTemp?' uq-name-temp':''}" contenteditable="true"
+        data-placeholder="${isTemp?'Tap to rename…':''}"
+        onblur="renameQueueArt('${artId}',this.textContent)">${title}</div>
+      <div class="uq-saved">✓ Auto-cropped &amp; saved</div>
     </div>
-    <button class="uq-del" onclick="removeQueueArt('${artId}')">✕</button>
+    <button class="uq-del" title="Remove" onclick="removeQueueArt('${artId}')">✕</button>
   `;
   q.prepend(item);
 }
@@ -1957,13 +2165,279 @@ document.getElementById('galleryAddBtn').addEventListener('click',()=>{
 });
 document.getElementById('addKidBtn').addEventListener('click',()=>openKidForm());
 
+
+/* ══ FAST SNAP ══ */
+let fsnapItems=[];  // [{id,origDataURL,croppedDataURL,title,notes}]
+let cropTarget=null; // {idx, img, origURL}
+let cropRect={x:0,y:0,w:0,h:0};
+let cropImg=null;
+let cropDragging=null; // {handle:'tl'|'tr'|'bl'|'br'|'move', startX, startY, startRect}
+
+function fsnapReset(){
+  fsnapItems=[];
+  document.getElementById('fsnapGrid').innerHTML='';
+  document.getElementById('fsnapReviewArea').style.display='none';
+  document.getElementById('fsnapConfirmBar').style.display='none';
+  document.getElementById('fsnapFileInput').value='';
+}
+
+function renderFsnapGrid(){
+  const grid=document.getElementById('fsnapGrid');
+  grid.innerHTML='';
+  const kid=DB.kids.find(k=>k.id===document.getElementById('fsnapKidSel').value);
+  fsnapItems.forEach((item,idx)=>{
+    const card=document.createElement('div');card.className='fsnap-card';
+    card.innerHTML=`
+      <div class="fsnap-img-wrap">
+        <img src="${item.croppedDataURL}" alt="${item.title}" id="fsnapImg_${idx}">
+        <button class="fsnap-del-btn" onclick="fsnapDelete(${idx})">✕</button>
+        <button class="fsnap-recrop-btn" onclick="openCropModal(${idx})">
+          <svg viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 002 2h14"/><path d="M18 22V8a2 2 0 00-2-2H2"/></svg>
+          Re-crop
+        </button>
+      </div>
+      <div class="fsnap-info">
+        <input class="fsnap-name-inp" value="${item.title}" placeholder="Title…" oninput="fsnapItems[${idx}].title=this.value">
+        <textarea class="fsnap-notes-inp" placeholder="Notes, story, context…" oninput="fsnapItems[${idx}].notes=this.value">${item.notes||''}</textarea>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  document.getElementById('fsnapCount').textContent=fsnapItems.length+' photo'+(fsnapItems.length!==1?'s':'');
+  document.getElementById('fsnapConfirmLabel').textContent='Save '+fsnapItems.length+' artwork'+(fsnapItems.length!==1?'s':'');
+}
+
+function fsnapDelete(idx){
+  fsnapItems.splice(idx,1);
+  if(fsnapItems.length===0){fsnapReset();return;}
+  renderFsnapGrid();
+}
+
+document.getElementById('fsnapFileInput').addEventListener('change',async function(){
+  const kid=DB.kids.find(k=>k.id===document.getElementById('fsnapKidSel').value);
+  if(!kid){toast('warning','Select a child first','',2500);this.value='';return;}
+  const year=document.getElementById('fsnapYearSel').value||'';
+  const season=document.getElementById('fsnapSeason').value||'';
+  toast('info','Processing photos…','Auto-cropping in progress',2000);
+  const files=Array.from(this.files);
+  let n=fsnapItems.length;
+  for(const file of files){
+    const raw=await fileToDataURL(file);
+    const cropped=await autoCropImage(raw);
+    const label=season?season.trim():(year?year:'artwork');
+    const title=kid.name+' — '+label+' #'+(n+1);
+    fsnapItems.push({id:uid(),origDataURL:raw,croppedDataURL:cropped,title,notes:'',kidId:kid.id,year});
+    n++;
+  }
+  document.getElementById('fsnapReviewArea').style.display='block';
+  document.getElementById('fsnapConfirmBar').style.display='flex';
+  renderFsnapGrid();
+  this.value='';
+  toast('save',files.length+' photo'+(files.length>1?'s':'')+' ready','Review titles and notes below.',2500);
+});
+
+async function fsnapConfirm(){
+  const kid=DB.kids.find(k=>k.id===document.getElementById('fsnapKidSel').value);
+  if(!kid){toast('warning','Select a child','',2200);return;}
+  if(fsnapItems.length===0){toast('warning','No photos to save','',2000);return;}
+  const fills=['g1','g2','g3','g4','g5','g6','g7','g8'];
+  // Derive approximate date from year (use Sept 1 of start year)
+  const year=document.getElementById('fsnapYearSel').value;
+  const baseDate=year?year.split('-')[0]+'-09-01':new Date().toISOString().split('T')[0];
+  fsnapItems.forEach(item=>{
+    DB.arts.push({
+      id:item.id,kidId:kid.id,title:item.title,
+      date:baseDate,notes:item.notes,emoji:'🎨',
+      fill:fills[DB.arts.length%fills.length],
+      fav:false,imageData:item.croppedDataURL,isSample:false
+    });
+  });
+  save();
+  const count=fsnapItems.length;
+  fsnapReset();
+  navigate('gallery');
+  toast('success',count+' artworks saved!','Head to the gallery to see them.',3000);
+}
+
+// Mode toggle
+document.getElementById('fsnapModeSnap').addEventListener('click',()=>{
+  document.getElementById('fsnapModeSnap').classList.add('active');
+  document.getElementById('fsnapModeFiles').classList.remove('active');
+  document.getElementById('fsnapFileInput').removeAttribute('capture');
+  document.getElementById('fsnapDropTitle').textContent='Tap to snap photos';
+  document.getElementById('fsnapFileInput').setAttribute('capture','environment');
+});
+document.getElementById('fsnapModeFiles').addEventListener('click',()=>{
+  document.getElementById('fsnapModeFiles').classList.add('active');
+  document.getElementById('fsnapModeSnap').classList.remove('active');
+  document.getElementById('fsnapFileInput').removeAttribute('capture');
+  document.getElementById('fsnapDropTitle').textContent='Choose from your library';
+});
+document.getElementById('fsnapBack').addEventListener('click',()=>navigate('upload'));
+
+// Populate kid select in fastsnap
+function renderFsnapKids(){
+  const sel=document.getElementById('fsnapKidSel');
+  sel.innerHTML='<option value="">— select child —</option>'+DB.kids.map(k=>`<option value="${k.id}">${k.emoji} ${k.name}</option>`).join('');
+}
+
+// Drop zone drag for fastsnap
+const fsnapDrop=document.getElementById('fsnapDrop');
+fsnapDrop.addEventListener('dragover',e=>{e.preventDefault();fsnapDrop.classList.add('drag');});
+fsnapDrop.addEventListener('dragleave',()=>fsnapDrop.classList.remove('drag'));
+fsnapDrop.addEventListener('drop',e=>{
+  e.preventDefault();fsnapDrop.classList.remove('drag');
+  const dt=e.dataTransfer;
+  if(dt.files.length){
+    // assign files to input
+    const inp=document.getElementById('fsnapFileInput');
+    Object.defineProperty(inp,'files',{value:dt.files,configurable:true});
+    inp.dispatchEvent(new Event('change'));
+  }
+});
+
+/* ══ CROP MODAL ══ */
+let cropApplyCb=null;
+
+function openCropModal(idx){
+  cropTarget=idx;
+  const item=fsnapItems[idx];
+  const overlay=document.getElementById('cropModal');
+  overlay.classList.add('open');
+  const canvas=document.getElementById('cropCanvas');
+  const ctx=canvas.getContext('2d');
+  cropImg=new Image();
+  cropImg.onload=()=>{
+    const maxW=Math.min(window.innerWidth-24,400);
+    const maxH=Math.min(window.innerHeight*0.55,500);
+    const scale=Math.min(maxW/cropImg.width,maxH/cropImg.height,1);
+    canvas.width=Math.round(cropImg.width*scale);
+    canvas.height=Math.round(cropImg.height*scale);
+    canvas.style.width=canvas.width+'px';
+    canvas.style.height=canvas.height+'px';
+    // Default crop = full image
+    cropRect={x:0,y:0,w:canvas.width,h:canvas.height};
+    drawCrop(ctx,canvas);
+  };
+  cropImg.src=item.origDataURL;
+}
+
+function drawCrop(ctx,canvas){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(cropImg,0,0,canvas.width,canvas.height);
+  // Darken outside crop
+  ctx.fillStyle='rgba(0,0,0,0.48)';
+  ctx.fillRect(0,0,canvas.width,cropRect.y);
+  ctx.fillRect(0,cropRect.y+cropRect.h,canvas.width,canvas.height-(cropRect.y+cropRect.h));
+  ctx.fillRect(0,cropRect.y,cropRect.x,cropRect.h);
+  ctx.fillRect(cropRect.x+cropRect.w,cropRect.y,canvas.width-(cropRect.x+cropRect.w),cropRect.h);
+  // Crop border
+  ctx.strokeStyle='rgba(155,93,229,0.9)';ctx.lineWidth=2;
+  ctx.strokeRect(cropRect.x,cropRect.y,cropRect.w,cropRect.h);
+  // Corner handles
+  const hs=7;
+  ctx.fillStyle='#9B5DE5';
+  [[cropRect.x,cropRect.y],[cropRect.x+cropRect.w,cropRect.y],
+   [cropRect.x,cropRect.y+cropRect.h],[cropRect.x+cropRect.w,cropRect.y+cropRect.h]].forEach(([hx,hy])=>{
+    ctx.beginPath();ctx.arc(hx,hy,hs,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+  });
+}
+
+function getCanvasPos(canvas,e){
+  const rect=canvas.getBoundingClientRect();
+  const src=e.touches?e.touches[0]:e;
+  return {x:src.clientX-rect.left,y:src.clientY-rect.top};
+}
+
+function nearHandle(pos){
+  const hs=18; // hit area
+  const corners=[
+    {name:'tl',x:cropRect.x,y:cropRect.y},
+    {name:'tr',x:cropRect.x+cropRect.w,y:cropRect.y},
+    {name:'bl',x:cropRect.x,y:cropRect.y+cropRect.h},
+    {name:'br',x:cropRect.x+cropRect.w,y:cropRect.y+cropRect.h},
+  ];
+  for(const c of corners){
+    if(Math.abs(pos.x-c.x)<hs&&Math.abs(pos.y-c.y)<hs)return c.name;
+  }
+  // Inside crop = move
+  if(pos.x>cropRect.x&&pos.x<cropRect.x+cropRect.w&&pos.y>cropRect.y&&pos.y<cropRect.y+cropRect.h)return'move';
+  return null;
+}
+
+const cropCanvas=document.getElementById('cropCanvas');
+function cropPointerDown(e){
+  e.preventDefault();
+  const pos=getCanvasPos(cropCanvas,e);
+  const handle=nearHandle(pos);
+  if(!handle)return;
+  cropDragging={handle,startX:pos.x,startY:pos.y,startRect:{...cropRect}};
+}
+function cropPointerMove(e){
+  if(!cropDragging)return;
+  e.preventDefault();
+  const pos=getCanvasPos(cropCanvas,e);
+  const dx=pos.x-cropDragging.startX, dy=pos.y-cropDragging.startY;
+  const r={...cropDragging.startRect};
+  const cw=cropCanvas.width, ch=cropCanvas.height;
+  if(cropDragging.handle==='move'){
+    cropRect.x=Math.max(0,Math.min(cw-r.w,r.x+dx));
+    cropRect.y=Math.max(0,Math.min(ch-r.h,r.y+dy));
+  } else {
+    if(cropDragging.handle==='tl'){cropRect.x=Math.max(0,r.x+dx);cropRect.y=Math.max(0,r.y+dy);cropRect.w=r.w-dx;cropRect.h=r.h-dy;}
+    if(cropDragging.handle==='tr'){cropRect.y=Math.max(0,r.y+dy);cropRect.w=Math.min(cw-r.x,r.w+dx);cropRect.h=r.h-dy;}
+    if(cropDragging.handle==='bl'){cropRect.x=Math.max(0,r.x+dx);cropRect.w=r.w-dx;cropRect.h=Math.min(ch-r.y,r.h+dy);}
+    if(cropDragging.handle==='br'){cropRect.w=Math.min(cw-r.x,r.w+dx);cropRect.h=Math.min(ch-r.y,r.h+dy);}
+    cropRect.w=Math.max(30,cropRect.w);cropRect.h=Math.max(30,cropRect.h);
+  }
+  const ctx=cropCanvas.getContext('2d');drawCrop(ctx,cropCanvas);
+}
+function cropPointerUp(){cropDragging=null;}
+cropCanvas.addEventListener('mousedown',cropPointerDown);
+cropCanvas.addEventListener('mousemove',cropPointerMove);
+cropCanvas.addEventListener('mouseup',cropPointerUp);
+cropCanvas.addEventListener('touchstart',cropPointerDown,{passive:false});
+cropCanvas.addEventListener('touchmove',cropPointerMove,{passive:false});
+cropCanvas.addEventListener('touchend',cropPointerUp);
+
+function closeCropModal(){document.getElementById('cropModal').classList.remove('open');}
+
+function applyCrop(){
+  const idx=cropTarget;
+  if(idx==null||!cropImg)return;
+  // Convert canvas crop coords back to original image coords
+  const scaleX=cropImg.naturalWidth/cropCanvas.width;
+  const scaleY=cropImg.naturalHeight/cropCanvas.height;
+  const ox=Math.round(cropRect.x*scaleX), oy=Math.round(cropRect.y*scaleY);
+  const ow=Math.round(cropRect.w*scaleX), oh=Math.round(cropRect.h*scaleY);
+  const out=document.createElement('canvas');
+  const maxPx=1200;
+  const sc=Math.min(1,maxPx/Math.max(ow,oh));
+  out.width=Math.round(ow*sc);out.height=Math.round(oh*sc);
+  const ctx=out.getContext('2d');
+  ctx.drawImage(cropImg,ox,oy,ow,oh,0,0,out.width,out.height);
+  fsnapItems[idx].croppedDataURL=out.toDataURL('image/jpeg',0.88);
+  closeCropModal();
+  renderFsnapGrid();
+  toast('success','Crop applied!','',1800);
+}
+
 /* ══ BEFORE UNLOAD ══ */
 let allowLeave=false;
+let buPending=false;
 window.addEventListener('beforeunload',e=>{
   if(allowLeave)return;
-  e.preventDefault();e.returnValue='';
-  document.getElementById('buModal').classList.add('open');
-  return '';
+  // Show our custom modal instead of browser prompt
+  // We can't suppress the browser dialog reliably, but we open ours too
+  if(!buPending){
+    buPending=true;
+    setTimeout(()=>{
+      document.getElementById('buModal').classList.add('open');
+      buPending=false;
+    },50);
+  }
+  // Don't set returnValue so browser prompt is suppressed in modern browsers
 });
 document.getElementById('buStay').addEventListener('click',()=>{
   document.getElementById('buModal').classList.remove('open');
@@ -1972,7 +2446,8 @@ document.getElementById('buStay').addEventListener('click',()=>{
 document.getElementById('buLeave').addEventListener('click',()=>{
   allowLeave=true;
   document.getElementById('buModal').classList.remove('open');
-  setTimeout(()=>{try{window.close();}catch(e){}},400);
+  toast('info','See you soon! 👋','Come back anytime — your art is all saved.',2200);
+  setTimeout(()=>{try{history.back();}catch(e){}},600);
 });
 
 /* ══ APPLY SETTINGS ══ */
