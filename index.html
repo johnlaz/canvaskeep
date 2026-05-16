@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#9B5DE5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="LittlePicasso">
+<meta name="description" content="Save and celebrate your child's artwork across every grade and year.">
+<title>LittlePicasso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<!-- html2canvas for PNG export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --c-sun:#FFD166;
+  --c-coral:#FF6B6B;
+  --c-sky:#4ECDC4;
+  --c-grape:#9B5DE5;
+  --c-peach:#FFA07A;
+  --c-cream:#FFF9F0;
+  --c-white:#FFFFFF;
+  --c-navy:#2C2C54;
+  --c-softgray:#F7F4EF;
+  --c-border:rgba(44,44,84,0.10);
+  --c-muted:#8A8070;
+  --c-card:#FFFFFF;
+  --c-bg:#FFF9F0;
+  --c-text:#2C2C54;
+  --c-text2:#6B6580;
+  --c-input:#F7F4EF;
+  --c-inputborder:rgba(44,44,84,0.15);
+  --c-overlay:rgba(44,44,84,0.55);
+  --c-toastbg:#2C2C54;
+  --c-toasttext:#FFFFFF;
+  --radius:20px;
+  --radius-sm:12px;
+  --radius-xs:8px;
+  --shadow-card:0 4px 20px rgba(44,44,84,0.10);
+  --shadow-fab:0 6px 20px rgba(255,107,107,0.40);
+  --shadow-grape:0 4px 16px rgba(155,93,229,0.30);
+  --transition:0.22s cubic-bezier(0.34,1.2,0.64,1);
+  --nav-h:64px;
+}
+[data-theme="dark"]{
+  --c-cream:#1A1A2E;
+  --c-bg:#1A1A2E;
+  --c-card:#252542;
+  --c-white:#252542;
+  --c-softgray:#2A2A48;
+  --c-border:rgba(255,255,255,0.08);
+  --c-text:#EEE8FF;
+  --c-text2:#9990BB;
+  --c-muted:#7A7095;
+  --c-input:#2A2A48;
+  --c-inputborder:rgba(255,255,255,0.12);
+  --c-overlay:rgba(10,10,28,0.75);
+  --c-toastbg:#EEE8FF;
+  --c-toasttext:#1A1A2E;
+}
+html,body{height:100%;background:var(--c-bg);color:var(--c-text);font-family:'Nunito',sans-serif;transition:background 0.3s,color 0.3s;overflow-x:hidden;}
+
+/* ═══════════════════════════════════════════
+   SCREEN SYSTEM
+═══════════════════════════════════════════ */
+.screen{
+  display:none;
+  flex-direction:column;
+  min-height:100vh;
+  max-width:430px;
+  margin:0 auto;
+  position:relative;
+  animation:fadeUp 0.35s ease both;
+}
+.screen.active{display:flex;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+
+/* ═══════════════════════════════════════════
+   INTRO SCREENS
+═══════════════════════════════════════════ */
+#screen-intro{
+  background:var(--c-bg);
+  justify-content:stretch;
+  overflow:hidden;
+}
+.intro-viewport{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  position:relative;
+}
+.intro-slides-track{
+  display:flex;
+  transition:transform 0.42s cubic-bezier(0.4,0,0.2,1);
+  height:100%;
+}
+.intro-slide{
+  min-width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding:0 32px 24px;
+}
+.intro-hero{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding-top:40px;
+  padding-bottom:20px;
+}
+.hero-art{
+  width:220px;height:220px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:88px;
+  position:relative;
+}
+.hero-art .badge{
+  position:absolute;
+  bottom:8px;right:8px;
+  width:44px;height:44px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  border:3px solid var(--c-bg);
+}
+.slide-1 .hero-art{background:linear-gradient(135deg,#FFE0A3 0%,#FFCDD2 100%);}
+.slide-1 .badge{background:var(--c-grape);}
+.slide-2 .hero-art{background:linear-gradient(135deg,#B3E5FC 0%,#C8E6C9 100%);}
+.slide-2 .badge{background:var(--c-coral);}
+.slide-3 .hero-art{background:linear-gradient(135deg,#E1BEE7 0%,#F8BBD0 100%);}
+.slide-3 .badge{background:var(--c-sky);}
+.slide-4 .hero-art{background:linear-gradient(135deg,#FFF9C4 0%,#F0F4C3 100%);}
+.slide-4 .badge{background:var(--c-sun);}
+.intro-tag{
+  font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;
+  color:var(--c-grape);margin-bottom:10px;
+}
+.intro-h1{
+  font-family:'Fredoka One',cursive;
+  font-size:30px;line-height:1.15;
+  color:var(--c-text);
+  text-align:center;margin-bottom:12px;
+}
+.intro-p{
+  font-size:15px;line-height:1.65;
+  color:var(--c-text2);
+  text-align:center;
+  max-width:320px;
+}
+.intro-footer{
+  padding:0 32px 36px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+}
+.intro-dots{
+  display:flex;gap:7px;
+}
+.intro-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--c-border);
+  transition:all 0.2s;
+  cursor:pointer;
+}
+.intro-dot.active{width:22px;border-radius:4px;background:var(--c-grape);}
+.btn-primary{
+  width:100%;max-width:340px;
+  padding:16px;border-radius:50px;
+  background:var(--c-grape);color:#fff;
+  font-family:'Fredoka One',cursive;
+  font-size:17px;letter-spacing:0.3px;
+  border:none;cursor:pointer;
+  box-shadow:var(--shadow-grape);
+  transition:transform 0.15s,box-shadow 0.15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(155,93,229,0.38);}
+.btn-primary:active{transform:scale(0.98);}
+.btn-secondary{
+  background:none;border:none;cursor:pointer;
+  font-size:13px;font-weight:700;color:var(--c-text2);
+  padding:4px;
+  transition:color 0.15s;
+}
+.btn-secondary:hover{color:var(--c-grape);}
+.intro-logo{
+  font-family:'Fredoka One',cursive;
+  font-size:26px;color:var(--c-grape);
+  padding-top:28px;padding-left:32px;
+  display:flex;align-items:center;gap:6px;
+}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--c-coral);}
+.intro-skip{
+  position:absolute;top:24px;right:24px;
+  background:none;border:none;cursor:pointer;
+  font-size:12px;font-weight:800;color:var(--c-text2);
+  letter-spacing:0.5px;text-transform:uppercase;
+  padding:6px 12px;border-radius:50px;
+  background:var(--c-softgray);
+  transition:background 0.15s;
+}
+.intro-skip:hover{background:var(--c-border);}
+.intro-back-btn{
+  position:absolute;top:24px;left:24px;
+  background:var(--c-softgray);border:none;cursor:pointer;
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.15s;
+}
+.intro-back-btn:hover{background:var(--c-border);}
+.intro-back-btn svg{width:16px;height:16px;stroke:var(--c-text);stroke-width:2.5;fill:none;}
+
+/* ═══════════════════════════════════════════
+   MAIN APP SCREEN
+═══════════════════════════════════════════ */
+#screen-app{
+  background:var(--c-bg);
+  padding-bottom:var(--nav-h);
+}
+.top-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 20px 14px;
+  position:sticky;top:0;z-index:40;
+  background:var(--c-bg);
+  border-bottom:1.5px solid var(--c-border);
+  transition:background 0.3s;
+}
+.logo{
+  font-family:'Fredoka One',cursive;
+  font-size:22px;color:var(--c-grape);
+  display:flex;align-items:center;gap:7px;
+}
+.nav-actions{display:flex;gap:10px;align-items:center;}
+.nav-btn{
+  width:38px;height:38px;border-radius:50%;
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform 0.15s,background 0.15s;
+}
+.nav-btn:hover{transform:scale(1.08);}
+.nav-btn.add{background:var(--c-coral);box-shadow:var(--shadow-fab);}
+.nav-btn.add svg{stroke:#fff;stroke-width:2.5;width:18px;height:18px;fill:none;}
+.nav-btn.settings{background:var(--c-softgray);}
+.nav-btn.settings svg{stroke:var(--c-text);stroke-width:2;width:18px;height:18px;fill:none;}
+
+/* ─── Child Tabs ─── */
+.child-tabs{
+  display:flex;gap:10px;
+  padding:14px 20px 0;
+  overflow-x:auto;scrollbar-width:none;
+}
+.child-tabs::-webkit-scrollbar{display:none;}
+.child-chip{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 16px;border-radius:50px;
+  background:var(--c-softgray);border:2px solid transparent;
+  cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap;
+  color:var(--c-muted);transition:all 0.18s;
+}
+.child-chip.active{
+  background:var(--c-grape);color:#fff;border-color:var(--c-grape);
+  box-shadow:var(--shadow-grape);
+}
+.chip-av{
+  width:22px;height:22px;border-radius:50%;font-size:11px;
+  font-weight:900;display:flex;align-items:center;justify-content:center;
+}
+.av-leo{background:#FFD166;color:#7A5B00;}
+.av-mia{background:#FF6B6B;color:#7A0000;}
+.av-all{background:rgba(155,93,229,0.15);color:var(--c-grape);}
+
+/* ─── Section Header ─── */
+.sec-head{
+  padding:20px 20px 8px;
+  display:flex;align-items:baseline;justify-content:space-between;
+}
+.sec-title{font-family:'Fredoka One',cursive;font-size:18px;color:var(--c-text);}
+.sec-link{font-size:12px;font-weight:700;color:var(--c-sky);cursor:pointer;background:none;border:none;}
+
+/* ─── Carousel ─── */
+.carousel-area{
+  display:flex;align-items:center;justify-content:center;
+  height:300px;overflow:hidden;position:relative;
+  perspective:900px;
+}
+.art-card{
+  position:absolute;background:var(--c-card);
+  border-radius:var(--radius);overflow:hidden;
+  cursor:pointer;transition:all 0.4s cubic-bezier(0.34,1.2,0.64,1);
+  box-shadow:var(--shadow-card);
+  border:1.5px solid var(--c-border);
+}
+.art-card.center{
+  width:210px;height:260px;
+  transform:translateX(0) rotateY(0) scale(1);
+  z-index:10;box-shadow:0 12px 40px rgba(44,44,84,0.18);
+}
+.art-card.left{
+  width:170px;height:210px;
+  transform:translateX(-155px) rotateY(22deg) scale(0.85);
+  opacity:0.45;z-index:5;
+}
+.art-card.right{
+  width:170px;height:210px;
+  transform:translateX(155px) rotateY(-22deg) scale(0.85);
+  opacity:0.45;z-index:5;
+}
+.art-fill{
+  width:100%;height:calc(100% - 68px);
+  display:flex;align-items:center;justify-content:center;
+  font-size:52px;position:relative;
+}
+.art-fav{
+  position:absolute;top:8px;right:8px;
+  background:rgba(255,255,255,0.9);border-radius:50%;
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  font-size:14px;cursor:pointer;
+  transition:transform 0.15s;border:none;
+}
+.art-fav:hover{transform:scale(1.2);}
+.art-plaque{
+  padding:8px 12px 10px;background:var(--c-card);
+  border-top:1.5px solid var(--c-border);
+}
+.art-title-text{
+  font-family:'Fredoka One',cursive;font-size:14px;
+  color:var(--c-text);line-height:1.2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.art-meta{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
+.meta-pill{
+  font-size:10px;font-weight:700;padding:2px 8px;
+  border-radius:50px;line-height:1.5;
+}
+.pill-age{background:#FFF0D6;color:#8A5800;}
+.pill-grade{background:#E8F8F7;color:#0F6E56;}
+.pill-date{background:#F0EBFF;color:#5B3FA0;}
+[data-theme="dark"] .pill-age{background:#3D2E00;color:#FFD166;}
+[data-theme="dark"] .pill-grade{background:#0A2E28;color:#4ECDC4;}
+[data-theme="dark"] .pill-date{background:#200A4A;color:#C499FF;}
+
+.fill-1{background:linear-gradient(135deg,#FFE0A3,#FFCDD2);}
+.fill-2{background:linear-gradient(135deg,#B3E5FC,#C8E6C9);}
+.fill-3{background:linear-gradient(135deg,#E1BEE7,#F8BBD0);}
+.fill-4{background:linear-gradient(135deg,#DCEDC8,#B2EBF2);}
+.fill-5{background:linear-gradient(135deg,#FFE0B2,#FFCCBC);}
+
+.carousel-dots{display:flex;justify-content:center;gap:6px;padding:4px 0 12px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--c-border);cursor:pointer;transition:all 0.2s;}
+.dot.active{width:20px;border-radius:4px;background:var(--c-grape);}
+
+/* ─── Stats Row ─── */
+.stats-row{display:flex;gap:10px;padding:4px 20px 20px;}
+.stat-card{
+  flex:1;background:var(--c-card);border-radius:var(--radius-sm);
+  padding:14px 12px;text-align:center;
+  border:1.5px solid var(--c-border);
+  transition:background 0.3s;
+}
+.stat-num{font-family:'Fredoka One',cursive;font-size:28px;line-height:1;margin-bottom:4px;}
+.stat-label{font-size:11px;font-weight:700;color:var(--c-muted);text-transform:uppercase;letter-spacing:0.5px;}
+.num-coral{color:var(--c-coral);}
+.num-grape{color:var(--c-grape);}
+.num-sky{color:var(--c-sky);}
+
+/* ─── Upload Strip ─── */
+.upload-strip{
+  margin:0 20px 24px;
+  background:var(--c-grape);border-radius:var(--radius);
+  padding:18px 20px;display:flex;align-items:center;gap:14px;
+  cursor:pointer;box-shadow:var(--shadow-grape);
+  transition:transform 0.15s;
+}
+.upload-strip:hover{transform:translateY(-1px);}
+.upload-icon{
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;
+}
+.upload-text .ut-title{font-family:'Fredoka One',cursive;font-size:16px;color:#fff;margin-bottom:2px;}
+.upload-text .ut-sub{font-size:12px;color:rgba(255,255,255,0.75);font-weight:600;}
+.upload-arrow{
+  margin-left:auto;width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;
+}
+.upload-arrow svg{width:16px;height:16px;stroke:#fff;stroke-width:2.5;fill:none;}
+
+/* ─── Timeline Grid ─── */
+.timeline-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 20px 32px;}
+.timeline-item{
+  background:var(--c-card);border-radius:var(--radius-sm);overflow:hidden;
+  border:1.5px solid var(--c-border);cursor:pointer;
+  transition:transform 0.18s,background 0.3s;
+}
+.timeline-item:hover{transform:translateY(-2px);}
+.ti-thumb{height:100px;display:flex;align-items:center;justify-content:center;font-size:36px;}
+.ti-info{padding:8px 10px 10px;}
+.ti-era{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:3px;}
+.ti-name{font-family:'Fredoka One',cursive;font-size:13px;color:var(--c-text);line-height:1.3;}
+.era-pre{color:var(--c-coral);}
+.era-k{color:var(--c-grape);}
+.era-1st{color:var(--c-sky);}
+.era-2nd{color:#F4A261;}
+
+/* ─── Bottom Nav ─── */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  background:var(--c-card);
+  border-top:1.5px solid var(--c-border);
+  display:flex;padding:10px 0 14px;z-index:40;
+  transition:background 0.3s;
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;opacity:0.42;transition:opacity 0.15s;
+  font-size:10px;font-weight:700;color:var(--c-text);letter-spacing:0.3px;text-transform:uppercase;
+}
+.nav-item.active{opacity:1;}
+.nav-item.active svg{stroke:var(--c-grape);}
+.nav-item svg{width:22px;height:22px;stroke:var(--c-text);stroke-width:2;fill:none;}
+.nav-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;}
+.fab{
+  width:52px;height:52px;border-radius:50%;background:var(--c-coral);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow-fab);margin-top:-18px;
+  transition:transform 0.15s;border:none;cursor:pointer;
+}
+.fab:hover{transform:scale(1.08);}
+.fab svg{width:24px;height:24px;stroke:#fff;stroke-width:2.5;fill:none;}
+
+/* ═══════════════════════════════════════════
+   SETTINGS MODAL
+═══════════════════════════════════════════ */
+.modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:var(--c-overlay);z-index:200;
+  align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(3px);
+  animation:fadeIn 0.2s ease both;
+}
+.modal-overlay.open{display:flex;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal-sheet{
+  width:100%;max-width:430px;
+  background:var(--c-card);
+  border-radius:28px 28px 0 0;
+  padding:0 0 40px;
+  max-height:92vh;overflow-y:auto;
+  animation:slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1) both;
+  scrollbar-width:thin;
+  transition:background 0.3s;
+}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-handle{
+  width:40px;height:4px;border-radius:2px;
+  background:var(--c-border);margin:14px auto 0;
+}
+.modal-top{
+  display:flex;align-items:center;padding:20px 24px 0;
+  gap:12px;
+}
+.modal-title{font-family:'Fredoka One',cursive;font-size:22px;color:var(--c-text);}
+.modal-close{
+  margin-left:auto;width:34px;height:34px;border-radius:50%;
+  background:var(--c-softgray);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.15s;
+}
+.modal-close:hover{background:var(--c-border);}
+.modal-close svg{width:14px;height:14px;stroke:var(--c-text);stroke-width:2.5;fill:none;}
+
+.settings-section{padding:20px 24px 0;}
+.settings-label{
+  font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;
+  color:var(--c-muted);margin-bottom:12px;
+}
+.setting-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 0;
+  border-bottom:1px solid var(--c-border);
+}
+.setting-row:last-child{border-bottom:none;}
+.setting-info .s-name{font-size:15px;font-weight:700;color:var(--c-text);}
+.setting-info .s-desc{font-size:12px;color:var(--c-text2);margin-top:2px;max-width:220px;}
+
+/* Toggle */
+.toggle-wrap{position:relative;width:48px;height:26px;flex-shrink:0;}
+.toggle-wrap input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-track{
+  position:absolute;inset:0;
+  background:var(--c-border);border-radius:13px;
+  cursor:pointer;transition:background 0.22s;
+}
+.toggle-thumb{
+  position:absolute;top:3px;left:3px;
+  width:20px;height:20px;border-radius:50%;
+  background:#fff;transition:transform 0.22s cubic-bezier(0.34,1.2,0.64,1);
+  pointer-events:none;
+}
+.toggle-wrap input:checked ~ .toggle-track{background:var(--c-grape);}
+.toggle-wrap input:checked ~ .toggle-thumb{transform:translateX(22px);}
+
+/* Select */
+.setting-select{
+  background:var(--c-input);border:1.5px solid var(--c-inputborder);
+  color:var(--c-text);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  padding:7px 12px;border-radius:var(--radius-xs);cursor:pointer;
+  outline:none;transition:border-color 0.15s;
+}
+.setting-select:focus{border-color:var(--c-grape);}
+
+/* Kids list in settings */
+.kids-list{display:flex;flex-direction:column;gap:10px;}
+.kid-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--c-softgray);
+  border-radius:var(--radius-sm);padding:12px 14px;
+  border:1.5px solid var(--c-border);
+}
+.kid-av{
+  width:40px;height:40px;border-radius:50%;
+  font-size:16px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.kid-info .k-name{font-size:15px;font-weight:800;color:var(--c-text);}
+.kid-info .k-meta{font-size:12px;color:var(--c-text2);margin-top:1px;}
+.kid-edit{
+  margin-left:auto;background:var(--c-card);
+  border:1.5px solid var(--c-border);
+  border-radius:var(--radius-xs);padding:6px 12px;
+  font-size:12px;font-weight:700;color:var(--c-text2);cursor:pointer;
+  transition:background 0.15s;
+}
+.kid-edit:hover{background:var(--c-border);}
+
+.add-kid-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  border:2px dashed var(--c-inputborder);
+  border-radius:var(--radius-sm);padding:12px;
+  cursor:pointer;color:var(--c-grape);font-weight:700;font-size:13px;
+  background:none;width:100%;
+  transition:border-color 0.15s,background 0.15s;
+}
+.add-kid-btn:hover{border-color:var(--c-grape);background:rgba(155,93,229,0.05);}
+.add-kid-btn svg{width:16px;height:16px;stroke:var(--c-grape);stroke-width:2.5;fill:none;}
+
+/* Danger zone */
+.danger-btn{
+  width:100%;padding:13px;border-radius:var(--radius-sm);
+  background:none;border:1.5px solid rgba(255,107,107,0.4);
+  color:var(--c-coral);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;transition:all 0.15s;margin-bottom:10px;
+}
+.danger-btn:hover{background:rgba(255,107,107,0.08);border-color:var(--c-coral);}
+.modal-version{text-align:center;font-size:11px;color:var(--c-muted);padding-top:8px;}
+
+/* Back to Intro btn in settings */
+.back-intro-btn{
+  width:100%;padding:13px;border-radius:var(--radius-sm);
+  background:var(--c-softgray);border:1.5px solid var(--c-border);
+  color:var(--c-text2);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all 0.15s;
+  display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:10px;
+}
+.back-intro-btn:hover{background:var(--c-border);color:var(--c-text);}
+.back-intro-btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:2.5;fill:none;}
+
+/* ═══════════════════════════════════════════
+   PRINT / SHARE MODAL
+═══════════════════════════════════════════ */
+.print-modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:var(--c-overlay);z-index:300;
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.print-modal-overlay.open{display:flex;}
+.print-modal{
+  width:calc(100% - 32px);max-width:380px;
+  background:var(--c-card);border-radius:var(--radius);
+  padding:28px 24px 24px;
+  animation:scaleIn 0.3s cubic-bezier(0.34,1.2,0.64,1) both;
+  transition:background 0.3s;
+}
+@keyframes scaleIn{from{transform:scale(0.88);opacity:0;}to{transform:scale(1);opacity:1;}}
+.pm-title{font-family:'Fredoka One',cursive;font-size:20px;color:var(--c-text);margin-bottom:6px;}
+.pm-sub{font-size:13px;color:var(--c-text2);margin-bottom:20px;}
+.print-preview{
+  border-radius:var(--radius-sm);overflow:hidden;
+  border:2px solid var(--c-border);margin-bottom:20px;
+  background:#fff;
+}
+.print-frame{
+  padding:20px;background:#fff;
+  display:flex;flex-direction:column;align-items:center;
+}
+.print-art{
+  width:100%;max-width:260px;height:180px;
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:72px;margin-bottom:14px;
+}
+.print-name{
+  font-family:'Fredoka One',cursive;
+  font-size:22px;color:#2C2C54;text-align:center;margin-bottom:6px;
+}
+.print-badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:8px;}
+.print-badge{
+  font-size:11px;font-weight:800;padding:3px 10px;
+  border-radius:50px;
+}
+.print-watermark{font-size:10px;font-weight:700;color:#9B5DE5;letter-spacing:0.8px;margin-top:6px;}
+.pm-actions{display:flex;gap:10px;}
+.pm-btn{
+  flex:1;padding:13px;border-radius:var(--radius-sm);
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;border:none;transition:all 0.15s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.pm-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;}
+.pm-btn.cancel{background:var(--c-softgray);color:var(--c-text2);}
+.pm-btn.cancel:hover{background:var(--c-border);}
+.pm-btn.download{background:var(--c-grape);color:#fff;box-shadow:var(--shadow-grape);}
+.pm-btn.download:hover{transform:translateY(-1px);}
+
+/* ═══════════════════════════════════════════
+   TOASTER
+═══════════════════════════════════════════ */
+.toaster-container{
+  position:fixed;top:24px;left:50%;transform:translateX(-50%);
+  z-index:500;display:flex;flex-direction:column;align-items:center;gap:10px;
+  width:calc(100% - 32px);max-width:380px;pointer-events:none;
+}
+.toast{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;border-radius:var(--radius-sm);
+  background:var(--c-toastbg);color:var(--c-toasttext);
+  font-size:14px;font-weight:700;
+  box-shadow:0 8px 24px rgba(0,0,0,0.25);
+  pointer-events:all;width:100%;
+  animation:toastIn 0.3s cubic-bezier(0.34,1.2,0.64,1) both;
+  transition:all 0.25s ease;
+}
+.toast.out{animation:toastOut 0.25s ease both;}
+@keyframes toastIn{from{transform:translateY(-16px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes toastOut{to{transform:translateY(-16px);opacity:0;}}
+.toast-icon{font-size:18px;flex-shrink:0;}
+.toast-body{flex:1;}
+.toast-title{font-size:13px;font-weight:800;}
+.toast-msg{font-size:12px;font-weight:600;opacity:0.8;margin-top:1px;}
+.toast-close{
+  background:none;border:none;cursor:pointer;
+  color:var(--c-toasttext);opacity:0.6;font-size:16px;padding:2px;
+  flex-shrink:0;
+}
+.toast-close:hover{opacity:1;}
+.toast.success .toast-icon::before{content:'✅';}
+.toast.warning .toast-icon::before{content:'⚠️';}
+.toast.info .toast-icon::before{content:'💡';}
+.toast.error .toast-icon::before{content:'❌';}
+.toast.art .toast-icon::before{content:'🎨';}
+
+/* ═══════════════════════════════════════════
+   BEFOREUNLOAD MODAL
+═══════════════════════════════════════════ */
+.beforeunload-overlay{
+  display:none;position:fixed;inset:0;
+  background:var(--c-overlay);z-index:600;
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.beforeunload-overlay.open{display:flex;}
+.beforeunload-card{
+  width:calc(100% - 32px);max-width:340px;
+  background:var(--c-card);border-radius:var(--radius);
+  padding:28px 24px 20px;
+  animation:scaleIn 0.3s cubic-bezier(0.34,1.2,0.64,1) both;
+  text-align:center;transition:background 0.3s;
+}
+.bu-emoji{font-size:44px;margin-bottom:12px;}
+.bu-title{font-family:'Fredoka One',cursive;font-size:22px;color:var(--c-text);margin-bottom:8px;}
+.bu-msg{font-size:14px;color:var(--c-text2);line-height:1.5;margin-bottom:22px;}
+.bu-actions{display:flex;flex-direction:column;gap:10px;}
+.bu-btn{
+  width:100%;padding:14px;border-radius:var(--radius-sm);
+  font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;
+  cursor:pointer;border:none;transition:all 0.15s;
+}
+.bu-btn.stay{background:var(--c-grape);color:#fff;box-shadow:var(--shadow-grape);}
+.bu-btn.stay:hover{transform:translateY(-1px);}
+.bu-btn.leave{background:var(--c-softgray);color:var(--c-text2);}
+.bu-btn.leave:hover{background:var(--c-border);}
+
+/* ═══════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════ */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--c-border);border-radius:2px;}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     TOASTER CONTAINER
+══════════════════════════════════════ -->
+<div class="toaster-container" id="toaster"></div>
+
+<!-- ══════════════════════════════════════
+     BEFORE-UNLOAD MODAL
+══════════════════════════════════════ -->
+<div class="beforeunload-overlay" id="beforeunloadOverlay">
+  <div class="beforeunload-card">
+    <div class="bu-emoji">🎨</div>
+    <div class="bu-title">Wait — don't go!</div>
+    <div class="bu-msg">You have unsaved masterpieces here. Leo's and Mia's artwork collection will stay right here when you come back.</div>
+    <div class="bu-actions">
+      <button class="bu-btn stay" id="buStay">Stay & Keep Creating</button>
+      <button class="bu-btn leave" id="buLeave">Leave Anyway</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     INTRO SCREEN
+══════════════════════════════════════ -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-logo">
+    <span class="logo-dot"></span>LittlePicasso
+  </div>
+  <button class="intro-skip" id="introSkipBtn" style="display:none">Skip</button>
+  <button class="intro-back-btn" id="introBackBtn" style="display:none">
+    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+
+  <div class="intro-viewport">
+    <div class="intro-slides-track" id="introTrack">
+
+      <!-- Slide 1 -->
+      <div class="intro-slide slide-1">
+        <div class="intro-hero">
+          <div class="hero-art">🎨<span class="badge">✨</span></div>
+        </div>
+        <div class="intro-tag">Welcome to LittlePicasso</div>
+        <h1 class="intro-h1">Every scribble tells a story worth keeping</h1>
+        <p class="intro-p">Your child's artwork is a window into their world. We help you preserve every crayon masterpiece — automatically dated, labeled by grade, and beautiful forever.</p>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="intro-slide slide-2">
+        <div class="intro-hero">
+          <div class="hero-art">📸<span class="badge">📦</span></div>
+        </div>
+        <div class="intro-tag">Box Clearer Mode</div>
+        <h1 class="intro-h1">Clear years of art boxes in one afternoon</h1>
+        <p class="intro-p">Set a date, snap, crop, save — and the camera reopens instantly. No typing, no fuss. One sitting to digitize an entire childhood.</p>
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="intro-slide slide-3">
+        <div class="intro-hero">
+          <div class="hero-art">🏛️<span class="badge">⭐</span></div>
+        </div>
+        <div class="intro-tag">Smart Timeline</div>
+        <h1 class="intro-h1">From Preschool squiggles to 2nd Grade portraits</h1>
+        <p class="intro-p">Age and grade are calculated automatically. Watch your child's style evolve — every piece stamped with exactly how old they were and what grade they were in.</p>
+      </div>
+
+      <!-- Slide 4 -->
+      <div class="intro-slide slide-4">
+        <div class="intro-hero">
+          <div class="hero-art">📺<span class="badge">🏠</span></div>
+        </div>
+        <div class="intro-tag">Art TV Mode</div>
+        <h1 class="intro-h1">Turn your TV into a rotating gallery wall</h1>
+        <p class="intro-p">Cast your favorite pieces straight to your TV or Home Assistant dashboard. A living museum of your child — no frame required.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="intro-footer">
+    <div class="intro-dots" id="introDots">
+      <div class="intro-dot active" data-idx="0"></div>
+      <div class="intro-dot" data-idx="1"></div>
+      <div class="intro-dot" data-idx="2"></div>
+      <div class="intro-dot" data-idx="3"></div>
+    </div>
+    <button class="btn-primary" id="introCTA">Get Started →</button>
+    <button class="btn-secondary" id="introSecondary">Already have an account? Sign in</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN APP SCREEN
+══════════════════════════════════════ -->
+<div id="screen-app" class="screen">
+
+  <!-- Top Nav -->
+  <nav class="top-nav">
+    <div class="logo">
+      <span class="logo-dot"></span>LittlePicasso
+    </div>
+    <div class="nav-actions">
+      <button class="nav-btn add" id="addArtBtn" title="Add artwork">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button class="nav-btn settings" id="settingsBtn" title="Settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Child Tabs -->
+  <div class="child-tabs">
+    <div class="child-chip active" data-kid="leo">
+      <div class="chip-av av-leo">L</div>Leo
+    </div>
+    <div class="child-chip" data-kid="mia">
+      <div class="chip-av av-mia">M</div>Mia
+    </div>
+    <div class="child-chip" data-kid="all">
+      <div class="chip-av av-all">✦</div>All Kids
+    </div>
+  </div>
+
+  <!-- Studio -->
+  <div class="sec-head">
+    <span class="sec-title" id="studioTitle">🖼️ Leo's Studio</span>
+    <button class="sec-link">View all →</button>
+  </div>
+
+  <div class="carousel-area" id="carousel">
+    <div class="art-card left" id="card-left"></div>
+    <div class="art-card center" id="card-center">
+      <button class="art-fav" id="favBtn" title="Toggle favorite">♡</button>
+    </div>
+    <div class="art-card right" id="card-right"></div>
+  </div>
+  <div class="carousel-dots" id="carouselDots"></div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num num-coral" id="statArt">47</div><div class="stat-label">Artworks</div></div>
+    <div class="stat-card"><div class="stat-num num-grape" id="statFav">12</div><div class="stat-label">Favorites</div></div>
+    <div class="stat-card"><div class="stat-num num-sky" id="statYrs">6</div><div class="stat-label">Yrs of Art</div></div>
+  </div>
+
+  <!-- Upload Strip -->
+  <div class="upload-strip" id="uploadStrip">
+    <div class="upload-icon">📸</div>
+    <div class="upload-text">
+      <div class="ut-title">Box Clearer Mode</div>
+      <div class="ut-sub">Snap · Crop · Save · Repeat</div>
+    </div>
+    <div class="upload-arrow">
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="sec-head">
+    <span class="sec-title">📅 Timeline</span>
+    <button class="sec-link">Filter →</button>
+  </div>
+  <div class="timeline-grid" id="timelineGrid"></div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <div class="nav-item" onclick="showToast('info','Home','Coming soon in the next update!',2800)">
+      <svg viewBox="0 0 24 24"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/><path d="M3 12v9h18v-9"/></svg>
+      Home
+    </div>
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Gallery
+    </div>
+    <div class="nav-center">
+      <button class="fab" id="fabBtn">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+    <div class="nav-item" onclick="showToast('info','Kids','Manage your kids profiles in Settings ⚙️',2800)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Kids
+    </div>
+    <div class="nav-item" onclick="showToast('info','Cast Mode','Connect your TV in Settings → Cast & Display',2800)">
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M17 2l5 5M7 2l-5 5M12 12v6M9 18h6"/></svg>
+      Cast
+    </div>
+  </nav>
+</div>
+
+<!-- ══════════════════════════════════════
+     SETTINGS MODAL
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="settingsOverlay">
+  <div class="modal-sheet" id="settingsSheet">
+    <div class="modal-handle"></div>
+    <div class="modal-top">
+      <span style="font-size:22px">⚙️</span>
+      <div class="modal-title">Settings</div>
+      <button class="modal-close" id="settingsClose">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Appearance -->
+    <div class="settings-section">
+      <div class="settings-label">Appearance</div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">🌙 Dark Mode</div>
+          <div class="s-desc">Easier on the eyes at night. Great for dads doing late-night scroll sessions.</div>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="darkToggle">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">🎨 Theme Color</div>
+          <div class="s-desc">Choose your gallery's accent color.</div>
+        </div>
+        <select class="setting-select" id="themeSelect">
+          <option value="grape">Grape 🍇</option>
+          <option value="coral">Coral 🪸</option>
+          <option value="sky">Teal 🌊</option>
+          <option value="sun">Sunny 🌻</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">📝 Font Size</div>
+          <div class="s-desc">Adjust text size across the app.</div>
+        </div>
+        <select class="setting-select" id="fontSelect">
+          <option value="normal">Normal</option>
+          <option value="large">Large</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="settings-section" style="margin-top:8px">
+      <div class="settings-label">Notifications</div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">📅 Monthly Recap</div>
+          <div class="s-desc">Get a summary of this month's new art every 1st.</div>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="recapToggle" checked>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">⭐ Favorites Reminder</div>
+          <div class="s-desc">Weekly nudge to mark your favorite pieces.</div>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="favReminderToggle">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">🎂 Birthday Flashback</div>
+          <div class="s-desc">On each child's birthday, resurface art from that same day in past years.</div>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="bdayToggle" checked>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Children Profiles -->
+    <div class="settings-section" style="margin-top:8px">
+      <div class="settings-label">Children Profiles</div>
+      <div class="kids-list">
+        <div class="kid-row">
+          <div class="kid-av" style="background:#FFD166;color:#7A5B00;">L</div>
+          <div class="kid-info">
+            <div class="k-name">Leo</div>
+            <div class="k-meta">Born Apr 15, 2018 · Kindergarten 2023 · 47 artworks</div>
+          </div>
+          <button class="kid-edit" onclick="showToast('info','Edit Profile','Profile editor coming in v1.1!',2500)">Edit</button>
+        </div>
+        <div class="kid-row">
+          <div class="kid-av" style="background:#FF6B6B;color:#7A0000;">M</div>
+          <div class="kid-info">
+            <div class="k-name">Mia</div>
+            <div class="k-meta">Born Sep 2, 2020 · Preschool 2024 · 23 artworks</div>
+          </div>
+          <button class="kid-edit" onclick="showToast('info','Edit Profile','Profile editor coming in v1.1!',2500)">Edit</button>
+        </div>
+        <button class="add-kid-btn" onclick="showToast('art','Add Child','Tap + in the top nav to add a new child profile!',3000)">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add another child
+        </button>
+      </div>
+    </div>
+
+    <!-- Storage & Backup -->
+    <div class="settings-section" style="margin-top:8px">
+      <div class="settings-label">Storage & Backup</div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">☁️ iCloud Backup</div>
+          <div class="s-desc">Sync artwork to iCloud so nothing is lost.</div>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="icloudToggle" checked>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">🗜️ Image Quality</div>
+          <div class="s-desc">Balance storage space vs. image clarity.</div>
+        </div>
+        <select class="setting-select" id="qualitySelect">
+          <option value="high">High</option>
+          <option value="medium" selected>Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">💾 Local Storage Used</div>
+          <div class="s-desc">3.2 GB of 5 GB used across 70 artworks.</div>
+        </div>
+        <span style="font-size:12px;font-weight:700;color:var(--c-sky);">Manage →</span>
+      </div>
+    </div>
+
+    <!-- Cast & Display -->
+    <div class="settings-section" style="margin-top:8px">
+      <div class="settings-label">Cast & Display</div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">📺 Art TV Mode</div>
+          <div class="s-desc">Enable fullscreen display mode for casting to your TV.</div>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="tvToggle">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">⏱️ Slideshow Interval</div>
+          <div class="s-desc">How long each piece displays on TV.</div>
+        </div>
+        <select class="setting-select" id="slideshowSelect">
+          <option value="10">10 sec</option>
+          <option value="30" selected>30 sec</option>
+          <option value="60">1 min</option>
+          <option value="300">5 min</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">🏠 Home Assistant</div>
+          <div class="s-desc">Expose local feed endpoint for HA dashboards.</div>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="haToggle">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Privacy -->
+    <div class="settings-section" style="margin-top:8px">
+      <div class="settings-label">Privacy & Security</div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">🔒 App Lock</div>
+          <div class="s-desc">Require Face ID or PIN to open the app.</div>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="lockToggle">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">🌐 Display Mode PIN</div>
+          <div class="s-desc">Protect the TV/cast view from public access.</div>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="displayPinToggle" checked>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">📊 Analytics</div>
+          <div class="s-desc">Share anonymous usage data to improve LittlePicasso.</div>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="analyticsToggle" checked>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Account -->
+    <div class="settings-section" style="margin-top:8px">
+      <div class="settings-label">Account</div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">👤 Profile</div>
+          <div class="s-desc">jessica.miller@email.com · Pro Plan</div>
+        </div>
+        <span style="font-size:12px;font-weight:700;color:var(--c-grape);cursor:pointer;">Edit →</span>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="s-name">💳 Subscription</div>
+          <div class="s-desc">LittlePicasso Pro · $3.99/month · Renews Jun 1</div>
+        </div>
+        <span style="font-size:12px;font-weight:700;color:var(--c-sky);cursor:pointer;">Manage →</span>
+      </div>
+    </div>
+
+    <!-- About & Navigation -->
+    <div class="settings-section" style="margin-top:16px">
+      <div class="settings-label">About</div>
+      <button class="back-intro-btn" id="backToIntroBtn">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        Replay the intro walkthrough
+      </button>
+      <button class="danger-btn" onclick="showToast('warning','Export','Preparing your full archive export... (demo)',3000)">
+        📦 Export All Artwork
+      </button>
+      <button class="danger-btn" onclick="showToast('error','Delete Account','This action cannot be undone. (demo only)',3500)">
+        🗑️ Delete Account & Data
+      </button>
+      <div class="modal-version">LittlePicasso v1.0.0 · Made with ♥ for families</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PRINT / SHARE MODAL
+══════════════════════════════════════ -->
+<div class="print-modal-overlay" id="printOverlay">
+  <div class="print-modal">
+    <div class="pm-title">Share this Artwork 🖼️</div>
+    <div class="pm-sub">Save as PNG to share or print.</div>
+    <div class="print-preview">
+      <div class="print-frame" id="printFrame">
+        <div class="print-art fill-1" id="printArtEmoji">🚀</div>
+        <div class="print-name" id="printArtTitle">Laser Dinosaur</div>
+        <div class="print-badges">
+          <span class="print-badge pill-age" id="printAge">4 yrs 5 mo</span>
+          <span class="print-badge pill-grade" id="printGrade">Kindergarten</span>
+          <span class="print-badge pill-date" id="printDate">Oct 2022</span>
+        </div>
+        <div class="print-watermark">✦ LittlePicasso</div>
+      </div>
+    </div>
+    <div class="pm-actions">
+      <button class="pm-btn cancel" id="printCancel">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Cancel
+      </button>
+      <button class="pm-btn download" id="printDownload">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Save PNG
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+/* ─── DATA ─── */
+const ARTWORKS = [
+  {title:"Laser Dinosaur",emoji:"🚀",fill:"fill-1",age:"4 yrs 5 mo",grade:"Kindergarten",date:"Oct 2022",kid:"leo",fav:false,tags:["dinosaurs","markers"]},
+  {title:"Rainbow T-Rex",emoji:"🦖",fill:"fill-3",age:"3 yrs 2 mo",grade:"Preschool",date:"Jun 2021",kid:"leo",fav:true,tags:["dinosaurs","crayons"]},
+  {title:"Ocean Friends",emoji:"🌊",fill:"fill-2",age:"5 yrs 1 mo",grade:"1st Grade",date:"Mar 2023",kid:"leo",fav:false,tags:["ocean","watercolor"]},
+  {title:"Sunny Day",emoji:"☀️",fill:"fill-4",age:"4 yrs 9 mo",grade:"Kindergarten",date:"Jan 2023",kid:"leo",fav:false,tags:["nature"]},
+  {title:"Space Ship",emoji:"🛸",fill:"fill-5",age:"6 yrs 0 mo",grade:"2nd Grade",date:"Sep 2024",kid:"leo",fav:true,tags:["space","markers"]},
+  {title:"My Family",emoji:"👨‍👩‍👧",fill:"fill-1",age:"2 yrs 8 mo",grade:"Preschool",date:"May 2023",kid:"mia",fav:true,tags:["family"]},
+  {title:"Rainbow Cat",emoji:"🌈",fill:"fill-3",age:"3 yrs 1 mo",grade:"Preschool",date:"Oct 2023",kid:"mia",fav:false,tags:["animals","crayons"]},
+  {title:"Princess Castle",emoji:"🏰",fill:"fill-2",age:"3 yrs 7 mo",grade:"Preschool",date:"Apr 2024",kid:"mia",fav:true,tags:["fantasy"]},
+];
+const TIMELINE_DATA = [
+  {era:"Preschool",eraClass:"era-pre",emoji:"🎨",fill:"fill-4",name:"My Family Portrait",kid:"leo"},
+  {era:"Kindergarten",eraClass:"era-k",emoji:"🦋",fill:"fill-5",name:"Butterfly Garden",kid:"leo"},
+  {era:"1st Grade",eraClass:"era-1st",emoji:"🏰",fill:"fill-3",name:"Dragon Castle",kid:"leo"},
+  {era:"2nd Grade",eraClass:"era-2nd",emoji:"🐬",fill:"fill-2",name:"Deep Sea World",kid:"leo"},
+];
+
+let curKid = "leo";
+let filteredArt = [];
+let curIdx = 0;
+let introIdx = 0;
+const INTRO_TOTAL = 4;
+
+/* ─── SCREENS ─── */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{
+    s.classList.remove('active');
+    s.style.animation='none';
+  });
+  const el = document.getElementById('screen-'+id);
+  el.style.animation='';
+  el.classList.add('active');
+}
+
+/* ─── INTRO ─── */
+function updateIntroSlide(){
+  const track = document.getElementById('introTrack');
+  track.style.transform=`translateX(-${introIdx*100}%)`;
+  document.querySelectorAll('.intro-dot').forEach((d,i)=>{
+    d.classList.toggle('active',i===introIdx);
+  });
+  const backBtn = document.getElementById('introBackBtn');
+  const skipBtn = document.getElementById('introSkipBtn');
+  backBtn.style.display = introIdx > 0 ? 'flex' : 'none';
+  skipBtn.style.display = introIdx < INTRO_TOTAL-1 ? 'block' : 'none';
+  const cta = document.getElementById('introCTA');
+  if(introIdx === INTRO_TOTAL-1){
+    cta.textContent = "Let's Go! 🎨";
+  } else {
+    cta.textContent = "Next →";
+  }
+}
+document.getElementById('introCTA').addEventListener('click',()=>{
+  if(introIdx < INTRO_TOTAL-1){ introIdx++; updateIntroSlide(); }
+  else { launchApp(); }
+});
+document.getElementById('introBackBtn').addEventListener('click',()=>{
+  if(introIdx > 0){ introIdx--; updateIntroSlide(); }
+});
+document.getElementById('introSkipBtn').addEventListener('click', launchApp);
+document.getElementById('introSecondary').addEventListener('click',()=>{
+  showToast('info','Sign In','Account sign-in coming soon! For now, enjoy the demo.',3000);
+});
+document.querySelectorAll('.intro-dot').forEach(d=>{
+  d.addEventListener('click',()=>{ introIdx=parseInt(d.dataset.idx); updateIntroSlide(); });
+});
+function launchApp(){
+  showScreen('app');
+  showToast('art','Welcome to LittlePicasso!','Your gallery is ready. Tap a card to explore. 🎨',3500);
+}
+updateIntroSlide();
+
+/* ─── TOASTER ─── */
+function showToast(type, title, msg, duration=3000){
+  const container = document.getElementById('toaster');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML=`
+    <span class="toast-icon" aria-hidden="true"></span>
+    <div class="toast-body">
+      <div class="toast-title">${title}</div>
+      ${msg?`<div class="toast-msg">${msg}</div>`:''}
+    </div>
+    <button class="toast-close" onclick="dismissToast(this.parentElement)">✕</button>
+  `;
+  container.appendChild(toast);
+  setTimeout(()=>dismissToast(toast), duration);
+}
+function dismissToast(el){
+  if(!el||!el.parentElement) return;
+  el.classList.add('out');
+  setTimeout(()=>el.remove(), 260);
+}
+
+/* ─── CAROUSEL ─── */
+function filterArt(){
+  filteredArt = curKid==='all' ? ARTWORKS : ARTWORKS.filter(a=>a.kid===curKid);
+  if(filteredArt.length===0) filteredArt = ARTWORKS;
+  curIdx = Math.min(curIdx, filteredArt.length-1);
+}
+function renderCardEl(el, art, isCenterEl){
+  if(!art){ el.innerHTML=''; return; }
+  el.innerHTML=`
+    <div class="art-fill ${art.fill}">${art.emoji}
+      ${isCenterEl?`<button class="art-fav" title="Toggle favorite">${art.fav?'❤️':'♡'}</button>`:''}
+    </div>
+    <div class="art-plaque">
+      <div class="art-title-text">${art.title}</div>
+      <div class="art-meta">
+        <span class="meta-pill pill-age">${art.age}</span>
+        <span class="meta-pill pill-grade">${art.grade}</span>
+        <span class="meta-pill pill-date">${art.date}</span>
+      </div>
+    </div>
+  `;
+  if(isCenterEl){
+    const favBtn = el.querySelector('.art-fav');
+    if(favBtn) favBtn.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      art.fav=!art.fav;
+      favBtn.textContent=art.fav?'❤️':'♡';
+      showToast(art.fav?'success':'info', art.fav?'Favorited!':'Removed from favorites', art.title, 2000);
+      updateStats();
+    });
+  }
+}
+function renderCarousel(){
+  filterArt();
+  const n = filteredArt.length;
+  renderCardEl(document.getElementById('card-left'), filteredArt[(curIdx-1+n)%n], false);
+  renderCardEl(document.getElementById('card-center'), filteredArt[curIdx], true);
+  renderCardEl(document.getElementById('card-right'), filteredArt[(curIdx+1)%n], false);
+  // dots
+  const dc = document.getElementById('carouselDots');
+  dc.innerHTML = filteredArt.map((_,i)=>`<div class="dot${i===curIdx?' active':''}" data-i="${i}"></div>`).join('');
+  dc.querySelectorAll('.dot').forEach(d=>d.addEventListener('click',()=>{curIdx=parseInt(d.dataset.i);renderCarousel();}));
+  // print preview sync
+  syncPrintPreview();
+}
+function navigate(dir){
+  curIdx=(curIdx+dir+filteredArt.length)%filteredArt.length;
+  renderCarousel();
+}
+document.getElementById('card-left').addEventListener('click',()=>navigate(-1));
+document.getElementById('card-right').addEventListener('click',()=>navigate(1));
+// swipe
+let touchStartX=0;
+document.getElementById('carousel').addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;},{passive:true});
+document.getElementById('carousel').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  if(Math.abs(dx)>40) navigate(dx<0?1:-1);
+});
+
+/* ─── CHILD TABS ─── */
+document.querySelectorAll('.child-chip').forEach(chip=>{
+  chip.addEventListener('click',()=>{
+    document.querySelectorAll('.child-chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    curKid=chip.dataset.kid;
+    curIdx=0;
+    const titles={'leo':"🖼️ Leo's Studio",'mia':"🖼️ Mia's Studio",'all':"🖼️ All Artwork"};
+    document.getElementById('studioTitle').textContent=titles[curKid]||"🖼️ Gallery";
+    updateStats();
+    renderCarousel();
+  });
+});
+
+/* ─── STATS ─── */
+function updateStats(){
+  filterArt();
+  document.getElementById('statArt').textContent=filteredArt.length;
+  document.getElementById('statFav').textContent=filteredArt.filter(a=>a.fav).length;
+  document.getElementById('statYrs').textContent=curKid==='mia'?3:6;
+}
+
+/* ─── TIMELINE ─── */
+function renderTimeline(){
+  const grid = document.getElementById('timelineGrid');
+  const items = curKid==='all' ? TIMELINE_DATA : TIMELINE_DATA.filter(t=>t.kid===curKid||curKid==='all');
+  grid.innerHTML = (items.length?items:TIMELINE_DATA).map(t=>`
+    <div class="timeline-item" onclick="showToast('art','${t.name}','${t.era} · Long-press to share',2500)">
+      <div class="ti-thumb ${t.fill}">${t.emoji}</div>
+      <div class="ti-info">
+        <div class="ti-era ${t.eraClass}">${t.era}</div>
+        <div class="ti-name">${t.name}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ─── SETTINGS MODAL ─── */
+const overlay = document.getElementById('settingsOverlay');
+document.getElementById('settingsBtn').addEventListener('click',()=>{
+  overlay.classList.add('open');
+});
+function closeSettings(){
+  overlay.classList.remove('open');
+  showToast('success','Settings saved','Your preferences have been updated.',2200);
+}
+document.getElementById('settingsClose').addEventListener('click',closeSettings);
+overlay.addEventListener('click',(e)=>{
+  if(e.target===overlay) closeSettings();
+});
+// Dark mode
+document.getElementById('darkToggle').addEventListener('change',function(){
+  document.documentElement.setAttribute('data-theme',this.checked?'dark':'');
+  showToast(this.checked?'info':'success',this.checked?'Dark Mode On':'Light Mode On',this.checked?'Easier on the eyes. Great for late nights.':'Back to the bright side!',2500);
+});
+// Theme color
+document.getElementById('themeSelect').addEventListener('change',function(){
+  const colors={grape:'#9B5DE5',coral:'#FF6B6B',sky:'#4ECDC4',sun:'#FFD166'};
+  document.documentElement.style.setProperty('--c-grape',colors[this.value]||colors.grape);
+  showToast('art','Theme Updated','New color applied across the app.',2000);
+});
+// Font size
+document.getElementById('fontSelect').addEventListener('change',function(){
+  document.documentElement.style.fontSize=this.value==='large'?'18px':'16px';
+  showToast('info','Font Size','Text size updated.',1800);
+});
+// Other toggles
+['recapToggle','favReminderToggle','bdayToggle','icloudToggle','tvToggle','haToggle','lockToggle','displayPinToggle','analyticsToggle'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('change',function(){
+    const labels={
+      recapToggle:['Monthly recaps off','Monthly recap emails on'],
+      favReminderToggle:['Favorites reminders off','Favorites reminder on'],
+      bdayToggle:['Birthday flashbacks off','Birthday flashbacks on 🎂'],
+      icloudToggle:['iCloud backup paused','iCloud backup active ☁️'],
+      tvToggle:['Art TV mode off','Art TV mode enabled 📺'],
+      haToggle:['Home Assistant off','Home Assistant feed enabled 🏠'],
+      lockToggle:['App lock off','App lock enabled 🔒'],
+      displayPinToggle:['Display PIN off','Display PIN enabled 🔒'],
+      analyticsToggle:['Analytics opt-out','Thanks for helping us improve!'],
+    };
+    const msgs=labels[id]||['Off','On'];
+    showToast('info',msgs[this.checked?1:0],'',1800);
+  });
+});
+// Back to intro from settings
+document.getElementById('backToIntroBtn').addEventListener('click',()=>{
+  overlay.classList.remove('open');
+  introIdx=0;
+  updateIntroSlide();
+  showScreen('intro');
+  showToast('info','Intro Walkthrough','Swipe through the slides again anytime.',2500);
+});
+
+/* ─── PRINT / SHARE ─── */
+const printOverlay = document.getElementById('printOverlay');
+function syncPrintPreview(){
+  const art=filteredArt[curIdx];
+  if(!art) return;
+  document.getElementById('printArtEmoji').className=`print-art ${art.fill}`;
+  document.getElementById('printArtEmoji').textContent=art.emoji;
+  document.getElementById('printArtTitle').textContent=art.title;
+  document.getElementById('printAge').textContent=art.age;
+  document.getElementById('printGrade').textContent=art.grade;
+  document.getElementById('printDate').textContent=art.date;
+}
+document.getElementById('card-center').addEventListener('dblclick',()=>{
+  syncPrintPreview();
+  printOverlay.classList.add('open');
+});
+// Also from FAB long-press or button
+document.getElementById('fabBtn').addEventListener('click',()=>{
+  syncPrintPreview();
+  printOverlay.classList.add('open');
+});
+document.getElementById('addArtBtn').addEventListener('click',()=>{
+  showToast('art','Add Artwork','Camera upload coming in the full native build!',3000);
+});
+document.getElementById('printCancel').addEventListener('click',()=>{
+  printOverlay.classList.remove('open');
+});
+printOverlay.addEventListener('click',(e)=>{
+  if(e.target===printOverlay) printOverlay.classList.remove('open');
+});
+document.getElementById('printDownload').addEventListener('click',async()=>{
+  const frame=document.getElementById('printFrame');
+  const btn=document.getElementById('printDownload');
+  btn.textContent='Generating…';btn.disabled=true;
+  try{
+    const canvas=await html2canvas(frame,{
+      scale:3,useCORS:true,
+      backgroundColor:'#ffffff',
+      logging:false,
+    });
+    const link=document.createElement('a');
+    const art=filteredArt[curIdx];
+    link.download=`${(art?art.title:'artwork').replace(/\s+/g,'-').toLowerCase()}-littlepicasso.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    printOverlay.classList.remove('open');
+    showToast('success','PNG Saved!','Your artwork card is ready to share or print. 🖼️',3000);
+  }catch(err){
+    showToast('error','Export Failed','Try again or screenshot manually.',2500);
+    console.error(err);
+  }
+  btn.textContent='Save PNG';btn.disabled=false;
+});
+
+/* ─── UPLOAD STRIP ─── */
+document.getElementById('uploadStrip').addEventListener('click',()=>{
+  showToast('info','Box Clearer Mode','Session-lock your date, then snap-crop-save in a loop. (Native camera in PWA build)',3500);
+});
+
+/* ─── BEFORE UNLOAD ─── */
+let allowUnload=false;
+window.addEventListener('beforeunload',(e)=>{
+  if(allowUnload) return;
+  e.preventDefault();
+  e.returnValue='';
+  document.getElementById('beforeunloadOverlay').classList.add('open');
+  return '';
+});
+document.getElementById('buStay').addEventListener('click',()=>{
+  document.getElementById('beforeunloadOverlay').classList.remove('open');
+  showToast('success','Welcome back!','Your gallery is right where you left it.',2500);
+});
+document.getElementById('buLeave').addEventListener('click',()=>{
+  allowUnload=true;
+  document.getElementById('beforeunloadOverlay').classList.remove('open');
+  showToast('info','See you soon!','Your art is saved locally. Come back anytime.',2000);
+  setTimeout(()=>{ try{window.close();}catch(e){} },600);
+});
+
+/* ─── INIT ─── */
+filterArt();
+renderCarousel();
+updateStats();
+renderTimeline();
+
+// Welcome toast with delay
+setTimeout(()=>{
+  showToast('art','Hi there! 👋','Swipe through the intro to get started.',3000);
+},600);
+</script>
+</body>
+</html>
