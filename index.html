@@ -10,7 +10,7 @@
 <title>CanvasKeep</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- Canvas 2D export - no external libraries needed -->
 <style>
 /* ══════════════════════════════════════
    TOKENS & RESET
@@ -744,27 +744,7 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
   flex-shrink:0;background:var(--card);border-top:1px solid var(--border);
 }
 
-/* ── OFF-SCREEN EXPORT CARD (1080×1350 — 4:5 ratio, perfect for sharing) ── */
-#printExportCard{
-  position:fixed;left:-9999px;top:-9999px;
-  width:1080px;
-  background:#fff;
-  font-family:'Nunito',sans-serif;
-}
-.pec-mat{background:#FAF8F4;padding:48px 48px 36px;}
-.pec-mat-inner{border:3px solid #E8E2D8;border-radius:20px;overflow:hidden;background:#fff;}
-.pec-img-zone{width:100%;background:#F5F3EE;display:flex;align-items:center;justify-content:center;min-height:320px;}
-.pec-img-zone img{width:100%;height:auto;display:block;}
-.pec-img-zone .pec-emoji{font-size:200px;padding:60px 0;text-align:center;width:100%;}
-.pec-plaque{background:linear-gradient(180deg,#1A1428 0%,#100C1E 100%);padding:40px 52px 44px;}
-.pec-title{font-family:'Fredoka One',cursive;font-size:52px;color:#EEE8FF;margin-bottom:22px;letter-spacing:.3px;line-height:1.15;}
-.pec-badges{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;}
-.pec-badge{font-size:22px;font-weight:700;padding:7px 22px;border-radius:50px;}
-.pec-age{background:rgba(255,209,102,.15);color:#FFD166;border:2px solid rgba(255,209,102,.28);}
-.pec-grade{background:rgba(78,205,196,.13);color:#4ECDC4;border:2px solid rgba(78,205,196,.22);}
-.pec-date{background:rgba(155,93,229,.18);color:#C499FF;border:2px solid rgba(155,93,229,.28);}
-.pec-notes{font-size:26px;color:rgba(238,232,255,.48);font-style:italic;line-height:1.5;margin-bottom:18px;max-width:900px;}
-.pec-wm{font-size:20px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(155,93,229,.50);}
+/* pec styles removed — Canvas 2D export */
 
 /* ══════════════════════════════════════
    BEFORE UNLOAD MODAL
@@ -1536,20 +1516,7 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
   </div>
 </div>
 
-<!-- Off-screen export card at full resolution -->
-<div id="printExportCard" aria-hidden="true">
-  <div class="pec-mat">
-    <div class="pec-mat-inner">
-      <div class="pec-img-zone" id="pecImgZone"><span class="pec-emoji">🎨</span></div>
-    </div>
-  </div>
-  <div class="pec-plaque">
-    <div class="pec-title" id="pecTitle">Artwork</div>
-    <div class="pec-badges" id="pecBadges"></div>
-    <div class="pec-notes" id="pecNotes"></div>
-    <div class="pec-wm">✦ CanvasKeep</div>
-  </div>
-</div>
+<!-- (export card rendered via Canvas 2D API) -->
 
 <!-- ════════════════════════════════════
      CONFIRM MODAL
@@ -2330,64 +2297,185 @@ function openPrintModal(art){
   notesEl.textContent=notes;
   notesEl.style.display=notes?'block':'none';
 
-  /* ── Export card (off-screen, full res) ── */
-  const pecImg=document.getElementById('pecImgZone');
-  if(art.imageData){
-    pecImg.innerHTML=`<img src="${art.imageData}" style="width:100%;height:auto;display:block;" alt="${art.title}">`;
-  } else {
-    pecImg.innerHTML=`<span class="pec-emoji">${art.emoji||'🎨'}</span>`;
-  }
-  document.getElementById('pecTitle').textContent=art.title;
-  document.getElementById('pecBadges').innerHTML=
-    `<span class="pec-badge pec-age">${kidLabel}${age}</span>`+
-    `<span class="pec-badge pec-grade">${grade}</span>`+
-    `<span class="pec-badge pec-date">${fmt(art.date)}</span>`;
-  const pecNotes=document.getElementById('pecNotes');
-  pecNotes.textContent=notes;
-  pecNotes.style.display=notes?'block':'none';
-
   document.getElementById('printModal').classList.add('open');
   document.getElementById('downloadPng').dataset.artId=art.id;
 }
 document.getElementById('downloadPng').addEventListener('click',async function(){
-  const origText=this.innerHTML;
+  const origHTML=this.innerHTML;
   this.innerHTML='<span style="opacity:.7">Rendering…</span>';this.disabled=true;
   try{
-    const card=document.getElementById('printExportCard');
-    // Temporarily bring on-screen for html2canvas (it can't capture off-screen elements in some browsers)
-    card.style.position='fixed';
-    card.style.left='-9999px';
-    card.style.top='0';
-    card.style.zIndex='-1';
-    card.style.visibility='hidden';
-    const canvas=await html2canvas(card,{
-      scale:2,          // 1080×2 = 2160px wide — retina quality
-      useCORS:true,
-      allowTaint:true,
-      backgroundColor:'#FAF8F4',
-      logging:false,
-      windowWidth:1080,
-      width:1080,
-    });
-    card.style.position='fixed';
-    card.style.left='-9999px';
-    card.style.top='-9999px';
-    card.style.visibility='';
     const artId=this.dataset.artId;
     const art=DB.arts.find(a=>a.id===artId);
-    const slug=(art?art.title:'artwork').replace(/[^a-z0-9]/gi,'-').replace(/-+/g,'-').toLowerCase();
+    if(!art)throw new Error('Art not found');
+    const k=kidById(art.kidId);
+    const age=ageAt(k?.bday,art.date);
+    const grade=gradeAt(k?.schoolStart,art.date);
+    const kidLabel=k?k.name+' · ':'';
+
+    /* ── Card dimensions: 1080 wide, height adapts to image ── */
+    const W=1080;
+    const MAT=44;           // mat padding
+    const MAT_BORDER=3;
+    const PLAQUE_PAD=44;
+    const TITLE_SIZE=56;
+    const BADGE_SIZE=24;
+    const NOTES_SIZE=28;
+    const WM_SIZE=22;
+    const BORDER_R=20;      // border radius (drawn manually via arc)
+
+    /* Load image first so we know its dimensions */
+    let artImg=null;
+    let imgW=0,imgH=0;
+    if(art.imageData){
+      artImg=await new Promise((res,rej)=>{
+        const i=new Image();
+        i.onload=()=>res(i);
+        i.onerror=rej;
+        i.src=art.imageData;
+      });
+      // Scale to fit 1080 width inside mat
+      const avail=W-(MAT*2)-(MAT_BORDER*2);
+      const scale=avail/artImg.naturalWidth;
+      imgW=avail;
+      imgH=Math.round(artImg.naturalHeight*scale);
+    } else {
+      imgW=W-(MAT*2)-(MAT_BORDER*2);
+      imgH=400; // emoji placeholder height
+    }
+
+    /* Estimate plaque height */
+    const notes=art.notes||'';
+    const notesLines=notes?wrapText(notes, W-(PLAQUE_PAD*2), NOTES_SIZE):[];
+    const PLAQUE_H=PLAQUE_PAD
+      + TITLE_SIZE+16           // title
+      + BADGE_SIZE+26+16        // badges row
+      + (notesLines.length?(notesLines.length*(NOTES_SIZE+6)+20):0)
+      + WM_SIZE+PLAQUE_PAD;
+
+    const CARD_H=MAT+MAT_BORDER+imgH+MAT_BORDER+MAT+PLAQUE_H;
+
+    /* Create canvas */
+    const cvs=document.createElement('canvas');
+    cvs.width=W; cvs.height=CARD_H;
+    const ctx=cvs.getContext('2d');
+
+    /* ── Mat background (cream) ── */
+    ctx.fillStyle='#FAF8F4';
+    ctx.fillRect(0,0,W,MAT+MAT_BORDER+imgH+MAT_BORDER+MAT);
+
+    /* ── Mat border box ── */
+    const matX=MAT,matY=MAT;
+    const matW=W-MAT*2,matH=MAT_BORDER+imgH+MAT_BORDER;
+    ctx.strokeStyle='#E8E2D8';ctx.lineWidth=MAT_BORDER;
+    roundRect(ctx,matX,matY,matW,matH,12);ctx.stroke();
+
+    /* ── Art image or emoji ── */
+    const artX=MAT+MAT_BORDER, artY=MAT+MAT_BORDER;
+    if(artImg){
+      ctx.drawImage(artImg,artX,artY,imgW,imgH);
+    } else {
+      // Emoji placeholder
+      ctx.fillStyle='#F5F3EE';
+      ctx.fillRect(artX,artY,imgW,imgH);
+      ctx.font=`${Math.min(imgH*.55,260)}px serif`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(art.emoji||'🎨',artX+imgW/2,artY+imgH/2);
+    }
+
+    /* ── Plaque (dark gradient) ── */
+    const pY=MAT+MAT_BORDER+imgH+MAT_BORDER+MAT;
+    const grad=ctx.createLinearGradient(0,pY,0,CARD_H);
+    grad.addColorStop(0,'#1A1428');grad.addColorStop(1,'#100C1E');
+    ctx.fillStyle=grad;
+    ctx.fillRect(0,pY,W,PLAQUE_H);
+
+    let ty=pY+PLAQUE_PAD;
+
+    /* Title */
+    ctx.fillStyle='#EEE8FF';
+    ctx.font=`bold ${TITLE_SIZE}px 'Fredoka One',Fredoka,cursive,sans-serif`;
+    ctx.textAlign='left';ctx.textBaseline='top';
+    ctx.fillText(art.title,PLAQUE_PAD,ty);
+    ty+=TITLE_SIZE+20;
+
+    /* Badges */
+    const badges=[
+      {text:kidLabel+age,   bg:'rgba(255,209,102,0.18)',border:'rgba(255,209,102,0.35)',col:'#FFD166'},
+      {text:grade,          bg:'rgba(78,205,196,0.15)', border:'rgba(78,205,196,0.28)', col:'#4ECDC4'},
+      {text:fmt(art.date),  bg:'rgba(155,93,229,0.20)', border:'rgba(155,93,229,0.35)', col:'#C499FF'},
+    ];
+    let bx=PLAQUE_PAD;
+    ctx.font=`bold ${BADGE_SIZE}px Nunito,Arial,sans-serif`;
+    ctx.textBaseline='middle';
+    badges.forEach(b=>{
+      if(!b.text||b.text==='—')return;
+      const tw=ctx.measureText(b.text).width;
+      const bw=tw+36,bh=BADGE_SIZE+18,by=ty;
+      // pill background
+      ctx.fillStyle=b.bg;
+      roundRect(ctx,bx,by,bw,bh,bh/2);ctx.fill();
+      ctx.strokeStyle=b.border;ctx.lineWidth=2;
+      roundRect(ctx,bx,by,bw,bh,bh/2);ctx.stroke();
+      ctx.fillStyle=b.col;
+      ctx.fillText(b.text,bx+18,by+bh/2);
+      bx+=bw+14;
+    });
+    ty+=BADGE_SIZE+18+24;
+
+    /* Notes */
+    if(notesLines.length){
+      ctx.fillStyle='rgba(238,232,255,0.45)';
+      ctx.font=`italic ${NOTES_SIZE}px Nunito,Arial,sans-serif`;
+      ctx.textBaseline='top';
+      notesLines.forEach(line=>{ctx.fillText(line,PLAQUE_PAD,ty);ty+=NOTES_SIZE+8;});
+      ty+=14;
+    }
+
+    /* Watermark */
+    ctx.fillStyle='rgba(155,93,229,0.45)';
+    ctx.font=`800 ${WM_SIZE}px Nunito,Arial,sans-serif`;
+    ctx.textBaseline='top';
+    ctx.fillText('✦ CANVASKEEP',PLAQUE_PAD,ty);
+
+    /* ── Download ── */
+    const slug=(art.title).replace(/[^a-z0-9]/gi,'-').replace(/-+/g,'-').toLowerCase();
     const link=document.createElement('a');
     link.download=`${slug}-canvaskeep.png`;
-    link.href=canvas.toDataURL('image/png');
+    link.href=cvs.toDataURL('image/png');
     link.click();
     document.getElementById('printModal').classList.remove('open');
     toast('success','Card saved! 🖼️','High-res PNG ready to share or print.',3000);
-  }catch(e){
-    console.error(e);
-    toast('error','Export failed','Try screenshotting the preview instead.',2500);
+  }catch(err){
+    console.error(err);
+    toast('error','Export failed',err.message||'Try screenshotting the preview.',2500);
   }
-  this.innerHTML=origText;this.disabled=false;
+  this.innerHTML=origHTML;this.disabled=false;
 });
+
+/* Canvas helpers */
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+}
+function wrapText(text,maxW,fontSize){
+  const cvs=document.createElement('canvas');
+  const ctx=cvs.getContext('2d');
+  ctx.font=`italic ${fontSize}px Nunito,Arial,sans-serif`;
+  const words=text.split(' ');
+  const lines=[];let line='';
+  words.forEach(w=>{
+    const test=line?line+' '+w:w;
+    if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=w;}
+    else line=test;
+  });
+  if(line)lines.push(line);
+  return lines;
+}
 
 /* ══ EXPORT / IMPORT ══ */
 function exportJSON(mode){
