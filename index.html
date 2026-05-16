@@ -1669,6 +1669,12 @@ function toast(type,title,msg,ms=3000){
 /* ══ SCREEN NAVIGATION ══ */
 const SCREENS={gallery:'scr-gallery',kids:'scr-kids',studio:'scr-studio',upload:'scr-upload',intro:'scr-intro',fastsnap:'scr-fastsnap'};
 function navigate(to){
+  // Update internal back stack
+  if(to==='gallery'){
+    screenStack.length=0;screenStack.push('gallery');
+  } else if(screenStack[screenStack.length-1]!==to){
+    screenStack.push(to);
+  }
   const fromEl=document.getElementById(SCREENS[curScreen]);
   const toEl=document.getElementById(SCREENS[to]);
   if(!toEl||to===curScreen)return;
@@ -2793,48 +2799,52 @@ function applyCrop(){
 }
 
 /* ══ LEAVE GUARD ══
-   Strategy: intercept at the source (clicks, back button) BEFORE
-   any navigation starts. beforeunload is too late to show a modal —
-   the page is already tearing down. We use it only as a last-resort
-   native browser fallback. ──────────────────────────────────────── */
+   Back button within the app navigates between screens.
+   Leave modal only fires when trying to exit the app entirely.
+   Gallery is always the terminal screen — back from gallery = exit prompt.
+═══════════════════════════════════════════════════════════════════════ */
 let allowLeave=false;
 
-function showLeaveModal(){
-  document.getElementById('buModal').classList.add('open');
-}
-function hideLeaveModal(){
-  document.getElementById('buModal').classList.remove('open');
-}
+/* Internal navigation stack — tracks where the user came from */
+const screenStack=['gallery']; // gallery is always the base
 
-/* 1. Intercept ALL clicks on <a> tags */
+function showLeaveModal(){document.getElementById('buModal').classList.add('open');}
+function hideLeaveModal(){document.getElementById('buModal').classList.remove('open');}
+
+/* 1. Intercept ALL clicks on real <a href> tags (external links only) */
 document.addEventListener('click',e=>{
   if(allowLeave)return;
   const a=e.target.closest('a[href]');
   if(!a)return;
   const href=a.getAttribute('href');
   if(!href||href==='#'||href.startsWith('javascript'))return;
-  e.preventDefault();
-  e.stopPropagation();
+  e.preventDefault();e.stopPropagation();
   showLeaveModal();
-  // Store intent so "Leave Anyway" can follow through
   document.getElementById('buLeave').dataset.href=href;
 },{capture:true});
 
-/* 2. Intercept browser back / forward (History API) */
-// Push a dummy state so the back button pops to us first
+/* 2. Browser back button — navigate within app, or show leave modal */
 history.pushState({canvaskeep:true},'','');
-window.addEventListener('popstate',e=>{
+window.addEventListener('popstate',()=>{
   if(allowLeave)return;
-  // Re-push so the URL stays put while modal is open
+  // Re-push our sentinel so we stay in control
   history.pushState({canvaskeep:true},'','');
-  showLeaveModal();
+  // Pop the internal stack
+  if(screenStack.length>1){
+    screenStack.pop();
+    const prev=screenStack[screenStack.length-1];
+    navigate(prev);   // go back to previous app screen
+  } else {
+    // Stack is empty or at gallery — this is a real exit attempt
+    showLeaveModal();
+  }
 });
 
-/* 3. Last-resort native dialog if something slips through */
+/* 3. Last-resort native fallback */
 window.addEventListener('beforeunload',e=>{
   if(allowLeave)return;
   e.preventDefault();
-  e.returnValue=''; // triggers native browser dialog as fallback
+  e.returnValue='';
 });
 
 /* Modal buttons */
@@ -2848,10 +2858,7 @@ document.getElementById('buLeave').addEventListener('click',()=>{
   hideLeaveModal();
   const href=document.getElementById('buLeave').dataset.href;
   if(href){window.location.href=href;}
-  else{
-    // Back button case — go back two (one is our dummy pushState)
-    history.go(-2);
-  }
+  else{history.go(-2);}
 });
 
 /* ══ APPLY SETTINGS ══ */
