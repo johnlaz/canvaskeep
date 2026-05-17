@@ -1390,6 +1390,15 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
     <div class="fsnap-drop-s">Select all at once — review &amp; edit before saving</div>
   </label>
   <input type="file" id="fsnapFileInput" accept="image/*" multiple capture="environment" style="display:none">
+  <!-- Compact add-more strip shown after first upload -->
+  <div id="fsnapAddMoreStrip" style="display:none;margin:0 18px 10px;background:var(--soft);border:1.5px solid var(--border);border-radius:var(--rs);padding:10px 14px;align-items:center;gap:10px;cursor:pointer" onclick="document.getElementById('fsnapFileInput').click()">
+    <span style="font-size:20px">📷</span>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:800;color:var(--text)">Add more photos</div>
+      <div style="font-size:11px;color:var(--text2)" id="fsnapAddMoreCount">0 photos loaded</div>
+    </div>
+    <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--accent);stroke-width:2;fill:none;flex-shrink:0"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </div>
 
   <!-- Review grid (shown after images loaded) -->
   <div class="scr-body" id="fsnapReviewArea" style="display:none;padding-bottom:90px">
@@ -3042,6 +3051,8 @@ function fsnapReset(){
   document.getElementById('fsnapGrid').innerHTML='';
   document.getElementById('fsnapReviewArea').style.display='none';
   document.getElementById('fsnapConfirmBar').style.display='none';
+  document.getElementById('fsnapDrop').style.display='';
+  document.getElementById('fsnapAddMoreStrip').style.display='none';
   document.getElementById('fsnapFileInput').value='';
 }
 
@@ -3073,6 +3084,8 @@ function renderFsnapGrid(){
   });
   document.getElementById('fsnapCount').textContent=fsnapItems.length+' photo'+(fsnapItems.length!==1?'s':'');
   document.getElementById('fsnapConfirmLabel').textContent='Save '+fsnapItems.length+' artwork'+(fsnapItems.length!==1?'s':'');
+  const addMore=document.getElementById('fsnapAddMoreCount');
+  if(addMore)addMore.textContent=fsnapItems.length+' photo'+(fsnapItems.length!==1?'s':'')+' loaded';
 }
 
 function fsnapDelete(idx){
@@ -3117,6 +3130,9 @@ document.getElementById('fsnapFileInput').addEventListener('change',async functi
     fsnapItems.push({id:uid(),origDataURL:raw,croppedDataURL:cropped,title,notes:'',kidId:kid.id,year});
     n++;
   }
+  // Collapse the big drop zone — show compact add-more strip
+  document.getElementById('fsnapDrop').style.display='none';
+  document.getElementById('fsnapAddMoreStrip').style.display='flex';
   document.getElementById('fsnapReviewArea').style.display='block';
   document.getElementById('fsnapConfirmBar').style.display='flex';
   renderFsnapGrid();
@@ -3677,7 +3693,11 @@ function renderSplitCrops(){
   splitCropDataURLs.forEach((url,i)=>{
     const card=document.createElement('div');card.className='split-crop-card';
     card.innerHTML=`
-      <img class="split-crop-thumb" src="${url}" alt="Piece ${i+1}">
+      <div style="position:relative">
+        <img class="split-crop-thumb" src="${url}" alt="Piece ${i+1}">
+        <button onclick="splitDeleteCrop(${i})" title="Don't save this piece"
+          style="position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;background:rgba(255,107,107,.88);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;font-weight:900">✕</button>
+      </div>
       <div class="split-crop-info">
         <input class="split-crop-inp" value="${splitTitles[i]||''}" placeholder="Title…" oninput="splitTitles[${i}]=this.value">
       </div>
@@ -3690,6 +3710,17 @@ function renderSplitCrops(){
   const bar=document.getElementById('splitConfirmBar');
   bar.style.display=n>0?'flex':'none';
   bar.classList.toggle('visible',n>0);
+}
+
+function splitDeleteCrop(idx){
+  splitCropDataURLs.splice(idx,1);
+  splitTitles.splice(idx,1);
+  // Also remove the corresponding region so Re-detect stays in sync
+  if(splitRegions.length>idx)splitRegions.splice(idx,1);
+  renderSplitCrops();
+  // Redraw canvas without the deleted region numbered
+  drawSplitCanvas();
+  toast('info','Piece removed','It will not be saved. Adjust lines to re-detect if needed.',2200);
 }
 
 /* ── Add manual region button — draws a centered default box ── */
