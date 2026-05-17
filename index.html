@@ -1083,6 +1083,98 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 .ftool-btn.warn{border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.08);color:var(--coral);}
 
 /* Crop handle dots drawn on canvas — no DOM elements needed */
+
+/* ══ SLIDESHOW ══════════════════════════════════════════════════════ */
+#slideshowOverlay{
+  display:none;position:fixed;inset:0;z-index:900;
+  background:#050310;flex-direction:column;
+  touch-action:none;
+}
+#slideshowOverlay.open{display:flex;}
+.ss-stage{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.ss-img-wrap{
+  width:100%;height:100%;display:flex;align-items:center;
+  justify-content:center;padding:24px 24px 0;
+}
+.ss-img{
+  max-width:100%;max-height:100%;object-fit:contain;
+  border-radius:12px;
+  box-shadow:0 0 80px rgba(155,93,229,0.35),0 0 160px rgba(155,93,229,0.12);
+  transition:opacity .7s ease;
+}
+.ss-emoji-big{
+  font-size:160px;line-height:1;
+  filter:drop-shadow(0 0 40px rgba(155,93,229,0.6));
+}
+.ss-plaque{
+  padding:18px 24px 32px;flex-shrink:0;
+  background:linear-gradient(0deg,rgba(5,3,16,0.98) 60%,rgba(5,3,16,0));
+}
+.ss-title{
+  font-family:'Fredoka One',cursive;font-size:26px;color:#EEE8FF;
+  margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ss-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.ss-badge{
+  font-size:11px;font-weight:800;padding:3px 10px;border-radius:50px;
+}
+.ss-badge.age{background:rgba(255,209,102,.15);color:#FFD166;}
+.ss-badge.grade{background:rgba(78,205,196,.13);color:#4ECDC4;}
+.ss-badge.date{background:rgba(155,93,229,.18);color:#C499FF;}
+.ss-controls{
+  display:flex;align-items:center;justify-content:space-between;
+}
+.ss-ctrl-btn{
+  width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(155,93,229,0.18);color:#C499FF;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.ss-ctrl-btn:hover{background:rgba(155,93,229,0.32);}
+.ss-ctrl-btn svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;}
+.ss-play-btn{width:52px;height:52px;background:rgba(155,93,229,0.28);}
+.ss-progress{
+  flex:1;height:2px;background:rgba(155,93,229,0.2);
+  border-radius:1px;margin:0 12px;position:relative;overflow:hidden;
+}
+.ss-progress-bar{
+  position:absolute;left:0;top:0;height:100%;
+  background:rgba(155,93,229,0.8);
+  transition:width linear;
+}
+.ss-counter{
+  font-size:11px;font-weight:800;color:rgba(238,232,255,0.4);
+  min-width:44px;text-align:center;
+}
+.ss-close-btn{
+  position:absolute;top:14px;right:14px;z-index:10;
+  width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(255,255,255,.08);color:rgba(238,232,255,.6);
+  font-size:18px;display:flex;align-items:center;justify-content:center;
+}
+/* ══ YEAR BOOK ══════════════════════════════════════════════════════ */
+#yearbookModal{
+  display:none;position:fixed;inset:0;z-index:850;
+  background:var(--overlay);align-items:flex-end;justify-content:center;
+}
+#yearbookModal.open{display:flex;}
+.yb-sheet{
+  background:var(--card);border-radius:28px 28px 0 0;
+  width:100%;max-width:430px;padding:28px 22px 40px;
+  max-height:75vh;overflow-y:auto;
+}
+.yb-title{font-family:'Fredoka One',cursive;font-size:22px;color:var(--text);margin-bottom:6px;}
+.yb-sub{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.5;}
+.yb-options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.yb-opt{
+  background:var(--soft);border:1.5px solid var(--border);
+  border-radius:var(--rs);padding:14px 16px;cursor:pointer;transition:all .15s;
+}
+.yb-opt:hover,.yb-opt.active{border-color:var(--accent);background:rgba(155,93,229,.06);}
+.yb-opt-t{font-size:14px;font-weight:800;color:var(--text);}
+.yb-opt-d{font-size:12px;color:var(--text2);margin-top:2px;}
 /* ══════════════════════════════════════
    SCROLLBAR
 ══════════════════════════════════════ */
@@ -1355,7 +1447,9 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
       <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
     <div class="logo" style="font-size:18px;margin:0 auto;color:#EEE8FF"><span class="logo-dot"></span>Studio</div>
-    <div style="width:36px"></div>
+    <button onclick="openSlideshow(studioArtList,studioIdx)" title="Slideshow" style="width:36px;height:36px;border-radius:50%;background:rgba(155,93,229,.18);border:1px solid rgba(155,93,229,.25);color:#C499FF;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+      <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    </button>
   </div>
   <div class="studio-stage" id="studioStage">
     <div class="museum-frame-wrap" id="museumFrameWrap">
@@ -1661,6 +1755,52 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
   </div>
 </div>
 
+<!-- ════════════════════════════
+     SLIDESHOW OVERLAY
+════════════════════════════ -->
+<div id="slideshowOverlay">
+  <button class="ss-close-btn" id="ssClose">✕</button>
+  <div class="ss-stage" id="ssStage">
+    <div class="ss-img-wrap" id="ssImgWrap"></div>
+  </div>
+  <div class="ss-plaque">
+    <div class="ss-title" id="ssTitle">Title</div>
+    <div class="ss-meta" id="ssMeta"></div>
+    <div class="ss-controls">
+      <button class="ss-ctrl-btn" id="ssPrev">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="ss-progress"><div class="ss-progress-bar" id="ssBar"></div></div>
+      <button class="ss-ctrl-btn ss-play-btn" id="ssPlay">
+        <svg viewBox="0 0 24 24" id="ssPlayIcon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </button>
+      <div class="ss-progress"><div class="ss-progress-bar" id="ssBar2" style="display:none"></div></div>
+      <button class="ss-ctrl-btn" id="ssNext">
+        <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div style="text-align:center;margin-top:8px">
+      <span class="ss-counter" id="ssCounter">1 / 1</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     YEAR BOOK MODAL
+════════════════════════════ -->
+<div id="yearbookModal">
+  <div class="yb-sheet">
+    <div class="yb-title">📖 Year-End Memory Book</div>
+    <div class="yb-sub">Generate a beautiful PDF of the year's artwork — one page per piece, with museum-style plaques. Print it or keep it forever.</div>
+    <div class="yb-options" id="ybOptions"></div>
+    <button class="btn btn-accent btn-full" id="ybGenerate">
+      <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#fff;stroke-width:2;fill:none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Generate PDF
+    </button>
+    <button class="btn btn-soft btn-full" onclick="document.getElementById('yearbookModal').classList.remove('open')" style="margin-top:10px">Cancel</button>
+  </div>
+</div>
+
 <!-- ════════════════════════════════════
      SETTINGS SHEET
 ════════════════════════════════════ -->
@@ -1785,7 +1925,18 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
       </div>
     </div>
 
-    <div class="sheet-sec" style="margin-top:8px">
+    <div class="sheet-sec">
+  <span class="caption">Gallery Tools</span>
+  <button class="btn btn-soft btn-full" onclick="closeSettings();openSlideshow(filteredArts())" style="margin-bottom:8px">
+    <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    Start Slideshow
+  </button>
+  <button class="btn btn-soft btn-full" onclick="closeSettings();openYearbook()">
+    <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Year-End Memory Book
+  </button>
+</div>
+<div class="sheet-sec" style="margin-top:8px">
   <span class="caption">Install App</span>
   <button id="installPWABtn" class="btn btn-accent btn-full" onclick="installCanvasKeep()" style="display:none;margin-bottom:12px">
     <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -2015,7 +2166,11 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
     <!-- Actions -->
     <div class="print-actions">
       <button class="btn btn-soft" style="flex:1" onclick="document.getElementById('printModal').classList.remove('open')">Cancel</button>
-      <button class="btn btn-accent" style="flex:2" id="downloadPng">
+      <button class="btn btn-soft" style="flex:1" id="sharePng">
+        <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share
+      </button>
+      <button class="btn btn-accent" style="flex:1" id="downloadPng">
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Save PNG
       </button>
@@ -2092,17 +2247,125 @@ let selectedAvColor='#FFD166,#7A5B00';
 let artImgData=null;
 let uploadSavedCount=0;
 
-/* ══ LOCAL STORAGE ══ */
-function save(){localStorage.setItem('ck_db',JSON.stringify(DB));}
-function load(){
+/* ══ INDEXEDDB STORAGE ══════════════════════════════════════════════
+   Two object stores:
+     meta   — kids[], arts[] (no imageData), settings{}, onboarded
+     images — {id, imageData} one entry per artwork
+   Falls back to localStorage if IDB unavailable.
+   Migrates existing localStorage data automatically on first open.
+══════════════════════════════════════════════════════════════════ */
+const DB_NAME='canvaskeep',DB_VER=2;
+let _idb=null; // IDB instance once opened
+
+function openIDB(){
+  return new Promise((res,rej)=>{
+    if(_idb){res(_idb);return;}
+    const req=indexedDB.open(DB_NAME,DB_VER);
+    req.onupgradeneeded=e=>{
+      const db=e.target.result;
+      if(!db.objectStoreNames.contains('meta'))
+        db.createObjectStore('meta');
+      if(!db.objectStoreNames.contains('images'))
+        db.createObjectStore('images');
+    };
+    req.onsuccess=e=>{_idb=e.target.result;res(_idb);};
+    req.onerror=()=>rej(req.error);
+  });
+}
+
+// Strip imageData out of arts before storing metadata
+function metaSnapshot(){
+  return {
+    kids:DB.kids,
+    arts:DB.arts.map(a=>{const {imageData,...rest}=a;return rest;}),
+    settings:DB.settings,
+    onboarded:isOnboarded()
+  };
+}
+
+async function save(){
   try{
+    const db=await openIDB();
+    const tx=db.transaction(['meta','images'],'readwrite');
+    tx.objectStore('meta').put(metaSnapshot(),'data');
+    // Upsert images for any art that has imageData in memory
+    const imgStore=tx.objectStore('images');
+    DB.arts.forEach(a=>{
+      if(a.imageData) imgStore.put(a.imageData,a.id);
+    });
+    await new Promise((res,rej)=>{tx.oncomplete=res;tx.onerror=()=>rej(tx.error);});
+  }catch(e){
+    // Fallback: localStorage (images may be truncated if >5MB)
+    try{localStorage.setItem('ck_db',JSON.stringify(DB));}catch(_){}
+  }
+}
+
+async function load(){
+  try{
+    const db=await openIDB();
+    // Read meta
+    const meta=await new Promise((res,rej)=>{
+      const r=db.transaction('meta').objectStore('meta').get('data');
+      r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);
+    });
+    if(meta){
+      DB.kids=meta.kids||[];
+      DB.arts=meta.arts||[];
+      DB.settings=Object.assign(DB.settings,meta.settings||{});
+      if(meta.onboarded) _onboarded=true;
+      // Rehydrate images
+      const imgs=await new Promise((res,rej)=>{
+        const r=db.transaction('images').objectStore('images').getAll();
+        r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);
+      });
+      // getAll returns values but we need keys too — use cursor
+      const imgMap={};
+      await new Promise((res,rej)=>{
+        const r=db.transaction('images').objectStore('images').openCursor();
+        r.onsuccess=e=>{
+          const cur=e.target.result;
+          if(cur){imgMap[cur.key]=cur.value;cur.continue();}else res();
+        };
+        r.onerror=()=>rej(r.error);
+      });
+      DB.arts.forEach(a=>{if(imgMap[a.id])a.imageData=imgMap[a.id];});
+      // Migrate old localStorage data if IDB was just populated from backup
+      return true;
+    }
+    // No IDB data — try migrating from localStorage
     const raw=localStorage.getItem('ck_db');
-    if(raw){DB=JSON.parse(raw);return true;}
-  }catch(e){}
+    if(raw){
+      const parsed=JSON.parse(raw);
+      DB.kids=parsed.kids||[];DB.arts=parsed.arts||[];
+      DB.settings=Object.assign(DB.settings,parsed.settings||{});
+      if(localStorage.getItem('ck_onboarded'))_onboarded=true;
+      await save(); // migrate into IDB
+      localStorage.removeItem('ck_db'); // clean up
+      return true;
+    }
+  }catch(e){
+    // IDB failed — try localStorage
+    try{
+      const raw=localStorage.getItem('ck_db');
+      if(raw){const p=JSON.parse(raw);DB.kids=p.kids||[];DB.arts=p.arts||[];DB.settings=Object.assign(DB.settings,p.settings||{});return true;}
+    }catch(_){}
+  }
   return false;
 }
-function isOnboarded(){return!!localStorage.getItem('ck_onboarded');}
-function setOnboarded(){localStorage.setItem('ck_onboarded','1');}
+
+// Delete an artwork's image from IDB when the artwork is deleted
+async function deleteImage(artId){
+  try{
+    const db=await openIDB();
+    const tx=db.transaction('images','readwrite');
+    tx.objectStore('images').delete(artId);
+  }catch(_){}
+}
+
+// Onboarded flag stored in IDB meta (with localStorage fallback)
+let _onboarded=false;
+function isOnboarded(){return _onboarded||!!localStorage.getItem('ck_onboarded');}
+function setOnboarded(){_onboarded=true;save();localStorage.setItem('ck_onboarded','1');}
 
 /* ══ HELPERS ══ */
 function uid(){return 'id_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);}
@@ -2462,12 +2725,14 @@ function saveKid(){
     DB.kids.push({id:uid(),name,emoji:selectedEmoji,color:colors[0],colorText:colors[1]||'#fff',bday:document.getElementById('kfBday').value,schoolStart:document.getElementById('kfSchool').value,isSample:false});
     toast('art','Child Added',name+' is ready for their gallery! 🎨',2500);
   }
-  save();closeKidForm();renderKids();renderGallery();
+  haptic(6);save();closeKidForm();renderKids();renderGallery();
 }
 function deleteKid(id){
   showConfirm('🗑️','Delete this child?','This will also delete ALL their artwork. This cannot be undone.',()=>{
+    const _kidArts=DB.arts.filter(a=>a.kidId===id);
     DB.kids=DB.kids.filter(k=>k.id!==id);
     DB.arts=DB.arts.filter(a=>a.kidId!==id);
+    _kidArts.forEach(a=>deleteImage(a.id));
     if(curKidFilter===id)curKidFilter='all';
     save();closeKidForm();renderKids();renderGallery();
     toast('info','Child Removed','All associated artwork has been deleted.',2500);
@@ -2544,10 +2809,11 @@ document.getElementById('studioShare').addEventListener('click',()=>{
 document.getElementById('studioDelete').addEventListener('click',()=>{
   const art=studioArtList[studioIdx];if(!art)return;
   showConfirm('🗑️',`Delete "${art.title}"?`,'This artwork will be permanently removed.',()=>{
-    DB.arts=DB.arts.filter(a=>a.id!==art.id);
-    studioArtList=studioArtList.filter(a=>a.id!==art.id);
+    const _sid=art.id;
+    DB.arts=DB.arts.filter(a=>a.id!==_sid);
+    studioArtList=studioArtList.filter(a=>a.id!==_sid);
     if(studioIdx>=studioArtList.length)studioIdx=Math.max(0,studioArtList.length-1);
-    save();renderStudio();toast('info','Artwork Deleted','',2000);
+    deleteImage(_sid);save();renderStudio();toast('info','Artwork Deleted','',2000);
   });
 });
 // Studio swipe
@@ -2846,6 +3112,7 @@ function renameQueueArt(id,name){
   if(a){a.title=name.trim()||a.title;save();}
 }
 function removeQueueArt(id){
+  deleteImage(id);
   DB.arts=DB.arts.filter(a=>a.id!==id);
   document.getElementById('uq-'+id)?.remove();
   uploadSavedCount=Math.max(0,uploadSavedCount-1);
@@ -2885,6 +3152,98 @@ function openPrintModal(art){
   document.getElementById('printModal').classList.add('open');
   document.getElementById('downloadPng').dataset.artId=art.id;
 }
+/* Share via Web Share API if available */
+async function shareArtCard(artId){
+  const art=DB.arts.find(a=>a.id===artId);
+  if(!art)return;
+  try{
+    const pngBlob=await renderArtCardBlob(art);
+    const file=new File([pngBlob],`${art.title.replace(/[^a-z0-9]/gi,'-').toLowerCase()}-canvaskeep.png`,{type:'image/png'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({
+        title:`${art.title} — CanvasKeep`,
+        text:`Artwork by ${DB.kids.find(k=>k.id===art.kidId)?.name||''}`,
+        files:[file]
+      });
+      toast('success','Shared!','',1800);
+    } else {
+      // Fallback: download
+      const url=URL.createObjectURL(pngBlob);
+      const a=document.createElement('a');
+      a.href=url;a.download=file.name;a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),3000);
+      toast('success','Card saved! 🖼️','',2500);
+    }
+  }catch(e){
+    if(e.name!=='AbortError') toast('error','Share failed',e.message,2500);
+  }
+}
+
+/* Extract PNG render into a reusable function that returns a Blob */
+async function renderArtCardBlob(art){
+  const k=DB.kids.find(a=>a.id===art.kidId);
+  const age=ageAt(k?.bday,art.date);
+  const grade=gradeAt(k?.schoolStart,art.date);
+  const kidLabel=k?k.name+' · ':'';
+  const W=1080,MAT=44,MAT_BORDER=3,PLAQUE_PAD=44,TITLE_SIZE=56,BADGE_SIZE=24,NOTES_SIZE=28,WM_SIZE=22;
+  let artImg=null,imgW=0,imgH=0;
+  if(art.imageData){
+    artImg=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=art.imageData;});
+    imgW=W-(MAT*2)-(MAT_BORDER*2);
+    imgH=Math.round(artImg.naturalHeight*(imgW/artImg.naturalWidth));
+  } else {imgW=W-(MAT*2)-(MAT_BORDER*2);imgH=400;}
+  const notes=art.notes||'';
+  const notesLines=notes?wrapText(notes,W-(PLAQUE_PAD*2),NOTES_SIZE):[];
+  const PLAQUE_H=PLAQUE_PAD+TITLE_SIZE+16+BADGE_SIZE+26+16+(notesLines.length?(notesLines.length*(NOTES_SIZE+6)+20):0)+WM_SIZE+PLAQUE_PAD;
+  const CARD_H=MAT+MAT_BORDER+imgH+MAT_BORDER+MAT+PLAQUE_H;
+  const cvs=document.createElement('canvas');cvs.width=W;cvs.height=CARD_H;
+  const ctx=cvs.getContext('2d');
+  // Mat
+  ctx.fillStyle='#FAF8F4';ctx.fillRect(0,0,W,MAT+MAT_BORDER+imgH+MAT_BORDER+MAT);
+  ctx.strokeStyle='#E8E2D8';ctx.lineWidth=MAT_BORDER;
+  roundRect(ctx,MAT,MAT,W-MAT*2,MAT_BORDER+imgH+MAT_BORDER,12);ctx.stroke();
+  if(artImg){ctx.drawImage(artImg,MAT+MAT_BORDER,MAT+MAT_BORDER,imgW,imgH);}
+  else{ctx.fillStyle='#F5F3EE';ctx.fillRect(MAT+MAT_BORDER,MAT+MAT_BORDER,imgW,imgH);
+    ctx.font=`${Math.min(imgH*.55,260)}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(art.emoji||'🎨',MAT+MAT_BORDER+imgW/2,MAT+MAT_BORDER+imgH/2);}
+  // Plaque
+  const pY=MAT+MAT_BORDER+imgH+MAT_BORDER+MAT;
+  const grad=ctx.createLinearGradient(0,pY,0,CARD_H);
+  grad.addColorStop(0,'#1A1428');grad.addColorStop(1,'#100C1E');
+  ctx.fillStyle=grad;ctx.fillRect(0,pY,W,PLAQUE_H);
+  // Radial glow behind artwork — rendered into plaque top
+  const glowGrad=ctx.createRadialGradient(W/2,pY,0,W/2,pY,W*0.45);
+  glowGrad.addColorStop(0,'rgba(155,93,229,0.22)');glowGrad.addColorStop(1,'rgba(155,93,229,0)');
+  ctx.fillStyle=glowGrad;ctx.fillRect(0,pY,W,PLAQUE_H*0.6);
+  let ty=pY+PLAQUE_PAD;
+  ctx.fillStyle='#EEE8FF';ctx.font=`bold ${TITLE_SIZE}px 'Fredoka One',cursive,sans-serif`;
+  ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText(art.title,PLAQUE_PAD,ty);
+  ty+=TITLE_SIZE+20;
+  const badges=[
+    {text:kidLabel+age,bg:'rgba(255,209,102,0.18)',border:'rgba(255,209,102,0.35)',col:'#FFD166'},
+    {text:grade,bg:'rgba(78,205,196,0.15)',border:'rgba(78,205,196,0.28)',col:'#4ECDC4'},
+    {text:fmt(art.date),bg:'rgba(155,93,229,0.20)',border:'rgba(155,93,229,0.35)',col:'#C499FF'},
+  ];
+  let bx=PLAQUE_PAD;
+  ctx.font=`bold ${BADGE_SIZE}px Nunito,Arial,sans-serif`;ctx.textBaseline='middle';
+  badges.forEach(b=>{
+    if(!b.text||b.text==='—')return;
+    const tw=ctx.measureText(b.text).width,bw=tw+36,bh=BADGE_SIZE+18,by=ty;
+    ctx.fillStyle=b.bg;roundRect(ctx,bx,by,bw,bh,bh/2);ctx.fill();
+    ctx.strokeStyle=b.border;ctx.lineWidth=2;roundRect(ctx,bx,by,bw,bh,bh/2);ctx.stroke();
+    ctx.fillStyle=b.col;ctx.fillText(b.text,bx+18,by+bh/2);bx+=bw+14;
+  });
+  ty+=BADGE_SIZE+18+24;
+  if(notesLines.length){
+    ctx.fillStyle='rgba(238,232,255,0.45)';ctx.font=`italic ${NOTES_SIZE}px Nunito,Arial,sans-serif`;
+    ctx.textBaseline='top';
+    notesLines.forEach(line=>{ctx.fillText(line,PLAQUE_PAD,ty);ty+=NOTES_SIZE+8;});ty+=14;
+  }
+  ctx.fillStyle='rgba(155,93,229,0.45)';ctx.font=`800 ${WM_SIZE}px Nunito,Arial,sans-serif`;
+  ctx.textBaseline='top';ctx.fillText('✦ CANVASKEEP',PLAQUE_PAD,ty);
+  return new Promise(res=>cvs.toBlob(res,'image/png'));
+}
+
 document.getElementById('downloadPng').addEventListener('click',async function(){
   const origHTML=this.innerHTML;
   this.innerHTML='<span style="opacity:.7">Rendering…</span>';this.disabled=true;
@@ -2892,142 +3251,14 @@ document.getElementById('downloadPng').addEventListener('click',async function()
     const artId=this.dataset.artId;
     const art=DB.arts.find(a=>a.id===artId);
     if(!art)throw new Error('Art not found');
-    const k=kidById(art.kidId);
-    const age=ageAt(k?.bday,art.date);
-    const grade=gradeAt(k?.schoolStart,art.date);
-    const kidLabel=k?k.name+' · ':'';
-
-    /* ── Card dimensions: 1080 wide, height adapts to image ── */
-    const W=1080;
-    const MAT=44;           // mat padding
-    const MAT_BORDER=3;
-    const PLAQUE_PAD=44;
-    const TITLE_SIZE=56;
-    const BADGE_SIZE=24;
-    const NOTES_SIZE=28;
-    const WM_SIZE=22;
-    const BORDER_R=20;      // border radius (drawn manually via arc)
-
-    /* Load image first so we know its dimensions */
-    let artImg=null;
-    let imgW=0,imgH=0;
-    if(art.imageData){
-      artImg=await new Promise((res,rej)=>{
-        const i=new Image();
-        i.onload=()=>res(i);
-        i.onerror=rej;
-        i.src=art.imageData;
-      });
-      // Scale to fit 1080 width inside mat
-      const avail=W-(MAT*2)-(MAT_BORDER*2);
-      const scale=avail/artImg.naturalWidth;
-      imgW=avail;
-      imgH=Math.round(artImg.naturalHeight*scale);
-    } else {
-      imgW=W-(MAT*2)-(MAT_BORDER*2);
-      imgH=400; // emoji placeholder height
-    }
-
-    /* Estimate plaque height */
-    const notes=art.notes||'';
-    const notesLines=notes?wrapText(notes, W-(PLAQUE_PAD*2), NOTES_SIZE):[];
-    const PLAQUE_H=PLAQUE_PAD
-      + TITLE_SIZE+16           // title
-      + BADGE_SIZE+26+16        // badges row
-      + (notesLines.length?(notesLines.length*(NOTES_SIZE+6)+20):0)
-      + WM_SIZE+PLAQUE_PAD;
-
-    const CARD_H=MAT+MAT_BORDER+imgH+MAT_BORDER+MAT+PLAQUE_H;
-
-    /* Create canvas */
-    const cvs=document.createElement('canvas');
-    cvs.width=W; cvs.height=CARD_H;
-    const ctx=cvs.getContext('2d');
-
-    /* ── Mat background (cream) ── */
-    ctx.fillStyle='#FAF8F4';
-    ctx.fillRect(0,0,W,MAT+MAT_BORDER+imgH+MAT_BORDER+MAT);
-
-    /* ── Mat border box ── */
-    const matX=MAT,matY=MAT;
-    const matW=W-MAT*2,matH=MAT_BORDER+imgH+MAT_BORDER;
-    ctx.strokeStyle='#E8E2D8';ctx.lineWidth=MAT_BORDER;
-    roundRect(ctx,matX,matY,matW,matH,12);ctx.stroke();
-
-    /* ── Art image or emoji ── */
-    const artX=MAT+MAT_BORDER, artY=MAT+MAT_BORDER;
-    if(artImg){
-      ctx.drawImage(artImg,artX,artY,imgW,imgH);
-    } else {
-      // Emoji placeholder
-      ctx.fillStyle='#F5F3EE';
-      ctx.fillRect(artX,artY,imgW,imgH);
-      ctx.font=`${Math.min(imgH*.55,260)}px serif`;
-      ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText(art.emoji||'🎨',artX+imgW/2,artY+imgH/2);
-    }
-
-    /* ── Plaque (dark gradient) ── */
-    const pY=MAT+MAT_BORDER+imgH+MAT_BORDER+MAT;
-    const grad=ctx.createLinearGradient(0,pY,0,CARD_H);
-    grad.addColorStop(0,'#1A1428');grad.addColorStop(1,'#100C1E');
-    ctx.fillStyle=grad;
-    ctx.fillRect(0,pY,W,PLAQUE_H);
-
-    let ty=pY+PLAQUE_PAD;
-
-    /* Title */
-    ctx.fillStyle='#EEE8FF';
-    ctx.font=`bold ${TITLE_SIZE}px 'Fredoka One',Fredoka,cursive,sans-serif`;
-    ctx.textAlign='left';ctx.textBaseline='top';
-    ctx.fillText(art.title,PLAQUE_PAD,ty);
-    ty+=TITLE_SIZE+20;
-
-    /* Badges */
-    const badges=[
-      {text:kidLabel+age,   bg:'rgba(255,209,102,0.18)',border:'rgba(255,209,102,0.35)',col:'#FFD166'},
-      {text:grade,          bg:'rgba(78,205,196,0.15)', border:'rgba(78,205,196,0.28)', col:'#4ECDC4'},
-      {text:fmt(art.date),  bg:'rgba(155,93,229,0.20)', border:'rgba(155,93,229,0.35)', col:'#C499FF'},
-    ];
-    let bx=PLAQUE_PAD;
-    ctx.font=`bold ${BADGE_SIZE}px Nunito,Arial,sans-serif`;
-    ctx.textBaseline='middle';
-    badges.forEach(b=>{
-      if(!b.text||b.text==='—')return;
-      const tw=ctx.measureText(b.text).width;
-      const bw=tw+36,bh=BADGE_SIZE+18,by=ty;
-      // pill background
-      ctx.fillStyle=b.bg;
-      roundRect(ctx,bx,by,bw,bh,bh/2);ctx.fill();
-      ctx.strokeStyle=b.border;ctx.lineWidth=2;
-      roundRect(ctx,bx,by,bw,bh,bh/2);ctx.stroke();
-      ctx.fillStyle=b.col;
-      ctx.fillText(b.text,bx+18,by+bh/2);
-      bx+=bw+14;
-    });
-    ty+=BADGE_SIZE+18+24;
-
-    /* Notes */
-    if(notesLines.length){
-      ctx.fillStyle='rgba(238,232,255,0.45)';
-      ctx.font=`italic ${NOTES_SIZE}px Nunito,Arial,sans-serif`;
-      ctx.textBaseline='top';
-      notesLines.forEach(line=>{ctx.fillText(line,PLAQUE_PAD,ty);ty+=NOTES_SIZE+8;});
-      ty+=14;
-    }
-
-    /* Watermark */
-    ctx.fillStyle='rgba(155,93,229,0.45)';
-    ctx.font=`800 ${WM_SIZE}px Nunito,Arial,sans-serif`;
-    ctx.textBaseline='top';
-    ctx.fillText('✦ CANVASKEEP',PLAQUE_PAD,ty);
-
-    /* ── Download ── */
-    const slug=(art.title).replace(/[^a-z0-9]/gi,'-').replace(/-+/g,'-').toLowerCase();
+    // Use shared render function
+    const pngBlob=await renderArtCardBlob(art);
+    const slug=art.title.replace(/[^a-z0-9]/gi,'-').replace(/-+/g,'-').toLowerCase();
     const link=document.createElement('a');
     link.download=`${slug}-canvaskeep.png`;
-    link.href=cvs.toDataURL('image/png');
+    link.href=URL.createObjectURL(pngBlob);
     link.click();
+    setTimeout(()=>URL.revokeObjectURL(link.href),3000);
     document.getElementById('printModal').classList.remove('open');
     toast('success','Card saved! 🖼️','High-res PNG ready to share or print.',3000);
   }catch(err){
@@ -4272,6 +4503,303 @@ function refreshArtFormPreview(){
 }
 
 /* Also open framing editor after file is selected (after auto-crop) */
+/* Share button in print modal */
+document.getElementById('sharePng').addEventListener('click',async function(){
+  const artId=document.getElementById('downloadPng').dataset.artId;
+  document.getElementById('printModal').classList.remove('open');
+  await shareArtCard(artId);
+});
+
+/* Vibration helper — one line, feels native */
+function haptic(pattern=10){try{navigator.vibrate&&navigator.vibrate(pattern);}catch(_){}}
+
+
+/* ══ SLIDESHOW ═══════════════════════════════════════════════════════
+   Auto-advance fullscreen gallery. Tap to pause/play.
+   Swipe left/right to navigate. Shows all arts for current filter.
+═══════════════════════════════════════════════════════════════════ */
+let ssArts=[],ssIdx=0,ssPlaying=true,ssTimer=null,ssDuration=5000;
+let ssTouchX=null;
+
+function openSlideshow(arts,startIdx=0){
+  ssArts=arts.filter(a=>a); // defensive
+  if(!ssArts.length){toast('warning','No artwork','Add some artwork first.',2000);return;}
+  ssIdx=startIdx;ssPlaying=true;
+  document.getElementById('slideshowOverlay').classList.add('open');
+  // Request fullscreen on supported devices
+  try{document.getElementById('slideshowOverlay').requestFullscreen?.();}catch(_){}
+  ssRender();ssSchedule();
+  haptic(6);
+}
+
+function ssRender(){
+  const art=ssArts[ssIdx];if(!art)return;
+  const k=DB.kids.find(k=>k.id===art.kidId);
+  // Image
+  const wrap=document.getElementById('ssImgWrap');
+  if(art.imageData){
+    wrap.innerHTML=`<img class="ss-img" src="${art.imageData}" alt="${art.title}" loading="lazy">`;
+  } else {
+    wrap.innerHTML=`<div class="ss-emoji-big">${art.emoji||'🎨'}</div>`;
+  }
+  // Plaque
+  document.getElementById('ssTitle').textContent=art.title;
+  const meta=document.getElementById('ssMeta');
+  const age=ageAt(k?.bday,art.date),grade=gradeAt(k?.schoolStart,art.date);
+  meta.innerHTML=`
+    ${k?`<span class="ss-badge age">${k.name}</span>`:''}
+    <span class="ss-badge age">${age}</span>
+    <span class="ss-badge grade">${grade}</span>
+    <span class="ss-badge date">${fmt(art.date)}</span>
+    ${art.fav?'<span class="ss-badge age">⭐</span>':''}
+  `;
+  document.getElementById('ssCounter').textContent=`${ssIdx+1} / ${ssArts.length}`;
+  // Play icon
+  document.getElementById('ssPlayIcon').innerHTML=ssPlaying
+    ?'<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'
+    :'<polygon points="5 3 19 12 5 21 5 3"/>';
+  ssResetBar();
+}
+
+function ssResetBar(){
+  const bar=document.getElementById('ssBar');
+  bar.style.transition='none';bar.style.width='0%';
+  if(ssPlaying){
+    requestAnimationFrame(()=>{
+      bar.style.transition=`width ${ssDuration}ms linear`;
+      bar.style.width='100%';
+    });
+  }
+}
+
+function ssSchedule(){
+  clearTimeout(ssTimer);
+  if(ssPlaying) ssTimer=setTimeout(()=>{ssNext();},ssDuration);
+}
+
+function ssNext(){
+  ssIdx=(ssIdx+1)%ssArts.length;
+  haptic(4);ssRender();ssSchedule();
+}
+function ssPrev(){
+  ssIdx=(ssIdx-1+ssArts.length)%ssArts.length;
+  haptic(4);ssRender();ssSchedule();
+}
+function ssTogglePlay(){
+  ssPlaying=!ssPlaying;
+  if(ssPlaying){ssSchedule();}else{clearTimeout(ssTimer);}
+  ssRender();haptic(6);
+}
+function closeSlideshow(){
+  clearTimeout(ssTimer);ssPlaying=false;
+  document.getElementById('slideshowOverlay').classList.remove('open');
+  try{document.exitFullscreen?.();}catch(_){}
+}
+
+// Controls
+document.getElementById('ssClose').addEventListener('click',closeSlideshow);
+document.getElementById('ssPrev').addEventListener('click',ssPrev);
+document.getElementById('ssNext').addEventListener('click',ssNext);
+document.getElementById('ssPlay').addEventListener('click',ssTogglePlay);
+
+// Swipe
+const ssOverlay=document.getElementById('slideshowOverlay');
+ssOverlay.addEventListener('touchstart',e=>{ssTouchX=e.touches[0].clientX;},{passive:true});
+ssOverlay.addEventListener('touchend',e=>{
+  if(ssTouchX===null)return;
+  const dx=e.changedTouches[0].clientX-ssTouchX;
+  if(Math.abs(dx)>50){dx<0?ssNext():ssPrev();}
+  ssTouchX=null;
+},{passive:true});
+
+// Keyboard
+window.addEventListener('keydown',e=>{
+  if(!document.getElementById('slideshowOverlay').classList.contains('open'))return;
+  if(e.key==='ArrowRight')ssNext();
+  else if(e.key==='ArrowLeft')ssPrev();
+  else if(e.key===' '||e.key==='Escape'){e.key==='Escape'?closeSlideshow():ssTogglePlay();}
+});
+
+/* ══ YEAR-END MEMORY BOOK PDF ════════════════════════════════════════
+   Uses jsPDF from CDN. Each artwork gets its own page.
+   Page layout: cream mat top 60%, dark plaque bottom 40%.
+   Portrait A4 (595×842pt) — also looks great printed.
+═══════════════════════════════════════════════════════════════════ */
+function openYearbook(){
+  const modal=document.getElementById('yearbookModal');
+  const opts=document.getElementById('ybOptions');
+  // Build option list: All arts, or per-kid, or per-year
+  const years=[...new Set(DB.arts.map(a=>a.date?.slice(0,4)).filter(Boolean))].sort().reverse();
+  const kids=DB.kids;
+  let html=`<div class="yb-opt active" data-filter="all" onclick="ybSelect(this)">
+    <div class="yb-opt-t">✦ All Artwork</div>
+    <div class="yb-opt-d">${DB.arts.length} piece${DB.arts.length!==1?'s':''} total</div>
+  </div>`;
+  kids.forEach(k=>{
+    const n=DB.arts.filter(a=>a.kidId===k.id).length;
+    html+=`<div class="yb-opt" data-filter="kid:${k.id}" onclick="ybSelect(this)">
+      <div class="yb-opt-t">${k.emoji} ${k.name}'s Collection</div>
+      <div class="yb-opt-d">${n} piece${n!==1?'s':''}</div>
+    </div>`;
+  });
+  years.forEach(y=>{
+    const n=DB.arts.filter(a=>a.date?.startsWith(y)).length;
+    html+=`<div class="yb-opt" data-filter="year:${y}" onclick="ybSelect(this)">
+      <div class="yb-opt-t">📅 ${y} Year in Art</div>
+      <div class="yb-opt-d">${n} piece${n!==1?'s':''} from ${y}</div>
+    </div>`;
+  });
+  opts.innerHTML=html;
+  modal.classList.add('open');
+}
+
+function ybSelect(el){
+  document.querySelectorAll('.yb-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+}
+
+document.getElementById('ybGenerate').addEventListener('click',async function(){
+  const active=document.querySelector('.yb-opt.active');
+  if(!active)return;
+  const filter=active.dataset.filter;
+  let arts=DB.arts;
+  if(filter.startsWith('kid:')){arts=DB.arts.filter(a=>a.kidId===filter.slice(4));}
+  else if(filter.startsWith('year:')){arts=DB.arts.filter(a=>a.date?.startsWith(filter.slice(5)));}
+  arts=[...arts].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(!arts.length){toast('warning','No artwork in this selection','',2000);return;}
+  document.getElementById('yearbookModal').classList.remove('open');
+  toast('info','Generating PDF…','This may take a moment for large collections.',3000);
+  this.disabled=true;
+  try{
+    await generateYearbookPDF(arts);
+  }catch(e){
+    console.error(e);
+    toast('error','PDF failed',e.message||'Try with fewer artworks.',3000);
+  }
+  this.disabled=false;
+});
+
+async function generateYearbookPDF(arts){
+  // Load jsPDF from CDN
+  if(!window.jspdf){
+    await new Promise((res,rej)=>{
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.onload=res;s.onerror=rej;document.head.appendChild(s);
+    });
+  }
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF({orientation:'portrait',unit:'pt',format:'a4'});
+  const PW=595,PH=842;
+  const MAT_H=PH*0.58,PLAQUE_H=PH-MAT_H;
+  const PAD=36;
+
+  for(let i=0;i<arts.length;i++){
+    const art=arts[i];
+    if(i>0)pdf.addPage();
+    const k=DB.kids.find(k=>k.id===art.kidId);
+    const age=ageAt(k?.bday,art.date),grade=gradeAt(k?.schoolStart,art.date);
+
+    // Cream mat background
+    pdf.setFillColor(250,248,244);
+    pdf.rect(0,0,PW,MAT_H,'F');
+
+    // Art image
+    if(art.imageData){
+      try{
+        // Get image dimensions by loading into canvas
+        const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=art.imageData;});
+        const maxW=PW-PAD*2,maxH=MAT_H-PAD*2;
+        const scale=Math.min(maxW/img.naturalWidth,maxH/img.naturalHeight);
+        const dw=img.naturalWidth*scale,dh=img.naturalHeight*scale;
+        const dx=(PW-dw)/2,dy=PAD+(maxH-dh)/2;
+        // Convert to JPEG via canvas for jsPDF
+        const cvs=document.createElement('canvas');cvs.width=img.naturalWidth;cvs.height=img.naturalHeight;
+        cvs.getContext('2d').drawImage(img,0,0);
+        const dataUrl=cvs.toDataURL('image/jpeg',0.88);
+        pdf.addImage(dataUrl,'JPEG',dx,dy,dw,dh);
+        // Mat border
+        pdf.setDrawColor(220,210,200);pdf.setLineWidth(1);
+        pdf.rect(dx-4,dy-4,dw+8,dh+8);
+      }catch(_){}
+    } else {
+      // Emoji fallback
+      pdf.setFontSize(80);pdf.setTextColor(100,90,120);
+      pdf.text(art.emoji||'🎨',PW/2,MAT_H/2,{align:'center',baseline:'middle'});
+    }
+
+    // Dark plaque
+    pdf.setFillColor(26,20,40);pdf.rect(0,MAT_H,PW,PLAQUE_H,'F');
+    // Subtle gradient feel via layered rects
+    pdf.setFillColor(155,93,229);pdf.setGState(new pdf.GState({opacity:0.08}));
+    pdf.rect(0,MAT_H,PW,PLAQUE_H/2,'F');
+    pdf.setGState(new pdf.GState({opacity:1}));
+
+    let ty=MAT_H+PAD;
+    // Title
+    pdf.setFont('helvetica','bold');pdf.setFontSize(28);pdf.setTextColor(238,232,255);
+    const titleLines=pdf.splitTextToSize(art.title,PW-PAD*2);
+    pdf.text(titleLines,PAD,ty);ty+=titleLines.length*34;
+
+    // Badges
+    pdf.setFontSize(10);pdf.setFont('helvetica','bold');
+    const badgeY=ty;
+    let bx=PAD;
+    const badges=[[k?.name||'',255,209,102],[age,78,205,196],[grade,155,93,229],[fmt(art.date),200,160,255]];
+    badges.forEach(([txt,r,g,b])=>{
+      if(!txt||txt==='—')return;
+      const w=pdf.getTextWidth(txt)+16;
+      pdf.setFillColor(r,g,b);pdf.setGState(new pdf.GState({opacity:0.18}));
+      pdf.roundedRect(bx,badgeY-10,w,18,4,4,'F');
+      pdf.setGState(new pdf.GState({opacity:1}));
+      pdf.setTextColor(r,g,b);pdf.text(txt,bx+8,badgeY+1);
+      bx+=w+8;
+    });
+    ty+=28;
+
+    // Notes
+    if(art.notes){
+      pdf.setFont('helvetica','italic');pdf.setFontSize(11);
+      pdf.setTextColor(238,232,255);pdf.setGState(new pdf.GState({opacity:0.5}));
+      const noteLines=pdf.splitTextToSize(art.notes,PW-PAD*2);
+      pdf.text(noteLines,PAD,ty);
+      pdf.setGState(new pdf.GState({opacity:1}));ty+=noteLines.length*15+10;
+    }
+
+    // Watermark
+    pdf.setFont('helvetica','bold');pdf.setFontSize(8);
+    pdf.setTextColor(155,93,229);pdf.setGState(new pdf.GState({opacity:0.5}));
+    pdf.text('✦ CANVASKEEP',PAD,PH-16);
+    pdf.setGState(new pdf.GState({opacity:1}));
+
+    // Page number
+    pdf.setTextColor(155,93,229);pdf.setFontSize(8);
+    pdf.text(`${i+1} / ${arts.length}`,PW-PAD,PH-16,{align:'right'});
+  }
+
+  // Cover page prepended
+  pdf.insertPage(1);
+  pdf.setFillColor(16,12,30);pdf.rect(0,0,PW,PH,'F');
+  const cGrad=pdf.createLinearGradient?null:null; // jsPDF doesn't have gradients natively
+  pdf.setFillColor(155,93,229);pdf.setGState(new pdf.GState({opacity:0.15}));
+  pdf.circle(PW/2,PH*0.38,180,'F');
+  pdf.setGState(new pdf.GState({opacity:1}));
+  pdf.setFont('helvetica','bold');pdf.setFontSize(42);pdf.setTextColor(238,232,255);
+  pdf.text('CanvasKeep',PW/2,PH*0.38,{align:'center'});
+  pdf.setFont('helvetica','italic');pdf.setFontSize(14);pdf.setTextColor(196,153,255);
+  const subtitle=arts[0]?.date?.slice(0,4)||new Date().getFullYear().toString();
+  pdf.text(`A Year in Art · ${subtitle}`,PW/2,PH*0.38+52,{align:'center'});
+  pdf.setFontSize(11);pdf.setTextColor(155,120,210);
+  pdf.text(`${arts.length} piece${arts.length!==1?'s':''} preserved`,PW/2,PH*0.38+80,{align:'center'});
+  pdf.setFont('helvetica','bold');pdf.setFontSize(9);pdf.setTextColor(155,93,229);
+  pdf.text('✦ CANVASKEEP',PW/2,PH-30,{align:'center'});
+
+  const year=arts[0]?.date?.slice(0,4)||'collection';
+  pdf.save(`canvaskeep-${year}.pdf`);
+  toast('success','PDF saved! 📖','Your memory book is ready.',3500);
+  haptic([8,50,8,50,8]);
+}
+
 /* ══ LEAVE GUARD ══
    Back button within the app navigates between screens.
    Leave modal only fires when trying to exit the app entirely.
@@ -4355,8 +4883,8 @@ function applySettings(){
 }
 
 /* ══ INIT ══ */
-(function init(){
-  const hasData=load();
+(async function init(){
+  const hasData=await load();
   applySettings();
   if(!hasData||DB.kids.length===0&&DB.arts.length===0){
     DB.kids=[...SAMPLE_KIDS];DB.arts=[...SAMPLE_ARTS];save();
