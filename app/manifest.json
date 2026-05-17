@@ -1,9 +1,9 @@
 {
   "name": "CanvasKeep",
   "short_name": "CanvasKeep",
-  "description": "Preserve your child's artwork \u2014 every crayon, every grade, every year.",
-  "start_url": "./",
-  "id": "/canvaskeep/",
+  "description": "Preserve your child's artwork — every crayon, every grade, every year.",
+  "start_url": "./index.html",
+  "id": "./index.html",
   "scope": "./",
   "display": "standalone",
   "display_override": [
@@ -59,7 +59,7 @@
       "name": "Open Gallery",
       "short_name": "Gallery",
       "description": "Go straight to the art gallery",
-      "url": "./#gallery",
+      "url": "./index.html#gallery",
       "icons": [
         {
           "src": "icon-192x192.png",
@@ -72,7 +72,7 @@
       "name": "Upload Artwork",
       "short_name": "Upload",
       "description": "Add new artwork quickly",
-      "url": "./#upload",
+      "url": "./index.html#upload",
       "icons": [
         {
           "src": "icon-192x192.png",

@@ -5459,6 +5459,8 @@ document.getElementById('buLeave').addEventListener('click',()=>{
   allowLeave=true;
   hideLeaveModal();
   const href=document.getElementById('buLeave').dataset.href;
+  // Signal landing page to show welcome-back toast
+  try { sessionStorage.setItem('ck_returned_from_app','1'); } catch(e){}
   if(href){window.location.href=href;}
   else{history.go(-2);}
 });
