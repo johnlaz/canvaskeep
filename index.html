@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CanvasKeep — A Museum for Your Child's Art</title>
   <meta name="description" content="Preserve your child's artwork forever. No clutter, no cloud, no account. Just beautiful memories, right on your phone." />
+  <meta name="theme-color" content="#9B5DE5" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -1026,6 +1029,59 @@
     </div>
     <p class="footer-copy">© 2025 LAZLAB Creations. Made for parents, by a parent, with love. 💜</p>
   </footer>
+
+  <!-- LANDING TOAST -->
+  <div id="lp-toaster" style="
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    z-index:9999;display:flex;flex-direction:column;gap:10px;align-items:center;
+    pointer-events:none;
+  "></div>
+
+  <script>
+    // Welcome-back toast when returning from app
+    function lpToast(emoji, title, msg) {
+      const t = document.createElement('div');
+      t.style.cssText = `
+        display:flex;align-items:flex-start;gap:12px;
+        background:#2D2033;color:#fff;
+        border-radius:14px;padding:14px 18px;
+        box-shadow:0 8px 32px rgba(0,0,0,0.22);
+        font-family:'Nunito',sans-serif;
+        max-width:320px;pointer-events:auto;
+        animation:lpSlideUp .3s ease both;
+        border-left:4px solid #9B5DE5;
+      `;
+      t.innerHTML = `
+        <span style="font-size:20px;margin-top:1px">${emoji}</span>
+        <div>
+          <div style="font-weight:800;font-size:14px;margin-bottom:2px">${title}</div>
+          ${msg ? `<div style="font-size:12px;opacity:.75;line-height:1.4">${msg}</div>` : ''}
+        </div>
+        <button onclick="this.parentElement.remove()" style="
+          background:none;border:none;color:rgba(255,255,255,.5);
+          font-size:16px;cursor:pointer;margin-left:8px;padding:0;line-height:1;
+          align-self:flex-start;
+        ">✕</button>
+      `;
+      document.getElementById('lp-toaster').appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(8px)'; t.style.transition = 'opacity .3s, transform .3s'; setTimeout(() => t.remove(), 320); }, 4000);
+    }
+
+    // Check if user just came back from the app
+    try {
+      if (sessionStorage.getItem('ck_returned_from_app') === '1') {
+        sessionStorage.removeItem('ck_returned_from_app');
+        setTimeout(() => lpToast('🎨', 'Welcome back!', 'Your gallery is saved and waiting whenever you\'re ready.'), 400);
+      }
+    } catch(e) {}
+  </script>
+
+  <style>
+    @keyframes lpSlideUp {
+      from { opacity:0; transform:translateY(16px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+  </style>
 
 </body>
 </html>
