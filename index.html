@@ -1876,8 +1876,7 @@ let gallerySort='newest'; // newest|oldest|alpha|favs
 let timelineExpanded=false;
 
 function renderGallery(){
-  const arts=filteredArts();
-  if(carouselIdx>=arts.length)carouselIdx=0;
+  if(carouselIdx<0)carouselIdx=0;
   const body=document.getElementById('galleryBody');
   body.innerHTML='';
 
@@ -3127,178 +3126,360 @@ function applyCrop(){
 
 
 /* ══ MULTI-ART SPLIT ══════════════════════════════════════════
-   Computer vision gutter detection:
-   1. Load photo onto canvas
-   2. Compute column/row brightness profiles
-   3. Find valleys (dark gutters between pieces)
-   4. Crop each region out as separate artwork
+   Primary mode: user draws split lines on canvas (H/V lines)
+   that divide the image into regions.
+   Helper: auto-detect tries edge-density gutters first.
+   Either way, the user sees numbered crop previews they can
+   rename before saving.
 ═══════════════════════════════════════════════════════════════ */
 let splitSourceImg=null;
-let splitSourceDataURL=null;
-let splitRegions=[]; // [{x,y,w,h}] in original image coords
-let splitCropDataURLs=[]; // cropped base64 per region
+let splitHLines=[];  // horizontal split lines, 0.0–1.0 (fraction of image height)
+let splitVLines=[];  // vertical split lines, 0.0–1.0 (fraction of image width)
+let splitCropDataURLs=[];
 let splitTitles=[];
+let splitDrawing=false;
+let splitDragLine=null; // {axis:'h'|'v', idx, startFrac}
+let splitMode='draw'; // 'draw' | 'drag'
+let splitDrawAxis=null; // 'h' or 'v' determined by first movement
 
 function splitReset(){
-  splitSourceImg=null;splitSourceDataURL=null;
-  splitRegions=[];splitCropDataURLs=[];splitTitles=[];
+  splitSourceImg=null;
+  splitHLines=[];splitVLines=[];
+  splitCropDataURLs=[];splitTitles=[];
+  splitDrawing=false;splitDragLine=null;splitDrawAxis=null;
   document.getElementById('splitPreviewArea').style.display='none';
   document.getElementById('splitConfirmBar').style.display='none';
   document.getElementById('splitFileInput').value='';
-  const ctx=document.getElementById('splitCanvas').getContext('2d');
-  ctx.clearRect(0,0,1,1);
+  document.getElementById('splitCropsRow').innerHTML='';
+  document.getElementById('splitDetectedLabel').textContent='0 artworks';
+  const cvs=document.getElementById('splitCanvas');
+  if(cvs.width>1)cvs.getContext('2d').clearRect(0,0,cvs.width,cvs.height);
 }
 
 document.getElementById('splitBack').addEventListener('click',()=>navigate('upload'));
 
+/* ── Load photo ── */
 document.getElementById('splitFileInput').addEventListener('change',async function(){
   if(!this.files[0])return;
   const raw=await fileToDataURL(this.files[0]);
-  splitSourceDataURL=raw;
   splitSourceImg=new Image();
-  await new Promise(res=>{splitSourceImg.onload=res;splitSourceImg.src=raw;});
-  drawSplitCanvas();
-  splitDetect();
+  await new Promise((res,rej)=>{splitSourceImg.onload=res;splitSourceImg.onerror=rej;splitSourceImg.src=raw;});
+  splitHLines=[];splitVLines=[];splitCropDataURLs=[];splitTitles=[];
   document.getElementById('splitPreviewArea').style.display='block';
+  document.getElementById('splitConfirmBar').style.display='none';
+  document.getElementById('splitCropsRow').innerHTML='';
+  // Size canvas to fit container
+  const cvs=document.getElementById('splitCanvas');
+  const containerW=cvs.parentElement.offsetWidth||Math.min(window.innerWidth-36,394);
+  const aspect=splitSourceImg.naturalHeight/splitSourceImg.naturalWidth;
+  cvs.width=containerW;
+  cvs.height=Math.round(containerW*aspect);
+  drawSplitCanvas();
+  toast('info','Draw split lines','Drag across the photo to add cut lines between artworks. Tap a line to remove it.',4000);
   this.value='';
 });
 
+/* ── Draw canvas ── */
 function drawSplitCanvas(){
   const cvs=document.getElementById('splitCanvas');
-  const maxW=cvs.parentElement.offsetWidth||360;
-  const scale=maxW/splitSourceImg.naturalWidth;
-  cvs.width=splitSourceImg.naturalWidth*scale;
-  cvs.height=splitSourceImg.naturalHeight*scale;
   const ctx=cvs.getContext('2d');
-  ctx.drawImage(splitSourceImg,0,0,cvs.width,cvs.height);
+  const W=cvs.width,H=cvs.height;
+  ctx.clearRect(0,0,W,H);
+  if(!splitSourceImg)return;
+  ctx.drawImage(splitSourceImg,0,0,W,H);
+  // Draw H lines
+  splitHLines.forEach((frac,i)=>{
+    const y=Math.round(frac*H);
+    ctx.strokeStyle='rgba(155,93,229,0.9)';ctx.lineWidth=3;
+    ctx.setLineDash([10,6]);ctx.beginPath();
+    ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+    ctx.setLineDash([]);
+    // Delete handle
+    drawLineHandle(ctx,W/2,y,'H',i);
+  });
+  // Draw V lines
+  splitVLines.forEach((frac,i)=>{
+    const x=Math.round(frac*W);
+    ctx.strokeStyle='rgba(78,205,196,0.9)';ctx.lineWidth=3;
+    ctx.setLineDash([10,6]);ctx.beginPath();
+    ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();
+    ctx.setLineDash([]);
+    drawLineHandle(ctx,x,H/2,'V',i);
+  });
+  // Number the regions
+  const regions=getRegionRects(W,H);
+  regions.forEach((r,i)=>{
+    ctx.fillStyle='rgba(155,93,229,0.82)';
+    ctx.beginPath();ctx.arc(r.x+20,r.y+20,13,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='bold 12px Nunito,Arial,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(i+1,r.x+20,r.y+21);
+  });
+  updateSplitLabel();
 }
 
+function drawLineHandle(ctx,x,y,axis,idx){
+  const r=12;
+  ctx.fillStyle=axis==='H'?'rgba(155,93,229,0.85)':'rgba(78,205,196,0.85)';
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.setLineDash([]);
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();
+  // X icon
+  ctx.strokeStyle='#fff';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x-5,y-5);ctx.lineTo(x+5,y+5);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x+5,y-5);ctx.lineTo(x-5,y+5);ctx.stroke();
+}
+
+/* ── Region grid from lines ── */
+function getRegionRects(W,H){
+  const hs=[0,...splitHLines.map(f=>f*H),H].sort((a,b)=>a-b);
+  const vs=[0,...splitVLines.map(f=>f*W),W].sort((a,b)=>a-b);
+  const regions=[];
+  for(let ri=0;ri<hs.length-1;ri++){
+    for(let ci=0;ci<vs.length-1;ci++){
+      regions.push({x:vs[ci],y:hs[ri],w:vs[ci+1]-vs[ci],h:hs[ri+1]-hs[ri]});
+    }
+  }
+  return regions;
+}
+
+function updateSplitLabel(){
+  const n=getRegionRects(1,1).length;
+  document.getElementById('splitDetectedLabel').textContent=n+' artwork'+(n!==1?'s':'')+' — draw lines to split';
+}
+
+/* ── Canvas pointer events (draw / drag / delete) ── */
+const splitCvs=document.getElementById('splitCanvas');
+
+function getSplitPos(e){
+  const rect=splitCvs.getBoundingClientRect();
+  const src=e.touches?e.touches[0]:e;
+  return{
+    x:(src.clientX-rect.left)*(splitCvs.width/rect.width),
+    y:(src.clientY-rect.top)*(splitCvs.height/rect.height)
+  };
+}
+
+function hitTestLine(pos){
+  const W=splitCvs.width,H=splitCvs.height;
+  const HIT=18;
+  // Check H-line handles (centered at W/2, frac*H)
+  for(let i=0;i<splitHLines.length;i++){
+    const y=splitHLines[i]*H;
+    if(Math.abs(pos.x-W/2)<HIT&&Math.abs(pos.y-y)<HIT)return{axis:'h',idx:i,type:'delete'};
+    if(Math.abs(pos.y-y)<HIT)return{axis:'h',idx:i,type:'drag'};
+  }
+  // Check V-line handles
+  for(let i=0;i<splitVLines.length;i++){
+    const x=splitVLines[i]*W;
+    if(Math.abs(pos.x-x)<HIT&&Math.abs(pos.y-H/2)<HIT)return{axis:'v',idx:i,type:'delete'};
+    if(Math.abs(pos.x-x)<HIT)return{axis:'v',idx:i,type:'drag'};
+  }
+  return null;
+}
+
+let splitDragStart=null;
+let splitDragOrigFrac=null;
+let splitDrawStart=null;
+
+splitCvs.addEventListener('mousedown',splitPointerDown);
+splitCvs.addEventListener('touchstart',e=>{e.preventDefault();splitPointerDown(e);},{passive:false});
+
+function splitPointerDown(e){
+  const pos=getSplitPos(e);
+  const hit=hitTestLine(pos);
+  if(hit){
+    if(hit.type==='delete'){
+      if(hit.axis==='h')splitHLines.splice(hit.idx,1);
+      else splitVLines.splice(hit.idx,1);
+      drawSplitCanvas();
+      cropAndShowPreviews();
+      return;
+    }
+    // Start drag
+    splitDragLine=hit;
+    splitDragStart=pos;
+    splitDragOrigFrac=hit.axis==='h'?splitHLines[hit.idx]:splitVLines[hit.idx];
+  } else {
+    // Start draw
+    splitDrawing=true;splitDrawStart=pos;splitDrawAxis=null;
+  }
+}
+
+splitCvs.addEventListener('mousemove',splitPointerMove);
+splitCvs.addEventListener('touchmove',e=>{e.preventDefault();splitPointerMove(e);},{passive:false});
+
+function splitPointerMove(e){
+  const pos=getSplitPos(e);
+  const W=splitCvs.width,H=splitCvs.height;
+  if(splitDragLine){
+    // Drag existing line
+    if(splitDragLine.axis==='h'){
+      splitHLines[splitDragLine.idx]=Math.max(0.02,Math.min(0.98,pos.y/H));
+    } else {
+      splitVLines[splitDragLine.idx]=Math.max(0.02,Math.min(0.98,pos.x/W));
+    }
+    drawSplitCanvas();
+    return;
+  }
+  if(!splitDrawing||!splitDrawStart)return;
+  const dx=Math.abs(pos.x-splitDrawStart.x);
+  const dy=Math.abs(pos.y-splitDrawStart.y);
+  // Determine axis from dominant direction (lock after 10px)
+  if(!splitDrawAxis&&(dx>10||dy>10)){
+    splitDrawAxis=dx>dy?'v':'h';
+  }
+  if(!splitDrawAxis)return;
+  // Draw live preview line
+  drawSplitCanvas();
+  const ctx=splitCvs.getContext('2d');
+  ctx.setLineDash([8,5]);ctx.lineWidth=3;
+  if(splitDrawAxis==='h'){
+    ctx.strokeStyle='rgba(155,93,229,0.7)';
+    ctx.beginPath();ctx.moveTo(0,pos.y);ctx.lineTo(W,pos.y);ctx.stroke();
+  } else {
+    ctx.strokeStyle='rgba(78,205,196,0.7)';
+    ctx.beginPath();ctx.moveTo(pos.x,0);ctx.lineTo(pos.x,H);ctx.stroke();
+  }
+  ctx.setLineDash([]);
+}
+
+splitCvs.addEventListener('mouseup',splitPointerUp);
+splitCvs.addEventListener('touchend',e=>{e.preventDefault();splitPointerUp(e);},{passive:false});
+
+function splitPointerUp(e){
+  const W=splitCvs.width,H=splitCvs.height;
+  if(splitDragLine){
+    splitDragLine=null;splitDragStart=null;
+    cropAndShowPreviews();
+    return;
+  }
+  if(!splitDrawing)return;
+  splitDrawing=false;
+  if(!splitDrawAxis)return; // tap with no movement = no line
+  const pos=getSplitPos(e.changedTouches?{...e,touches:e.changedTouches}:e);
+  if(splitDrawAxis==='h'){
+    const frac=Math.max(0.02,Math.min(0.98,pos.y/H));
+    // Don't add if within 3% of existing line
+    if(!splitHLines.some(f=>Math.abs(f-frac)<0.03)){
+      splitHLines.push(frac);splitHLines.sort((a,b)=>a-b);
+    }
+  } else {
+    const frac=Math.max(0.02,Math.min(0.98,pos.x/W));
+    if(!splitVLines.some(f=>Math.abs(f-frac)<0.03)){
+      splitVLines.push(frac);splitVLines.sort((a,b)=>a-b);
+    }
+  }
+  splitDrawAxis=null;
+  drawSplitCanvas();
+  cropAndShowPreviews();
+}
+
+/* ── Auto-detect (improved edge-density method) ── */
 function splitDetect(){
   if(!splitSourceImg)return;
+  toast('info','Auto-detecting…','Looking for gaps between artworks.',1500);
   const W=splitSourceImg.naturalWidth,H=splitSourceImg.naturalHeight;
-  // Work on a downsampled canvas for speed
-  const SCALE=0.25;
+  const SCALE=0.3;
   const sw=Math.round(W*SCALE),sh=Math.round(H*SCALE);
   const tmp=document.createElement('canvas');tmp.width=sw;tmp.height=sh;
   const ctx=tmp.getContext('2d');
   ctx.drawImage(splitSourceImg,0,0,sw,sh);
   const data=ctx.getImageData(0,0,sw,sh).data;
 
-  // Lightness profile per row and column
-  function lightness(r,g,b){return(Math.max(r,g,b)+Math.min(r,g,b))/2/255;}
-  const rowL=new Float32Array(sh);
-  const colL=new Float32Array(sw);
-  for(let y=0;y<sh;y++) for(let x=0;x<sw;x++){
-    const i=(y*sw+x)*4;
-    const l=lightness(data[i],data[i+1],data[i+2]);
-    rowL[y]+=l/sw;
-    colL[x]+=l/sh;
+  // Edge density: for each row/col, sum the absolute pixel-to-pixel differences
+  // Gutters have LOW edge density (uniform background color)
+  // Content has HIGH edge density (lots of detail/color changes)
+  const rowEdge=new Float32Array(sh);
+  const colEdge=new Float32Array(sw);
+  for(let y=0;y<sh;y++){
+    for(let x=1;x<sw;x++){
+      const i=(y*sw+x)*4;
+      const j=(y*sw+x-1)*4;
+      rowEdge[y]+=Math.abs(data[i]-data[j])+Math.abs(data[i+1]-data[j+1])+Math.abs(data[i+2]-data[j+2]);
+    }
+    rowEdge[y]/=(sw*255*3); // normalize 0-1
   }
-  // Find gutter valleys: regions where avg lightness > 0.82 (light/white background)
-  // This means the row/col is mostly background
-  const BG_THRESH=0.78;
-  const MIN_GUTTER=Math.round(sh*0.02); // at least 2% of image height
-  const MIN_CONTENT=Math.round(sh*0.08); // content block at least 8% tall
+  for(let x=0;x<sw;x++){
+    for(let y=1;y<sh;y++){
+      const i=(y*sw+x)*4;
+      const j=((y-1)*sw+x)*4;
+      colEdge[x]+=Math.abs(data[i]-data[j])+Math.abs(data[i+1]-data[j+1])+Math.abs(data[i+2]-data[j+2]);
+    }
+    colEdge[x]/=(sh*255*3);
+  }
 
-  function findSegments(profile,len,minGutter,minContent){
-    // Mark each position as gutter or content
-    const isGutter=profile.map(v=>v>BG_THRESH);
-    // Run-length encode
-    const segs=[];let start=0,inGutter=isGutter[0];
-    for(let i=1;i<=len;i++){
-      if(i===len||isGutter[i]!==inGutter){
-        segs.push({gutter:inGutter,start,end:i-1,len:i-start});
-        start=i;inGutter=i<len?isGutter[i]:false;
+  // Smooth profiles with a small window
+  function smooth(arr,win=3){
+    return arr.map((_,i)=>{
+      let s=0,c=0;
+      for(let k=Math.max(0,i-win);k<=Math.min(arr.length-1,i+win);k++){s+=arr[k];c++;}
+      return s/c;
+    });
+  }
+  const sRow=smooth(Array.from(rowEdge));
+  const sCol=smooth(Array.from(colEdge));
+
+  // Find gutter candidates: local minima below 20th percentile
+  function findGutters(profile,minFrac=0.1,maxFrac=0.9){
+    const sorted=[...profile].sort((a,b)=>a-b);
+    const thresh=sorted[Math.floor(sorted.length*0.2)]; // 20th percentile
+    const gutters=[];
+    for(let i=2;i<profile.length-2;i++){
+      if(profile[i]<thresh&&profile[i]<=profile[i-1]&&profile[i]<=profile[i+1]){
+        const frac=i/profile.length;
+        if(frac>minFrac&&frac<maxFrac) gutters.push(frac);
       }
     }
-    // Extract content segments (non-gutter, long enough)
-    const content=segs.filter(s=>!s.gutter&&s.len>=minContent);
-    // Merge adjacent content separated by tiny gutters
+    // Deduplicate close gutters (keep deepest minimum in each cluster)
     const merged=[];
-    content.forEach(s=>{
-      if(merged.length&&s.start-merged[merged.length-1].end<minGutter){
-        merged[merged.length-1].end=s.end;
-        merged[merged.length-1].len=merged[merged.length-1].end-merged[merged.length-1].start+1;
-      } else merged.push({...s});
+    gutters.forEach(g=>{
+      if(!merged.length||g-merged[merged.length-1]>0.08) merged.push(g);
     });
-    return merged;
+    return merged.slice(0,4); // max 4 cuts per axis
   }
 
-  const rowSegs=findSegments(rowL,sh,MIN_GUTTER,MIN_CONTENT);
-  const colSegs=findSegments(colL,sw,Math.round(sw*0.02),Math.round(sw*0.08));
+  const hGutters=findGutters(sRow);
+  const vGutters=findGutters(sCol);
 
-  // Scale segments back to original image coords
-  function scaleSegs(segs,scale){
-    return segs.map(s=>({start:Math.round(s.start/scale),end:Math.round(s.end/scale),len:Math.round(s.len/scale)}));
+  if(hGutters.length===0&&vGutters.length===0){
+    toast('warning','No splits detected','Try drawing lines manually — drag across the photo to cut.',3500);
+    return;
   }
-  const rows=scaleSegs(rowSegs,SCALE);
-  const cols=scaleSegs(colSegs,SCALE);
-
-  // Build grid of regions
-  splitRegions=[];
-  const rr=rows.length>0?rows:[{start:0,end:H-1,len:H}];
-  const cc=cols.length>0?cols:[{start:0,end:W-1,len:W}];
-  rr.forEach(r=>cc.forEach(c=>{
-    const pad=8;
-    splitRegions.push({
-      x:Math.max(0,c.start-pad),y:Math.max(0,r.start-pad),
-      w:Math.min(W,c.end+pad)-Math.max(0,c.start-pad),
-      h:Math.min(H,r.end+pad)-Math.max(0,r.start-pad)
-    });
-  }));
-
-  // Cap at 9 regions max
-  if(splitRegions.length>9)splitRegions=splitRegions.slice(0,9);
-
-  // Draw detection overlay on canvas
-  drawSplitOverlay();
-  // Crop each region
-  cropSplitRegions();
+  splitHLines=hGutters;
+  splitVLines=vGutters;
+  splitHLines.sort((a,b)=>a-b);
+  splitVLines.sort((a,b)=>a-b);
+  drawSplitCanvas();
+  cropAndShowPreviews();
+  const n=getRegionRects(1,1).length;
+  toast('success','Found '+n+' regions','Drag lines to adjust. Tap the ✕ handle to remove one.',3000);
 }
 
-function drawSplitOverlay(){
-  const cvs=document.getElementById('splitCanvas');
-  const scaleX=cvs.width/splitSourceImg.naturalWidth;
-  const scaleY=cvs.height/splitSourceImg.naturalHeight;
-  const ctx=cvs.getContext('2d');
-  ctx.clearRect(0,0,cvs.width,cvs.height);
-  ctx.drawImage(splitSourceImg,0,0,cvs.width,cvs.height);
-  // Semi-dark overlay outside regions
-  ctx.fillStyle='rgba(8,8,24,0.38)';
-  ctx.fillRect(0,0,cvs.width,cvs.height);
-  splitRegions.forEach((r,i)=>{
-    const rx=r.x*scaleX,ry=r.y*scaleY,rw=r.w*scaleX,rh=r.h*scaleY;
-    // Clear region (show original image through)
-    ctx.clearRect(rx,ry,rw,rh);
-    ctx.drawImage(splitSourceImg,r.x,r.y,r.w,r.h,rx,ry,rw,rh);
-    // Border
-    ctx.strokeStyle='rgba(155,93,229,0.9)';ctx.lineWidth=2.5;
-    ctx.strokeRect(rx+1,ry+1,rw-2,rh-2);
-    // Number badge
-    ctx.fillStyle='rgba(155,93,229,0.9)';
-    const bw=26,bh=26;
-    ctx.beginPath();ctx.arc(rx+bw/2+4,ry+bh/2+4,13,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#fff';ctx.font='bold 13px Nunito,Arial,sans-serif';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(i+1,rx+bw/2+4,ry+bh/2+5);
-  });
-}
-
-async function cropSplitRegions(){
+/* ── Crop all regions and show previews ── */
+async function cropAndShowPreviews(){
+  if(!splitSourceImg)return;
+  const W=splitSourceImg.naturalWidth,H=splitSourceImg.naturalHeight;
+  const cvsW=splitCvs.width,cvsH=splitCvs.height;
+  const regionsCanvas=getRegionRects(cvsW,cvsH);
   const kid=DB.kids.find(k=>k.id===document.getElementById('splitKidSel').value);
+  const kidName=kid?kid.name:'Artwork';
+  // Scale regions back to original image coords
+  const scaleX=W/cvsW,scaleY=H/cvsH;
   splitCropDataURLs=[];
+  // Keep existing titles if same count
+  const prevTitles=[...splitTitles];
   splitTitles=[];
-  for(let i=0;i<splitRegions.length;i++){
-    const r=splitRegions[i];
-    const tmp=document.createElement('canvas');tmp.width=r.w;tmp.height=r.h;
-    const ctx=tmp.getContext('2d');
-    ctx.drawImage(splitSourceImg,r.x,r.y,r.w,r.h,0,0,r.w,r.h);
-    // Auto-crop each region
-    const rawDataURL=tmp.toDataURL('image/jpeg',0.92);
-    const cropped=await autoCropImage(rawDataURL);
+  for(let i=0;i<regionsCanvas.length;i++){
+    const r=regionsCanvas[i];
+    const ox=Math.round(r.x*scaleX),oy=Math.round(r.y*scaleY);
+    const ow=Math.round(r.w*scaleX),oh=Math.round(r.h*scaleY);
+    const tmp=document.createElement('canvas');tmp.width=ow;tmp.height=oh;
+    tmp.getContext('2d').drawImage(splitSourceImg,ox,oy,ow,oh,0,0,ow,oh);
+    const raw=tmp.toDataURL('image/jpeg',0.92);
+    const cropped=await autoCropImage(raw);
     splitCropDataURLs.push(cropped);
-    const kidName=kid?kid.name:'Artwork';
-    splitTitles.push(kidName+' — Piece '+(i+1));
+    splitTitles.push(prevTitles[i]||(kidName+' — Piece '+(i+1)));
   }
   renderSplitCrops();
 }
@@ -3316,15 +3497,45 @@ function renderSplitCrops(){
     `;
     row.appendChild(card);
   });
-  document.getElementById('splitDetectedLabel').textContent='Detected '+splitRegions.length+' artwork'+(splitRegions.length!==1?'s':'');
-  document.getElementById('splitConfirmLabel').textContent='Save '+splitRegions.length+' artwork'+(splitRegions.length!==1?'s':'');
-  document.getElementById('splitConfirmBar').style.display=splitRegions.length>0?'flex':'none';
-  document.getElementById('splitConfirmBar').classList.toggle('visible',splitRegions.length>0);
+  const n=splitCropDataURLs.length;
+  document.getElementById('splitDetectedLabel').textContent=n+' artwork'+(n!==1?'s':'')+' ready';
+  document.getElementById('splitConfirmLabel').textContent='Save '+n+' artwork'+(n!==1?'s':'');
+  const bar=document.getElementById('splitConfirmBar');
+  bar.style.display=n>0?'flex':'none';
+  bar.classList.toggle('visible',n>0);
 }
+
+/* ── Add manual region button — draws a centered default box ── */
+document.getElementById('splitAddManual').addEventListener('click',()=>{
+  if(!splitSourceImg){toast('warning','Load a photo first','',2000);return;}
+  // Add a line pair that halves the remaining largest region
+  const W=splitCvs.width,H=splitCvs.height;
+  // Default: add a V line in the middle if none, else an H line
+  if(splitVLines.length===0&&splitHLines.length===0){
+    splitVLines.push(0.5);
+  } else if(splitVLines.length<=splitHLines.length){
+    // Add another V line to create equal columns
+    const existing=[0,...splitVLines,1].sort((a,b)=>a-b);
+    let bestIdx=0,bestGap=0;
+    for(let i=0;i<existing.length-1;i++){const g=existing[i+1]-existing[i];if(g>bestGap){bestGap=g;bestIdx=i;}}
+    const newLine=(existing[bestIdx]+existing[bestIdx+1])/2;
+    if(!splitVLines.some(f=>Math.abs(f-newLine)<0.03)){splitVLines.push(newLine);splitVLines.sort((a,b)=>a-b);}
+  } else {
+    const existing=[0,...splitHLines,1].sort((a,b)=>a-b);
+    let bestIdx=0,bestGap=0;
+    for(let i=0;i<existing.length-1;i++){const g=existing[i+1]-existing[i];if(g>bestGap){bestGap=g;bestIdx=i;}}
+    const newLine=(existing[bestIdx]+existing[bestIdx+1])/2;
+    if(!splitHLines.some(f=>Math.abs(f-newLine)<0.03)){splitHLines.push(newLine);splitHLines.sort((a,b)=>a-b);}
+  }
+  drawSplitCanvas();
+  cropAndShowPreviews();
+  toast('info','Line added','Drag it to position, or draw your own by swiping across the photo.',2800);
+});
 
 async function splitSaveAll(){
   const kid=DB.kids.find(k=>k.id===document.getElementById('splitKidSel').value);
   if(!kid){toast('warning','Select a child first','',2500);return;}
+  if(splitCropDataURLs.length===0){toast('warning','No regions to save','Draw some split lines first.',2500);return;}
   const date=document.getElementById('splitDate').value||new Date().toISOString().split('T')[0];
   const fills=['g1','g2','g3','g4','g5','g6','g7','g8'];
   splitCropDataURLs.forEach((url,i)=>{
