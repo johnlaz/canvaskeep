@@ -1931,6 +1931,10 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
     <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
     Start Slideshow
   </button>
+  <button class="btn btn-soft btn-full" onclick="closeSettings();startYearReview()" style="margin-bottom:8px">
+    <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Last 12 Months in Review
+  </button>
   <button class="btn btn-soft btn-full" onclick="closeSettings();openYearbook()">
     <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
     Year-End Memory Book
@@ -1944,7 +1948,10 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
   </button>
   <div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.55">On iOS: tap Share → Add to Home Screen<br>On Android/Chrome: tap the install banner above</div>
 </div>
-<div style="padding:20px 22px 8px;font-size:11px;color:var(--muted);text-align:center">CanvasKeep v1.0 · All data stored locally in your browser</div>
+<div style="padding:20px 22px 8px;font-size:11px;color:var(--muted);text-align:center">
+  CanvasKeep v1.1 · All data stored locally on your device<br>
+  <span id="storageEstimate" style="color:var(--accent);font-weight:800"></span>
+</div>
     <div style="height:20px"></div>
   </div>
 </div>
@@ -2622,7 +2629,8 @@ function renderGallery(){
     const g=gradeAt(k?.schoolStart,a.date);
     const gc=gradClass(g);
     const d=document.createElement('div');d.className='titem';
-    d.innerHTML=`<div class="tthumb ${a.fill}">${a.imageData?`<img src="${a.imageData}" style="width:100%;height:100%;object-fit:contain;background:#F9F6F1">`:`<span>${a.emoji||'🎨'}</span>`}</div><div class="tinfo"><div class="tera ${gc}">${g}</div><div class="tname">${a.title}</div></div>`;
+    const thumbSrc=a.imageData||'';
+    d.innerHTML=`<div class="tthumb ${a.fill}">${thumbSrc?`<img data-src="${thumbSrc}" src="" style="width:100%;height:100%;object-fit:contain;background:#F9F6F1" class="lazy-img">`:`<span>${a.emoji||'🎨'}</span>`}</div><div class="tinfo"><div class="tera ${gc}">${g}</div><div class="tname">${a.title}</div></div>`;
     d.addEventListener('click',()=>{studioArtList=arts;studioIdx=arts.indexOf(a);navigate('studio');});
     tg.appendChild(d);
   });
@@ -2635,6 +2643,8 @@ function renderGallery(){
     body.appendChild(moreBtn);
   }
   th.querySelector('#timelineToggle')?.addEventListener('click',()=>{timelineExpanded=!timelineExpanded;renderGallery();});
+  // Lazy-load timeline thumbnails
+  requestAnimationFrame(observeLazyImages);
 }
 function buildArtCard(art,pos,isCenter){
   if(!art)return'';
@@ -2967,6 +2977,7 @@ function removeBackground(dataURL, tolerance=38){
       const W=Math.round(img.width*scale), H=Math.round(img.height*scale);
       const c=document.createElement('canvas');c.width=W;c.height=H;
       const ctx=c.getContext('2d');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
       ctx.drawImage(img,0,0,W,H);
       const imgData=ctx.getImageData(0,0,W,H);
       const data=imgData.data;
@@ -3043,6 +3054,7 @@ function removeBackground(dataURL, tolerance=38){
   });
 }
 function autoCropImage(dataURL){
+  /* quality patched by upgrade */
   return new Promise((resolve)=>{
     const img=new Image();
     img.onload=()=>{
@@ -3051,6 +3063,7 @@ function autoCropImage(dataURL){
       const c=document.createElement('canvas');
       c.width=W; c.height=H;
       const ctx=c.getContext('2d');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
       ctx.drawImage(img,0,0);
       const data=ctx.getImageData(0,0,W,H).data;
 
@@ -3198,11 +3211,19 @@ async function renderArtCardBlob(art){
   const CARD_H=MAT+MAT_BORDER+imgH+MAT_BORDER+MAT+PLAQUE_H;
   const cvs=document.createElement('canvas');cvs.width=W;cvs.height=CARD_H;
   const ctx=cvs.getContext('2d');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   // Mat
   ctx.fillStyle='#FAF8F4';ctx.fillRect(0,0,W,MAT+MAT_BORDER+imgH+MAT_BORDER+MAT);
   ctx.strokeStyle='#E8E2D8';ctx.lineWidth=MAT_BORDER;
   roundRect(ctx,MAT,MAT,W-MAT*2,MAT_BORDER+imgH+MAT_BORDER,12);ctx.stroke();
-  if(artImg){ctx.drawImage(artImg,MAT+MAT_BORDER,MAT+MAT_BORDER,imgW,imgH);}
+  if(artImg){
+    ctx.save();
+    ctx.shadowColor='rgba(155,93,229,0.5)';
+    ctx.shadowBlur=52;
+    ctx.drawImage(artImg,MAT+MAT_BORDER,MAT+MAT_BORDER,imgW,imgH);
+    ctx.shadowBlur=0;ctx.shadowColor='transparent';
+    ctx.restore();
+  }
   else{ctx.fillStyle='#F5F3EE';ctx.fillRect(MAT+MAT_BORDER,MAT+MAT_BORDER,imgW,imgH);
     ctx.font=`${Math.min(imgH*.55,260)}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText(art.emoji||'🎨',MAT+MAT_BORDER+imgW/2,MAT+MAT_BORDER+imgH/2);}
@@ -3281,6 +3302,7 @@ function roundRect(ctx,x,y,w,h,r){
 function wrapText(text,maxW,fontSize){
   const cvs=document.createElement('canvas');
   const ctx=cvs.getContext('2d');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   ctx.font=`italic ${fontSize}px Nunito,Arial,sans-serif`;
   const words=text.split(' ');
   const lines=[];let line='';
@@ -3340,7 +3362,16 @@ function driveDownload(){
 }
 
 /* ══ SETTINGS ══ */
-function openSettings(){document.getElementById('settingsOverlay').classList.add('open');}
+function openSettings(){
+  // Storage estimate
+  if(navigator.storage&&navigator.storage.estimate){
+    navigator.storage.estimate().then(({usage,quota})=>{
+      const usedMB=(usage/1048576).toFixed(1);
+      const quotaMB=Math.round(quota/1048576);
+      const el=document.getElementById('storageEstimate');
+      if(el) el.textContent=`${usedMB} MB used of ~${quotaMB} MB available`;
+    }).catch(()=>{});
+  }document.getElementById('settingsOverlay').classList.add('open');}
 function closeSettings(){document.getElementById('settingsOverlay').classList.remove('open');}
 document.getElementById('settingsClose').addEventListener('click',closeSettings);
 document.getElementById('settingsOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('settingsOverlay'))closeSettings();});
@@ -3518,6 +3549,7 @@ document.getElementById('fsnapFileInput').addEventListener('change',async functi
   document.getElementById('fsnapReviewArea').style.display='block';
   document.getElementById('fsnapConfirmBar').style.display='flex';
   renderFsnapGrid();
+  requestAnimationFrame(observeLazyImages);
   this.value='';
   toast('save',files.length+' photo'+(files.length>1?'s':'')+' ready','Review titles and notes below.',2500);
 });
@@ -3592,6 +3624,7 @@ function openCropModal(idx){
   overlay.classList.add('open');
   const canvas=document.getElementById('cropCanvas');
   const ctx=canvas.getContext('2d');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   cropImg=new Image();
   cropImg.onload=()=>{
     const maxW=Math.min(window.innerWidth-24,400);
@@ -3677,7 +3710,8 @@ function cropPointerMove(e){
     if(cropDragging.handle==='br'){cropRect.w=Math.min(cw-r.x,r.w+dx);cropRect.h=Math.min(ch-r.y,r.h+dy);}
     cropRect.w=Math.max(30,cropRect.w);cropRect.h=Math.max(30,cropRect.h);
   }
-  const ctx=cropCanvas.getContext('2d');drawCrop(ctx,cropCanvas);
+  const ctx=cropCanvas.getContext('2d');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';drawCrop(ctx,cropCanvas);
 }
 function cropPointerUp(){cropDragging=null;}
 cropCanvas.addEventListener('mousedown',cropPointerDown);
@@ -3702,6 +3736,7 @@ function applyCrop(){
   const sc=Math.min(1,maxPx/Math.max(ow,oh));
   out.width=Math.round(ow*sc);out.height=Math.round(oh*sc);
   const ctx=out.getContext('2d');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   ctx.drawImage(cropImg,ox,oy,ow,oh,0,0,out.width,out.height);
   fsnapItems[idx].croppedDataURL=out.toDataURL('image/jpeg',0.88);
   closeCropModal();
@@ -3768,6 +3803,7 @@ document.getElementById('splitFileInput').addEventListener('change',async functi
 function drawSplitCanvas(){
   const cvs=document.getElementById('splitCanvas');
   const ctx=cvs.getContext('2d');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   const W=cvs.width,H=cvs.height;
   ctx.clearRect(0,0,W,H);
   if(!splitSourceImg)return;
@@ -3918,6 +3954,7 @@ function splitPointerMove(e){
   // Draw live preview line
   drawSplitCanvas();
   const ctx=splitCvs.getContext('2d');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   ctx.setLineDash([8,5]);ctx.lineWidth=3;
   if(splitDrawAxis==='h'){
     ctx.strokeStyle='rgba(155,93,229,0.7)';
@@ -3969,6 +4006,7 @@ function splitDetect(){
   const sw=Math.round(W*SCALE),sh=Math.round(H*SCALE);
   const tmp=document.createElement('canvas');tmp.width=sw;tmp.height=sh;
   const ctx=tmp.getContext('2d');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   ctx.drawImage(splitSourceImg,0,0,sw,sh);
   const data=ctx.getImageData(0,0,sw,sh).data;
 
@@ -4076,7 +4114,7 @@ function renderSplitCrops(){
     const card=document.createElement('div');card.className='split-crop-card';
     card.innerHTML=`
       <div style="position:relative">
-        <img class="split-crop-thumb" src="${url}" alt="Piece ${i+1}">
+        <img class="split-crop-thumb" src="${url}" loading="lazy" alt="Piece ${i+1}">
         <button onclick="splitDeleteCrop(${i})" title="Don't save this piece"
           style="position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;background:rgba(255,107,107,.88);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;font-weight:900">✕</button>
       </div>
@@ -4220,6 +4258,7 @@ function sizeFramingCanvas(){
 function drawFramingCanvas(){
   const cvs=document.getElementById('framingCanvas');
   const ctx=cvs.getContext('2d');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   const W=cvs.width,H=cvs.height;
   ctx.clearRect(0,0,W,H);
 
@@ -4238,14 +4277,17 @@ function drawFramingCanvas(){
   // Draw image with keystone using quadrilateral mapping approximation
   drawKeystoned(ctx,W,H);
 
-  // Dark vignette outside crop
+  // Dark vignette outside crop — globalAlpha + globalCompositeOperation
   const cx=framingCrop.x*W, cy=framingCrop.y*H;
   const cx2=framingCrop.x2*W, cy2=framingCrop.y2*H;
-  ctx.fillStyle='rgba(10,8,18,0.62)';
-  ctx.fillRect(0,0,W,cy);                       // top
-  ctx.fillRect(0,cy2,W,H-cy2);                  // bottom
-  ctx.fillRect(0,cy,cx,cy2-cy);                 // left
-  ctx.fillRect(cx2,cy,W-cx2,cy2-cy);            // right
+  ctx.save();
+  ctx.globalAlpha=0.62;
+  ctx.fillStyle='#0A0812';
+  ctx.fillRect(0,0,W,cy);
+  ctx.fillRect(0,cy2,W,H-cy2);
+  ctx.fillRect(0,cy,cx,cy2-cy);
+  ctx.fillRect(cx2,cy,W-cx2,cy2-cy);
+  ctx.restore();
 
   // Crop border
   ctx.strokeStyle='rgba(155,93,229,0.9)';ctx.lineWidth=2;
@@ -4410,6 +4452,7 @@ function framingRotate90(){
   const cvs=document.createElement('canvas');
   cvs.width=framingImg.naturalHeight;cvs.height=framingImg.naturalWidth;
   const ctx=cvs.getContext('2d');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   ctx.translate(cvs.width/2,cvs.height/2);
   ctx.rotate(Math.PI/2);
   ctx.drawImage(framingImg,-framingImg.naturalWidth/2,-framingImg.naturalHeight/2);
@@ -4452,6 +4495,7 @@ document.getElementById('framingApply').addEventListener('click',()=>{
   const fullCvs=document.createElement('canvas');
   fullCvs.width=iw;fullCvs.height=ih;
   const fCtx=fullCvs.getContext('2d');
+  fCtx.imageSmoothingEnabled=true;fCtx.imageSmoothingQuality='high';
   const ksH=framingKsH/100,ksV=framingKsV/100;
 
   fCtx.save();fCtx.translate(iw/2,ih/2);
@@ -4798,6 +4842,76 @@ async function generateYearbookPDF(arts){
   pdf.save(`canvaskeep-${year}.pdf`);
   toast('success','PDF saved! 📖','Your memory book is ready.',3500);
   haptic([8,50,8,50,8]);
+}
+
+
+/* ══ LAZY IMAGE OBSERVER ═══════════════════════════════════════════
+   Uses IntersectionObserver to load data-src images only when they
+   scroll into the viewport. Call observeLazyImages() after any
+   render that produces .lazy-img elements.
+══════════════════════════════════════════════════════════════════ */
+let _lazyObserver=null;
+
+function observeLazyImages(){
+  if(!('IntersectionObserver' in window)){
+    // Fallback: load all immediately
+    document.querySelectorAll('img.lazy-img[data-src]').forEach(img=>{
+      if(img.dataset.src) img.src=img.dataset.src;
+    });
+    return;
+  }
+  if(!_lazyObserver){
+    _lazyObserver=new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          const img=entry.target;
+          if(img.dataset.src){
+            img.src=img.dataset.src;
+            img.removeAttribute('data-src');
+          }
+          _lazyObserver.unobserve(img);
+        }
+      });
+    },{rootMargin:'120px'});
+  }
+  document.querySelectorAll('img.lazy-img[data-src]').forEach(img=>{
+    _lazyObserver.observe(img);
+  });
+}
+
+
+/* ══ FRAMING EDITOR RESIZE ══════════════════════════════════════
+   ResizeObserver keeps the canvas calibrated if the viewport
+   changes while the editor is open (keyboard, rotation).
+══════════════════════════════════════════════════════════════════ */
+if('ResizeObserver' in window){
+  const _frameResizeObs=new ResizeObserver(()=>{
+    if(framingImg&&document.getElementById('framingOverlay').classList.contains('open')){
+      sizeFramingCanvas();drawFramingCanvas();
+    }
+  });
+  _frameResizeObs.observe(document.getElementById('framingStage'));
+}
+
+
+/* ── Year-in-Review ─────────────────────────────────────────────
+   Filters arts from the last 365 days, sorts oldest→newest,
+   launches the slideshow. Reuses the entire SS engine.
+──────────────────────────────────────────────────────────────── */
+function startYearReview(){
+  const cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-1);
+  const recent=DB.arts
+    .filter(a=>a.date&&new Date(a.date+'T00:00:00')>=cutoff)
+    .sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(!recent.length){
+    toast('info','No artwork in the last 12 months','Start adding pieces to build your review!',3000);
+    return;
+  }
+  openSlideshow(recent,0);
+  // Show a brief intro toast before it starts
+  setTimeout(()=>toast('success',
+    `${recent.length} piece${recent.length!==1?'s':''} from the last year`,
+    'Oldest to newest — watch them grow. ✨',3500),400);
 }
 
 /* ══ LEAVE GUARD ══
