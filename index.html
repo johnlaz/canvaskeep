@@ -1933,15 +1933,37 @@ function renderGallery(){
     return;
   }
 
+  // Build filtered + searched + sorted arts array
+  let arts=filteredArts();
+  if(gallerySearch){
+    const q=gallerySearch.toLowerCase();
+    arts=arts.filter(a=>a.title.toLowerCase().includes(q)||(a.notes||'').toLowerCase().includes(q));
+  }
+  if(gallerySort==='oldest') arts=[...arts].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  else if(gallerySort==='newest') arts=[...arts].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  else if(gallerySort==='alpha') arts=[...arts].sort((a,b)=>a.title.localeCompare(b.title));
+  else if(gallerySort==='favs') arts=[...arts].filter(a=>a.fav).concat([...arts].filter(a=>!a.fav));
+  if(carouselIdx>=arts.length)carouselIdx=0;
+
   // Section header
-  const kidName=curKidFilter==='all'?'All':'';
   const kid=kidById(curKidFilter);
   const hdr=document.createElement('div');hdr.className='sec';
   hdr.innerHTML=`<span class="sec-t">🖼️ ${kid?kid.name+"'s":'All'} Gallery</span><button class="sec-link" onclick="navigate('studio')">Studio →</button>`;
   body.appendChild(hdr);
 
   if(arts.length===0){
-    body.innerHTML+='<div class="empty-state"><div class="empty-ico">🎨</div><div class="empty-t">No artwork yet</div><div class="empty-d">Upload your first piece using Box Clearer Mode.</div><button class="btn btn-accent" onclick="navigate(\'upload\')" style="margin-top:8px">Upload Now</button></div>';
+    const isSearch=!!gallerySearch;
+    const es=document.createElement('div');es.className=isSearch?'search-empty':'empty-state';
+    es.innerHTML=isSearch
+      ?`<div class="search-empty-ico">🔍</div><div class="search-empty-t">No results for "${gallerySearch}"</div><div class="search-empty-d">Try a different title or story word.</div>`
+      :`<div class="empty-ico">🎨</div><div class="empty-t">No artwork yet</div><div class="empty-d">Upload your first piece using Box Clearer Mode.</div><button class="btn btn-accent" onclick="navigate('upload')" style="margin-top:8px">Upload Now</button>`;
+    body.appendChild(es);
+    if(!isSearch){
+      const us=document.createElement('div');us.className='upload-strip';
+      us.innerHTML=`<div class="us-ico">📸</div><div><div class="us-t">Box Clearer Mode</div><div class="us-s">Snap · Crop · Save · Repeat</div></div><div class="us-arr"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>`;
+      us.addEventListener('click',()=>navigate('upload'));
+      body.appendChild(us);
+    }
     return;
   }
 
