@@ -694,6 +694,7 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 ══════════════════════════════════════ */
 /* ── PRINT / SHARE MODAL ── */
 #printModal{align-items:flex-end;}
+#buModal{z-index:9000;}
 #printModal .modal-box{
   width:100%;max-width:430px;
   background:var(--card);
@@ -786,7 +787,7 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 /* ══════════════════════════════════════
    BEFORE UNLOAD MODAL
 ══════════════════════════════════════ */
-#buModal{z-index:9000;}
+
 
 /* ══════════════════════════════════════
    EMPTY STATE
@@ -1357,7 +1358,7 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
     <div class="modal-title">Hold on — don't leave!</div>
     <div class="modal-msg">Your gallery lives right here. Everything is saved locally — come back anytime and your kids' artwork will be waiting.</div>
     <div class="modal-btns">
-      <button class="btn btn-accent btn-full" id="buStay">Stay & Keep Creating</button>
+      <button class="btn btn-accent btn-full" id="buStay">Stay &amp; Keep Creating</button>
       <button class="btn btn-soft btn-full" id="buLeave">Leave Anyway</button>
     </div>
   </div>
@@ -5405,64 +5406,59 @@ function checkBluetoothAvailability(){
    Leave modal only fires when trying to exit the app entirely.
    Gallery is always the terminal screen — back from gallery = exit prompt.
 ═══════════════════════════════════════════════════════════════════════ */
-let allowLeave=false;
+/* Navigation guard — confirm before leaving the app */
+let allowLeave = false;
 
-/* Internal navigation stack — tracks where the user came from */
-const screenStack=['gallery']; // gallery is always the base
+const screenStack = ['gallery'];
 
-function showLeaveModal(){document.getElementById('buModal').classList.add('open');}
-function hideLeaveModal(){document.getElementById('buModal').classList.remove('open');}
+function showLeaveModal(){ document.getElementById('buModal').classList.add('open'); }
+function hideLeaveModal(){ document.getElementById('buModal').classList.remove('open'); }
 
-/* 1. Intercept ALL clicks on real <a href> tags (external links only) */
-document.addEventListener('click',e=>{
-  if(allowLeave)return;
-  const a=e.target.closest('a[href]');
-  if(!a)return;
-  const href=a.getAttribute('href');
-  if(!href||href==='#'||href.startsWith('javascript'))return;
-  e.preventDefault();e.stopPropagation();
+/* 1. Intercept clicks on real <a href> links */
+document.addEventListener('click', e => {
+  if (allowLeave) return;
+  const a = e.target.closest('a[href]');
+  if (!a) return;
+  const href = a.getAttribute('href');
+  if (!href || href === '#' || href.startsWith('javascript')) return;
+  e.preventDefault(); e.stopPropagation();
   showLeaveModal();
-  document.getElementById('buLeave').dataset.href=href;
-},{capture:true});
+  document.getElementById('buLeave').dataset.href = href;
+}, {capture: true});
 
-/* 2. Browser back button — navigate within app, or show leave modal */
-history.pushState({canvaskeep:true},'','');
-window.addEventListener('popstate',()=>{
-  if(allowLeave)return;
-  // Re-push our sentinel so we stay in control
-  history.pushState({canvaskeep:true},'','');
-  // Pop the internal stack
-  if(screenStack.length>1){
+/* 2. Browser / PWA back button */
+history.pushState({canvaskeep: true}, '', '');
+window.addEventListener('popstate', () => {
+  if (allowLeave) return;
+  history.pushState({canvaskeep: true}, '', '');
+  if (screenStack.length > 1) {
     screenStack.pop();
-    const prev=screenStack[screenStack.length-1];
-    navigate(prev);   // go back to previous app screen
+    navigate(screenStack[screenStack.length - 1]);
   } else {
-    // Stack is empty or at gallery — this is a real exit attempt
     showLeaveModal();
   }
 });
 
-/* 3. Last-resort native fallback */
-window.addEventListener('beforeunload',e=>{
-  if(allowLeave)return;
+/* 3. Native browser fallback (tab close / address bar navigation) */
+window.addEventListener('beforeunload', e => {
+  if (allowLeave) return;
   e.preventDefault();
-  e.returnValue='';
+  e.returnValue = '';
 });
 
 /* Modal buttons */
-document.getElementById('buStay').addEventListener('click',()=>{
+document.getElementById('buStay').addEventListener('click', () => {
   hideLeaveModal();
   delete document.getElementById('buLeave').dataset.href;
-  toast('success','Welcome back!','Your gallery is right here. 🎨',2200);
+  toast('success', 'Welcome back!', 'Your gallery is right here. 🎨', 2200);
 });
-document.getElementById('buLeave').addEventListener('click',()=>{
-  allowLeave=true;
+document.getElementById('buLeave').addEventListener('click', () => {
+  allowLeave = true;
   hideLeaveModal();
-  const href=document.getElementById('buLeave').dataset.href;
-  // Signal landing page to show welcome-back toast
-  try { sessionStorage.setItem('ck_returned_from_app','1'); } catch(e){}
-  if(href){window.location.href=href;}
-  else{history.go(-2);}
+  const href = document.getElementById('buLeave').dataset.href;
+  try { sessionStorage.setItem('ck_returned_from_app', '1'); } catch(e) {}
+  if (href) { window.location.href = href; }
+  else { history.go(-2); }
 });
 
 /* ══ APPLY SETTINGS ══ */
