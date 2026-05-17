@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'canvaskeep-v4';
+const CACHE_NAME = 'canvaskeep-v5';
 const SHELL_URLS = [
   './',
   './index.html',
@@ -54,7 +54,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // CDN resources (html2canvas etc): cache-first
+  // CDN resources (jsPDF etc): cache-first
   if (url.hostname.includes('cdnjs') || url.hostname.includes('googleapis')) {
     event.respondWith(
       caches.match(event.request).then(cached =>
