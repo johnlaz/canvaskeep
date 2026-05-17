@@ -5427,9 +5427,13 @@ document.addEventListener('click', e => {
 }, {capture: true});
 
 /* 2. Browser / PWA back button */
+// Push two sentinels — one for the PWA's own initial history entry,
+// one as the actual trap. This ensures back is always intercepted.
 history.pushState({canvaskeep: true}, '', '');
-window.addEventListener('popstate', () => {
+history.pushState({canvaskeep: true}, '', '');
+window.addEventListener('popstate', e => {
   if (allowLeave) return;
+  // Always re-push so we never run out of sentinel
   history.pushState({canvaskeep: true}, '', '');
   if (screenStack.length > 1) {
     screenStack.pop();
@@ -5458,7 +5462,7 @@ document.getElementById('buLeave').addEventListener('click', () => {
   const href = document.getElementById('buLeave').dataset.href;
   try { sessionStorage.setItem('ck_returned_from_app', '1'); } catch(e) {}
   if (href) { window.location.href = href; }
-  else { history.go(-2); }
+  else { history.go(-3); }
 });
 
 /* ══ APPLY SETTINGS ══ */
