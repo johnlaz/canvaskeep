@@ -2965,8 +2965,9 @@ function openArtForm(art){
   document.getElementById('afNotes').value=art?art.notes:'';
   document.getElementById('afEditId').value=art?art.id:'';
   artImgData=art?art.imageData:null;
-  const prev=document.getElementById('artImgPreview');
-  prev.innerHTML=artImgData?`<img src="${artImgData}" style="width:100%;height:100%;object-fit:contain;background:#F9F6F1">`:`<div style="text-align:center;color:var(--muted)"><div style="font-size:36px;margin-bottom:6px">📷</div><div style="font-size:12px;font-weight:700">Tap to choose image</div></div>`;
+  artImgOrigData=art?art.imageData:null;
+  // Use refreshArtFormPreview so FRAME/RETAKE buttons always appear for existing art
+  refreshArtFormPreview();
   // Populate kid select
   const sel=document.getElementById('afKid');
   sel.innerHTML=DB.kids.map(k=>`<option value="${k.id}" ${art&&art.kidId===k.id?'selected':''}>${k.emoji} ${k.name}</option>`).join('');
