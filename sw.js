@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'canvaskeep-v2';
+const CACHE_NAME = 'canvaskeep-v4';
 const SHELL_URLS = [
   './',
   './index.html',

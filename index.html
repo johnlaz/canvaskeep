@@ -451,22 +451,26 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 #scr-studio .logo{color:#EEE8FF;}
 #scr-studio .back-btn{background:rgba(155,93,229,.18);color:#C499FF;border:1px solid rgba(155,93,229,.25);}
 #scr-studio .back-btn:hover{background:rgba(155,93,229,.30);}
+/* Studio stage: fills available height between top-bar and controls.
+   No internal scroll — frame sizes to fit. Image uses object-fit:contain
+   so portrait artwork is letterboxed within the art zone rather than
+   forcing the plaque off-screen. */
 .studio-stage{
-  flex:1;display:flex;align-items:flex-start;justify-content:center;
-  overflow-y:auto;overflow-x:hidden;position:relative;background:#080818;
-  -webkit-overflow-scrolling:touch;
+  flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;background:#080818;
+  padding:10px 12px;
 }
 .studio-stage::before{
-  content:'';position:fixed;
-  width:360px;height:360px;border-radius:50%;
+  content:'';position:absolute;
+  width:min(360px, 80%);aspect-ratio:1;border-radius:50%;
   background:radial-gradient(ellipse,rgba(155,93,229,.28) 0%,rgba(155,93,229,.08) 52%,transparent 72%);
-  top:35%;left:50%;transform:translate(-50%,-50%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
   pointer-events:none;z-index:0;
   animation:glowPulse 4.5s ease-in-out infinite;
 }
 .studio-stage::after{
-  content:'';position:fixed;
-  width:220px;height:220px;border-radius:50%;
+  content:'';position:absolute;
+  width:min(220px, 55%);aspect-ratio:1;border-radius:50%;
   background:radial-gradient(ellipse,rgba(78,205,196,.11) 0%,transparent 68%);
   top:22%;left:22%;pointer-events:none;z-index:0;
   animation:glowPulse 7s ease-in-out infinite reverse;
@@ -476,13 +480,13 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
   50%{opacity:1;transform:translate(-50%,-50%) scale(1.09);}
 }
 .museum-frame-wrap{
-  display:flex;flex-direction:column;align-items:center;
-  padding:14px 14px 20px;width:100%;position:relative;z-index:2;
-  min-height:min-content;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:100%;height:100%;position:relative;z-index:2;
 }
 .museum-frame-glow{
-  position:relative;width:calc(100% - 8px);max-width:356px;
+  position:relative;width:100%;max-width:356px;max-height:100%;
   padding:9px 9px 0;border-radius:24px;
+  display:flex;flex-direction:column;
   background:linear-gradient(155deg,rgba(155,93,229,.20) 0%,rgba(90,40,180,.12) 60%,rgba(78,205,196,.07) 100%);
   border:1px solid rgba(155,93,229,.38);
   box-shadow:
@@ -497,24 +501,24 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
   50%{box-shadow:0 0 0 1px rgba(155,93,229,.26),0 0 66px rgba(155,93,229,.55),0 0 120px rgba(155,93,229,.28),0 36px 72px rgba(0,0,0,.82);}
 }
 .museum-frame{
-  position:relative;width:100%;
+  position:relative;width:100%;flex:1;min-height:0;
   border-radius:16px 16px 0 0;overflow:hidden;
+  display:flex;
 }
-/* Art zone — no fixed height, image sets its own size */
+/* Art zone: fills available space inside the frame. Image is contained
+   within it so portrait, landscape, and square artwork all fit without
+   pushing the plaque off-screen. */
 .museum-art{
-  width:100%;
+  width:100%;height:100%;min-height:0;
   background:#0A0818;
   display:flex;align-items:center;justify-content:center;
   font-size:100px;position:relative;
-  /* min so emoji placeholder has room */
-  min-height:160px;
 }
 .museum-art-img{
-  /* fill full width, height auto = portrait shows completely */
-  width:100%;
-  height:auto;
+  max-width:100%;max-height:100%;
+  width:auto;height:auto;
   display:block;
-  object-fit:unset;
+  object-fit:contain;
 }
 .studio-edit-overlay{
   position:absolute;inset:0;background:rgba(8,8,24,.52);
@@ -532,22 +536,27 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 .studio-edit-inner span{font-size:12px;font-weight:800;color:#C499FF;letter-spacing:.5px;text-transform:uppercase;}
 .museum-plaque{
   background:linear-gradient(180deg,#130E28 0%,#080818 100%);
-  padding:14px 18px 18px;
+  padding:12px 16px 14px;
   border-top:1.5px solid rgba(155,93,229,.32);
   border-radius:0 0 16px 16px;
+  flex-shrink:0;
 }
-.plaque-title{font-family:'Fredoka One',cursive;font-size:22px;color:#EEE8FF;margin-bottom:9px;letter-spacing:.2px;}
-.plaque-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px;}
-.plaque-badge{font-size:11px;font-weight:700;padding:3px 11px;border-radius:50px;}
+.plaque-title{font-family:'Fredoka One',cursive;font-size:20px;color:#EEE8FF;margin-bottom:7px;letter-spacing:.2px;line-height:1.15;}
+.plaque-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;}
+.plaque-badge{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:50px;white-space:nowrap;}
 .pb-age{background:rgba(255,209,102,.14);color:#FFD166;border:1px solid rgba(255,209,102,.26);}
 .pb-grade{background:rgba(78,205,196,.12);color:#4ECDC4;border:1px solid rgba(78,205,196,.22);}
 .pb-date{background:rgba(155,93,229,.18);color:#C499FF;border:1px solid rgba(155,93,229,.30);}
-.plaque-notes{font-size:12px;color:rgba(238,232,255,.48);line-height:1.55;font-style:italic;margin-top:3px;min-height:16px;}
+.plaque-notes{
+  font-size:12px;color:rgba(238,232,255,.55);line-height:1.45;font-style:italic;margin-top:2px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;text-overflow:ellipsis;
+}
 .plaque-edit-btn{
-  display:none;align-items:center;gap:5px;margin-top:11px;
-  padding:6px 14px;border-radius:50px;cursor:pointer;width:fit-content;
+  display:none;align-items:center;gap:5px;margin-top:8px;
+  padding:5px 12px;border-radius:50px;cursor:pointer;width:fit-content;
   background:rgba(155,93,229,.14);border:1px solid rgba(155,93,229,.32);
-  font-size:11px;font-weight:800;color:#C499FF;letter-spacing:.4px;text-transform:uppercase;
+  font-size:10.5px;font-weight:800;color:#C499FF;letter-spacing:.4px;text-transform:uppercase;
   transition:background .15s;
 }
 .plaque-edit-btn.visible{display:flex;}
@@ -555,34 +564,53 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 .plaque-edit-btn svg{width:12px;height:12px;stroke:#C499FF;stroke-width:2.5;fill:none;}
 .studio-controls{
   display:flex;align-items:center;justify-content:space-between;
-  padding:12px 22px 18px;
+  padding:10px 22px calc(14px + env(safe-area-inset-bottom, 0px));
   background:rgba(8,8,24,.97);
   border-top:1px solid rgba(155,93,229,.14);
   flex-shrink:0;position:relative;z-index:2;
 }
 .studio-nav-btn{
-  width:48px;height:48px;border-radius:50%;
+  width:46px;height:46px;border-radius:50%;
   background:rgba(155,93,229,.12);border:1.5px solid rgba(155,93,229,.30);
   display:flex;align-items:center;justify-content:center;cursor:pointer;
-  transition:all .18s;
+  transition:all .18s;flex-shrink:0;
 }
 .studio-nav-btn:hover{background:rgba(155,93,229,.26);border-color:rgba(155,93,229,.55);}
 .studio-nav-btn:active{transform:scale(.93);}
 .studio-nav-btn svg{width:20px;height:20px;stroke:#C499FF;stroke-width:2;fill:none;}
-.studio-center-actions{display:flex;gap:11px;align-items:center;}
+.studio-center-actions{display:flex;gap:10px;align-items:center;}
 .studio-act-btn{
-  width:44px;height:44px;border-radius:50%;
+  width:42px;height:42px;border-radius:50%;
   border:1.5px solid rgba(255,255,255,.11);background:rgba(255,255,255,.05);
   display:flex;align-items:center;justify-content:center;cursor:pointer;
-  transition:all .15s;font-size:18px;
+  transition:all .15s;font-size:17px;flex-shrink:0;
 }
 .studio-act-btn:hover{background:rgba(155,93,229,.22);border-color:rgba(155,93,229,.42);}
 .studio-act-btn:active{transform:scale(.91);}
 .studio-act-btn svg{width:18px;height:18px;stroke:#EEE8FF;stroke-width:2;fill:none;}
 .studio-counter{
   font-size:11px;font-weight:700;color:rgba(196,153,255,.42);
-  letter-spacing:.6px;text-align:center;padding:4px 0 6px;
+  letter-spacing:.6px;text-align:center;padding:3px 0 5px;
   background:rgba(8,8,24,.97);flex-shrink:0;position:relative;z-index:2;
+}
+
+/* Compact Studio chrome on short phones (iPhone SE, small Androids) so
+   the museum frame has room to breathe. */
+@media (max-height: 720px){
+  #scr-studio .top-bar{padding:10px 16px 8px!important;}
+  #scr-studio .logo{font-size:16px;}
+  .studio-stage{padding:6px 10px;}
+  .museum-frame-glow{padding:7px 7px 0;border-radius:20px;}
+  .museum-frame{border-radius:14px 14px 0 0;}
+  .museum-plaque{padding:10px 14px 12px;border-radius:0 0 14px 14px;}
+  .plaque-title{font-size:18px;margin-bottom:5px;}
+  .plaque-badge{font-size:10px;padding:2px 9px;}
+  .plaque-notes{font-size:11.5px;-webkit-line-clamp:1;}
+  .studio-controls{padding:8px 18px calc(10px + env(safe-area-inset-bottom, 0px));}
+  .studio-nav-btn{width:42px;height:42px;}
+  .studio-act-btn{width:38px;height:38px;font-size:15px;}
+  .studio-act-btn svg{width:16px;height:16px;}
+  .studio-counter{font-size:10px;padding:2px 0 4px;}
 }
 
 /* ══════════════════════════════════════
@@ -1063,6 +1091,112 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 </style>
 </head>
 <body>
+
+<!-- ════════════════════════════════════
+     SPLASH SCREEN
+     Self-contained inline CSS so it paints
+     before the rest of the page renders.
+     Auto-dismisses ~1.8s after load.
+════════════════════════════════════ -->
+<div id="ckSplash" role="status" aria-label="CanvasKeep loading">
+  <style>
+    #ckSplash{
+      position:fixed;inset:0;z-index:99999;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:18px;
+      background:linear-gradient(160deg,#9B5DE5 0%,#7B3FD4 55%,#5B2BA8 100%);
+      animation:ckSplashFade 1.8s ease-in 1.4s forwards;
+      -webkit-tap-highlight-color:transparent;
+    }
+    #ckSplash .ck-icon-wrap{
+      width:132px;height:132px;border-radius:30px;
+      background:rgba(255,255,255,0.12);
+      box-shadow:
+        0 8px 32px rgba(0,0,0,0.25),
+        0 0 0 1px rgba(255,255,255,0.15),
+        0 0 60px rgba(255,255,255,0.18);
+      display:flex;align-items:center;justify-content:center;
+      animation:ckSplashPop 0.6s cubic-bezier(.22,1.2,.36,1) both;
+      overflow:hidden;
+    }
+    #ckSplash .ck-icon-wrap img{
+      width:100%;height:100%;object-fit:cover;display:block;
+      border-radius:30px;
+    }
+    #ckSplash .ck-wordmark{
+      font-family:'Fredoka One','Nunito',system-ui,sans-serif;
+      font-size:36px;color:#FFFFFF;letter-spacing:0.4px;
+      text-shadow:0 2px 12px rgba(0,0,0,0.18);
+      animation:ckSplashRise 0.7s cubic-bezier(.22,1,.36,1) 0.15s both;
+    }
+    #ckSplash .ck-tag{
+      font-family:'Nunito',system-ui,sans-serif;
+      font-size:13px;font-weight:600;letter-spacing:0.5px;
+      color:rgba(255,255,255,0.78);
+      animation:ckSplashRise 0.7s cubic-bezier(.22,1,.36,1) 0.3s both;
+    }
+    #ckSplash .ck-dots{
+      display:flex;gap:6px;margin-top:8px;
+      animation:ckSplashRise 0.7s cubic-bezier(.22,1,.36,1) 0.45s both;
+    }
+    #ckSplash .ck-dots span{
+      width:7px;height:7px;border-radius:50%;
+      background:rgba(255,255,255,0.85);
+      animation:ckSplashDot 1.1s ease-in-out infinite;
+    }
+    #ckSplash .ck-dots span:nth-child(2){animation-delay:0.15s;}
+    #ckSplash .ck-dots span:nth-child(3){animation-delay:0.3s;}
+    @keyframes ckSplashPop{
+      0%{opacity:0;transform:scale(0.6);}
+      100%{opacity:1;transform:scale(1);}
+    }
+    @keyframes ckSplashRise{
+      0%{opacity:0;transform:translateY(12px);}
+      100%{opacity:1;transform:translateY(0);}
+    }
+    @keyframes ckSplashDot{
+      0%,100%{opacity:0.35;transform:scale(0.85);}
+      50%{opacity:1;transform:scale(1.1);}
+    }
+    @keyframes ckSplashFade{
+      0%{opacity:1;}
+      100%{opacity:0;visibility:hidden;pointer-events:none;}
+    }
+    /* Respect users who prefer no motion */
+    @media (prefers-reduced-motion: reduce){
+      #ckSplash .ck-icon-wrap,
+      #ckSplash .ck-wordmark,
+      #ckSplash .ck-tag,
+      #ckSplash .ck-dots{animation:none;}
+      #ckSplash{animation:ckSplashFade 0.4s ease-in 1.4s forwards;}
+    }
+  </style>
+  <div class="ck-icon-wrap">
+    <img src="icon-512x512.png" alt="CanvasKeep" width="512" height="512">
+  </div>
+  <div class="ck-wordmark">CanvasKeep</div>
+  <div class="ck-tag">Preserve the canvas. Keep the memory.</div>
+  <div class="ck-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+</div>
+<script>
+  // Remove splash from DOM after fade-out completes so it can't intercept taps.
+  (function(){
+    var splash = document.getElementById('ckSplash');
+    if(!splash) return;
+    var remove = function(){
+      if(splash && splash.parentNode){splash.parentNode.removeChild(splash);}
+    };
+    // CSS animation ends at 1.4s + 1.8s = 3.2s; remove just after.
+    setTimeout(remove, 3300);
+    // If user taps, fast-dismiss
+    splash.addEventListener('click', function(){
+      splash.style.transition = 'opacity .25s';
+      splash.style.opacity = '0';
+      setTimeout(remove, 260);
+    }, {once:true});
+  })();
+</script>
+
 <div id="app">
 
 <!-- ════════════════════════════════════
@@ -2368,7 +2502,7 @@ function renderStudio(){
   const k=kidById(art.kidId);
   const artEl=document.getElementById('museumArt');
   if(art.imageData){
-    artEl.innerHTML=`<img class="museum-art-img" src="${art.imageData}" style="width:100%;height:auto;display:block;">`;
+    artEl.innerHTML=`<img class="museum-art-img" src="${art.imageData}" alt="${(art.title||'Artwork').replace(/"/g,'&quot;')}">`;
   } else {
     artEl.innerHTML=`<span style="font-size:100px">${art.emoji||'🎨'}</span>`;
   }
