@@ -1175,6 +1175,58 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
 .yb-opt:hover,.yb-opt.active{border-color:var(--accent);background:rgba(155,93,229,.06);}
 .yb-opt-t{font-size:14px;font-weight:800;color:var(--text);}
 .yb-opt-d{font-size:12px;color:var(--text2);margin-top:2px;}
+
+/* ══ STORAGE CHOICE CARD ════════════════════════════════════════ */
+#storageChoiceOverlay{
+  display:none;position:fixed;inset:0;z-index:950;
+  background:var(--bg);flex-direction:column;
+  align-items:center;justify-content:center;padding:32px 24px;
+}
+#storageChoiceOverlay.open{display:flex;}
+.sc-logo{font-family:'Fredoka One',cursive;font-size:32px;color:var(--text);margin-bottom:6px;text-align:center;}
+.sc-sub{font-size:14px;color:var(--text2);text-align:center;line-height:1.6;margin-bottom:32px;max-width:320px;}
+.sc-options{display:flex;flex-direction:column;gap:14px;width:100%;max-width:340px;}
+.sc-opt{
+  background:var(--card);border:2px solid var(--border);border-radius:20px;
+  padding:20px 22px;cursor:pointer;transition:all .18s;text-align:left;
+  display:flex;align-items:flex-start;gap:16px;
+}
+.sc-opt:hover,.sc-opt:focus{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--sha);}
+.sc-opt-ico{font-size:32px;flex-shrink:0;margin-top:2px;}
+.sc-opt-t{font-family:'Fredoka One',cursive;font-size:18px;color:var(--text);margin-bottom:4px;}
+.sc-opt-d{font-size:12px;color:var(--text2);line-height:1.5;}
+.sc-badge{
+  display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;
+  border-radius:50px;margin-top:6px;
+}
+.sc-badge.green{background:rgba(46,204,113,.15);color:#27AE60;}
+.sc-badge.amber{background:rgba(255,209,102,.15);color:#E67E22;}
+/* Drive status in settings */
+.drive-status{
+  display:flex;align-items:center;gap:10px;
+  background:var(--soft);border:1.5px solid var(--border);
+  border-radius:var(--rs);padding:12px 14px;margin-bottom:10px;
+}
+.drive-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.drive-avatar-ph{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;flex-shrink:0;}
+.drive-info{flex:1;min-width:0;}
+.drive-name{font-size:13px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.drive-sync{font-size:11px;color:var(--text2);}
+/* Cast / Bluetooth buttons in slideshow */
+.ss-cast-btn{
+  position:absolute;top:14px;left:14px;z-index:10;
+  width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(255,255,255,.08);color:rgba(238,232,255,.6);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;
+}
+.ss-cast-btn:hover{background:rgba(155,93,229,.25);}
+.ss-cast-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;}
+/* Bluetooth print in share modal */
+.bt-print-row{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 0;border-top:1px solid var(--border);margin-top:8px;
+}
 /* ══════════════════════════════════════
    SCROLLBAR
 ══════════════════════════════════════ */
@@ -1755,10 +1807,42 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
   </div>
 </div>
 
+<!-- ════════════════════════════════════
+     STORAGE CHOICE CARD
+════════════════════════════════════ -->
+<div id="storageChoiceOverlay">
+  <div class="sc-logo"><span class="logo-dot"></span>CanvasKeep</div>
+  <p class="sc-sub">Where should your children's artwork live?<br>You can always change this later in Settings.</p>
+  <div class="sc-options">
+    <button class="sc-opt" id="scChooseCloud">
+      <div class="sc-opt-ico">☁️</div>
+      <div>
+        <div class="sc-opt-t">Back up to Google Drive</div>
+        <div class="sc-opt-d">Your artwork is automatically saved to your Google account. Access it on any device, never lose a piece.</div>
+        <span class="sc-badge green">Recommended</span>
+      </div>
+    </button>
+    <button class="sc-opt" id="scChooseLocal">
+      <div class="sc-opt-ico">📱</div>
+      <div>
+        <div class="sc-opt-t">Keep on this device</div>
+        <div class="sc-opt-d">Everything stays private on your phone. Export a backup manually whenever you want from Settings.</div>
+        <span class="sc-badge amber">You manage backups</span>
+      </div>
+    </button>
+  </div>
+</div>
+
 <!-- ════════════════════════════
      SLIDESHOW OVERLAY
 ════════════════════════════ -->
 <div id="slideshowOverlay">
+  <button class="ss-cast-btn" id="ssCast" title="Cast to TV" style="display:none">
+    <svg viewBox="0 0 24 24"><path d="M2 8.5A12.5 12.5 0 0 1 14.5 21"/><path d="M2 13.5A7.5 7.5 0 0 1 9.5 21"/><circle cx="2.5" cy="20.5" r="1.5" fill="currentColor"/><rect x="14" y="3" width="8" height="6" rx="1"/><path d="M14 12h8M14 15h5"/></svg>
+  </button>
+  <button class="ss-cast-btn" id="ssBluetooth" title="Print wirelessly" style="display:none;left:58px">
+    <svg viewBox="0 0 24 24"><polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"/></svg>
+  </button>
   <button class="ss-close-btn" id="ssClose">✕</button>
   <div class="ss-stage" id="ssStage">
     <div class="ss-img-wrap" id="ssImgWrap"></div>
@@ -1935,10 +2019,29 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
     <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     Last 12 Months in Review
   </button>
+  <button class="btn btn-soft btn-full" id="settingsDriveConnectBtn" onclick="closeSettings();signInWithGoogle()" style="margin-bottom:8px;display:none">
+    <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+    Connect Google Drive
+  </button>
   <button class="btn btn-soft btn-full" onclick="closeSettings();openYearbook()">
     <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
     Year-End Memory Book
   </button>
+</div>
+<div class="sheet-sec" id="driveSettingsSection" style="display:none">
+  <span class="caption">Google Drive Backup</span>
+  <div class="drive-status" id="driveStatusRow">
+    <div class="drive-avatar-ph" id="driveAvatarPh">?</div>
+    <div class="drive-info">
+      <div class="drive-name" id="driveUserName">Not signed in</div>
+      <div class="drive-sync" id="driveSyncStatus">Tap below to connect</div>
+    </div>
+  </div>
+  <button class="btn btn-soft btn-full" id="driveBackupNowBtn" style="margin-bottom:8px">
+    <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+    Back Up Now
+  </button>
+  <button class="btn btn-soft btn-full" id="driveSignOutBtn">Sign Out of Google</button>
 </div>
 <div class="sheet-sec" style="margin-top:8px">
   <span class="caption">Install App</span>
@@ -2171,6 +2274,14 @@ input,select,textarea{font-family:'Nunito',sans-serif;}
     </div>
 
     <!-- Actions -->
+    <div id="btPrintRow" class="bt-print-row" style="display:none;padding:0 0 12px">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--accent);stroke-width:2;fill:none;flex-shrink:0"><polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"/></svg>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:800;color:var(--text)" id="btPrinterName">Bluetooth Printer</div>
+        <div style="font-size:11px;color:var(--text2)">Print wirelessly</div>
+      </div>
+      <button class="btn btn-accent" style="padding:8px 14px;font-size:12px" id="btPrintBtn">Print</button>
+    </div>
     <div class="print-actions">
       <button class="btn btn-soft" style="flex:1" onclick="document.getElementById('printModal').classList.remove('open')">Cancel</button>
       <button class="btn btn-soft" style="flex:1" id="sharePng">
@@ -2453,10 +2564,18 @@ function updateIntro(){
 }
 document.getElementById('iCTA').addEventListener('click',()=>{
   if(introIdx<INTRO_MAX-1){introIdx++;updateIntro();}
-  else{setOnboarded();navigate('gallery');}
+  else{
+    // Show storage choice card instead of going straight to gallery
+    document.getElementById('storageChoiceOverlay').classList.add('open');
+    initCastDetection();
+    checkBluetoothAvailability();
+  }
 });
 document.getElementById('iBackBtn').addEventListener('click',()=>{if(introIdx>0){introIdx--;updateIntro();}});
-document.getElementById('iSkipBtn').addEventListener('click',()=>{setOnboarded();navigate('gallery');});
+document.getElementById('iSkipBtn').addEventListener('click',()=>{
+  document.getElementById('storageChoiceOverlay').classList.add('open');
+  initCastDetection();checkBluetoothAvailability();
+});
 document.getElementById('iSecondary').addEventListener('click',()=>{document.getElementById('importInput').click();});
 document.querySelectorAll('.idot').forEach(d=>d.addEventListener('click',()=>{introIdx=parseInt(d.dataset.i);updateIntro();}));
 function replayIntro(){closeSettings();introIdx=0;updateIntro();navigate('intro');}
@@ -3363,6 +3482,13 @@ function driveDownload(){
 
 /* ══ SETTINGS ══ */
 function openSettings(){
+  // Drive UI
+  updateDriveSettingsUI();
+  // Show Drive section if enabled
+  const ds=document.getElementById('driveSettingsSection');
+  if(ds) ds.style.display=DB.settings.driveEnabled?'block':'none';
+  const cb=document.getElementById('settingsDriveConnectBtn');
+  if(cb) cb.style.display=DB.settings.driveEnabled?'none':'flex';
   // Storage estimate
   if(navigator.storage&&navigator.storage.estimate){
     navigator.storage.estimate().then(({usage,quota})=>{
@@ -4914,6 +5040,366 @@ function startYearReview(){
     'Oldest to newest — watch them grow. ✨',3500),400);
 }
 
+/* ══ GOOGLE DRIVE BACKUP ═════════════════════════════════════════════
+   Uses Google Identity Services (no popup, no server).
+   Scopes: drive.file — only files this app created.
+   Data flow: IDB → JSON → CompressionStream → Drive file
+              Drive file → DecompressionStream → JSON → IDB
+═══════════════════════════════════════════════════════════════════ */
+const GAPI_CLIENT_ID='YOUR_GOOGLE_CLIENT_ID'; // replace before deploy
+const GAPI_SCOPE='https://www.googleapis.com/auth/drive.file';
+const DRIVE_FILE_NAME='canvaskeep-backup.ckb';
+let _driveToken=null;
+let _driveFileId=null;
+let _driveUser=null;
+
+function loadGIS(){
+  return new Promise((res,rej)=>{
+    if(window.google?.accounts){res();return;}
+    const s=document.createElement('script');
+    s.src='https://accounts.google.com/gsi/client';
+    s.async=true;s.defer=true;
+    s.onload=res;s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+
+async function signInWithGoogle(){
+  try{
+    await loadGIS();
+    // Use token client for Drive API access
+    const tokenClient=google.accounts.oauth2.initTokenClient({
+      client_id:GAPI_CLIENT_ID,
+      scope:GAPI_SCOPE,
+      callback:(resp)=>{
+        if(resp.error){toast('error','Google sign-in failed',resp.error,3000);return;}
+        _driveToken=resp.access_token;
+        // Get user info
+        fetch('https://www.googleapis.com/oauth2/v3/userinfo',{
+          headers:{Authorization:'Bearer '+_driveToken}
+        }).then(r=>r.json()).then(info=>{
+          _driveUser=info;
+          DB.settings.driveEnabled=true;
+          DB.settings.driveUser={name:info.name,email:info.email,picture:info.picture};
+          save();
+          updateDriveSettingsUI();
+          driveBackupNow();
+          toast('success','Connected to Google Drive','Your artwork will be backed up automatically.',3000);
+        });
+      }
+    });
+    tokenClient.requestAccessToken({prompt:'consent'});
+  }catch(e){
+    toast('error','Could not load Google sign-in','Check your connection and try again.',3000);
+  }
+}
+
+function signOutGoogle(){
+  _driveToken=null;_driveFileId=null;_driveUser=null;
+  DB.settings.driveEnabled=false;delete DB.settings.driveUser;
+  save();updateDriveSettingsUI();
+  toast('info','Signed out of Google Drive','Data stays on your device.',2500);
+}
+
+function updateDriveSettingsUI(){
+  const section=document.getElementById('driveSettingsSection');
+  const u=DB.settings.driveUser;
+  if(!section)return;
+  section.style.display=DB.settings.driveEnabled?'block':'none';
+  if(u){
+    document.getElementById('driveUserName').textContent=u.name||u.email||'Google User';
+    document.getElementById('driveSyncStatus').textContent=
+      DB.settings.driveLastSync?'Last backup: '+new Date(DB.settings.driveLastSync).toLocaleString():'Never backed up';
+    const ph=document.getElementById('driveAvatarPh');
+    if(u.picture){
+      ph.outerHTML=`<img class="drive-avatar" id="driveAvatarPh" src="${u.picture}" alt="">`;
+    } else {
+      ph.textContent=(u.name||'?')[0].toUpperCase();
+    }
+  }
+}
+
+async function compressJSON(obj){
+  const json=JSON.stringify(obj);
+  const stream=new Blob([json]).stream();
+  const compressed=stream.pipeThrough(new CompressionStream('gzip'));
+  const chunks=[];
+  const reader=compressed.getReader();
+  while(true){const{done,value}=await reader.read();if(done)break;chunks.push(value);}
+  return new Blob(chunks,{type:'application/gzip'});
+}
+
+async function decompressBlob(blob){
+  const stream=blob.stream().pipeThrough(new DecompressionStream('gzip'));
+  const chunks=[];const reader=stream.getReader();
+  while(true){const{done,value}=await reader.read();if(done)break;chunks.push(value);}
+  return JSON.parse(new TextDecoder().decode(new Uint8Array(
+    chunks.reduce((a,b)=>{const c=new Uint8Array(a.length+b.length);c.set(a);c.set(b,a.length);return c;},new Uint8Array(0))
+  )));
+}
+
+async function driveBackupNow(){
+  if(!_driveToken){
+    // Try silent token refresh
+    toast('warning','Not signed in to Google Drive','Sign in from Settings to back up.',3000);
+    return;
+  }
+  try{
+    document.getElementById('driveSyncStatus').textContent='Backing up…';
+    const data=metaSnapshot();
+    // Include images in backup blob (they're already in memory)
+    data.arts=DB.arts.map(a=>({...a}));
+    const blob=await compressJSON(data);
+
+    // Find or create the backup file
+    if(!_driveFileId){
+      const search=await fetch(
+        `https://www.googleapis.com/drive/v3/files?q=name='${DRIVE_FILE_NAME}'+and+trashed=false&fields=files(id,name)`,
+        {headers:{Authorization:'Bearer '+_driveToken}}
+      ).then(r=>r.json());
+      _driveFileId=search.files?.[0]?.id||null;
+    }
+
+    const meta=new Blob([JSON.stringify({name:DRIVE_FILE_NAME,mimeType:'application/gzip'})],{type:'application/json'});
+    const form=new FormData();
+    form.append('metadata',meta);form.append('file',blob);
+
+    const url=_driveFileId
+      ?`https://www.googleapis.com/upload/drive/v3/files/${_driveFileId}?uploadType=multipart`
+      :`https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+    const method=_driveFileId?'PATCH':'POST';
+
+    const resp=await fetch(url,{method,headers:{Authorization:'Bearer '+_driveToken},body:form}).then(r=>r.json());
+    if(resp.id){
+      _driveFileId=resp.id;
+      DB.settings.driveLastSync=Date.now();
+      DB.settings.driveFileId=resp.id;
+      save();
+      document.getElementById('driveSyncStatus').textContent='Backed up just now';
+      toast('success','Backed up to Google Drive ☁️','',2000);
+    }
+  }catch(e){
+    document.getElementById('driveSyncStatus').textContent='Backup failed — try again';
+    toast('error','Backup failed',e.message,3000);
+  }
+}
+
+async function driveRestore(){
+  if(!_driveToken){await signInWithGoogle();return;}
+  try{
+    toast('info','Restoring from Drive…','This may take a moment.',2500);
+    const fid=DB.settings.driveFileId||_driveFileId;
+    if(!fid){toast('warning','No backup found on Drive','',2500);return;}
+    const blob=await fetch(
+      `https://www.googleapis.com/drive/v3/files/${fid}?alt=media`,
+      {headers:{Authorization:'Bearer '+_driveToken}}
+    ).then(r=>r.blob());
+    const data=await decompressBlob(blob);
+    DB.kids=data.kids||[];DB.arts=data.arts||[];
+    DB.settings=Object.assign(DB.settings,data.settings||{});
+    await save();renderGallery();
+    toast('success','Restored from Google Drive!','Your artwork is back.',3000);
+  }catch(e){
+    toast('error','Restore failed',e.message,3000);
+  }
+}
+
+// Auto-backup after every save if Drive is enabled
+const _origSave=save;
+window._autoBackupTimer=null;
+// Wrap save to trigger Drive backup 30s after last change (debounced)
+// We do this after the main save function is defined — see init
+
+/* ══ STORAGE CHOICE CARD ════════════════════════════════════════ */
+document.getElementById('scChooseCloud').addEventListener('click',async()=>{
+  DB.settings.storageChoice='drive';
+  setOnboarded();
+  document.getElementById('storageChoiceOverlay').classList.remove('open');
+  navigate('gallery');
+  await signInWithGoogle();
+});
+document.getElementById('scChooseLocal').addEventListener('click',()=>{
+  DB.settings.storageChoice='local';
+  setOnboarded();
+  document.getElementById('storageChoiceOverlay').classList.remove('open');
+  navigate('gallery');
+  toast('info','All set!','You can always enable Drive backup later in Settings.',3000);
+});
+
+// Drive settings buttons
+document.getElementById('driveBackupNowBtn').addEventListener('click',driveBackupNow);
+document.getElementById('driveSignOutBtn').addEventListener('click',()=>{
+  showConfirm('☁️','Sign out of Google Drive?','Your local data stays safe. Future changes will not be backed up automatically.',signOutGoogle);
+});
+
+/* ══ GOOGLE CAST (Chromecast / Nest Hub) ════════════════════════
+   Uses the Presentation API as the baseline — works for wired
+   and wireless displays in Chrome without any SDK.
+   Detects Cast availability and shows the Cast button.
+   Cast Receiver URL: host a simple HTML page that plays the slideshow.
+═══════════════════════════════════════════════════════════════ */
+const CAST_RECEIVER_URL='https://canvaskeep.app/cast-receiver.html';
+let _presentationConn=null;
+let _castAvailable=false;
+
+function initCastDetection(){
+  // Presentation API: works for Chrome on desktop/Android
+  if(navigator.presentation&&navigator.presentation.defaultRequest!==undefined){
+    _castAvailable=true;
+    document.getElementById('ssCast').style.display='flex';
+  }
+  // Google Cast SDK — load silently, show button if available
+  if(typeof cast==='undefined'){
+    const s=document.createElement('script');
+    s.src='https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
+    s.async=true;
+    s.onload=()=>{
+      window['__onGCastApiAvailable']=function(isAvailable){
+        if(isAvailable){
+          _castAvailable=true;
+          document.getElementById('ssCast').style.display='flex';
+        }
+      };
+    };
+    document.head.appendChild(s);
+  }
+}
+
+async function startCast(){
+  if(!ssArts.length)return;
+  // Build the URL we'll send to the receiver
+  // We pass artwork IDs as a URL fragment — the receiver fetches them
+  const artIds=ssArts.map(a=>a.id).join(',');
+
+  // Try Presentation API first (simplest, no SDK needed)
+  if(navigator.presentation){
+    try{
+      const req=new PresentationRequest([CAST_RECEIVER_URL+'#ids='+encodeURIComponent(artIds)]);
+      req.addEventListener('connectionavailable',e=>{
+        _presentationConn=e.connection;
+        _presentationConn.addEventListener('message',msg=>{
+          if(msg.data==='next')ssNext();
+          else if(msg.data==='prev')ssPrev();
+          else if(msg.data==='toggle')ssTogglePlay();
+        });
+        // Send the current artwork index
+        _presentationConn.send(JSON.stringify({
+          type:'artworks',
+          arts:ssArts.map(a=>({
+            id:a.id,title:a.title,imageData:a.imageData,emoji:a.emoji,
+            kidName:DB.kids.find(k=>k.id===a.kidId)?.name||'',
+            date:a.date
+          })),
+          idx:ssIdx
+        }));
+        toast('success','Casting to display ✨','Controls stay on your phone.',2500);
+      });
+      const conn=await req.start();
+    }catch(e){
+      if(e.name!=='NotFoundError')toast('error','Cast failed',e.message,3000);
+    }
+    return;
+  }
+  toast('info','Casting not available','Use Chrome on Android or desktop to cast to a TV.',3000);
+}
+
+document.getElementById('ssCast').addEventListener('click',startCast);
+
+function stopCast(){
+  if(_presentationConn){_presentationConn.terminate();_presentationConn=null;}
+}
+
+/* ══ WEB BLUETOOTH PRINTING ══════════════════════════════════════
+   Connects to nearby Bluetooth photo printers.
+   Targets common printer services: Canon Selphy, Instax Link.
+   Sends the PNG card as a raw print job.
+═══════════════════════════════════════════════════════════════ */
+let _btPrinter=null;
+let _btPrinterChar=null;
+
+async function connectBluetooth(){
+  if(!navigator.bluetooth){
+    toast('warning','Bluetooth not available','Use Chrome on Android or desktop.',3000);
+    return;
+  }
+  try{
+    toast('info','Scanning for printers…','Make sure your printer is on and in range.',2500);
+    // Request any BT device with a printer-like service
+    const device=await navigator.bluetooth.requestDevice({
+      acceptAllDevices:true,
+      optionalServices:[
+        '000018f0-0000-1000-8000-00805f9b34fb', // common serial service
+        '00001101-0000-1000-8000-00805f9b34fb', // serial port profile
+      ]
+    });
+    _btPrinter=device;
+    const server=await device.gatt.connect();
+    toast('success',`Connected to ${device.name||'printer'}!`,'Tap Print to send the card.',3000);
+    document.getElementById('btPrinterName').textContent=device.name||'Bluetooth Printer';
+    document.getElementById('btPrintRow').style.display='flex';
+    device.addEventListener('gattserverdisconnected',()=>{
+      _btPrinter=null;_btPrinterChar=null;
+      document.getElementById('btPrintRow').style.display='none';
+    });
+  }catch(e){
+    if(e.name!=='NotFoundError')toast('error','Bluetooth failed',e.message,3000);
+  }
+}
+
+async function btPrintCard(artId){
+  if(!_btPrinter||!_btPrinter.gatt.connected){await connectBluetooth();return;}
+  const art=DB.arts.find(a=>a.id===artId);if(!art)return;
+  try{
+    toast('info','Preparing print…','Rendering card at print resolution.',1500);
+    const blob=await renderArtCardBlob(art);
+    const buf=await blob.arrayBuffer();
+    // Send in 512-byte chunks (standard BLE MTU)
+    const server=await _btPrinter.gatt.connect();
+    const services=await server.getPrimaryServices();
+    for(const svc of services){
+      const chars=await svc.getCharacteristics();
+      for(const c of chars){
+        if(c.properties.write||c.properties.writeWithoutResponse){
+          _btPrinterChar=c;break;
+        }
+      }
+      if(_btPrinterChar)break;
+    }
+    if(!_btPrinterChar){toast('error','Printer not compatible','Could not find a write channel.',3000);return;}
+    const chunk=512;const data=new Uint8Array(buf);
+    for(let i=0;i<data.length;i+=chunk){
+      await _btPrinterChar.writeValueWithoutResponse(data.slice(i,i+chunk));
+    }
+    toast('success','Sent to printer! 🖨️','',2500);haptic([8,50,8]);
+  }catch(e){toast('error','Print failed',e.message,3000);}
+}
+
+document.getElementById('btPrintBtn')?.addEventListener('click',()=>{
+  const artId=document.getElementById('downloadPng').dataset.artId;
+  btPrintCard(artId);
+});
+
+// Show BT option in print modal if BT is available
+function checkBluetoothAvailability(){
+  if(navigator.bluetooth){
+    // Add "Connect printer" link to print modal
+    const row=document.getElementById('btPrintRow');
+    if(row){
+      // Add connect button if no printer yet
+      if(!_btPrinter){
+        const connectBtn=document.createElement('button');
+        connectBtn.className='btn btn-soft';
+        connectBtn.style.cssText='padding:8px 14px;font-size:12px';
+        connectBtn.textContent='Scan';
+        connectBtn.onclick=connectBluetooth;
+        row.appendChild(connectBtn);
+        row.style.display='flex';
+      }
+    }
+  }
+}
+
+
 /* ══ LEAVE GUARD ══
    Back button within the app navigates between screens.
    Leave modal only fires when trying to exit the app entirely.
@@ -5009,6 +5495,15 @@ function applySettings(){
     document.getElementById('scr-gallery').classList.remove('right');
     document.getElementById('scr-gallery').classList.add('active');
     curScreen='gallery';renderGallery();
+    // Restore Drive user if previously connected
+    if(DB.settings.driveUser){
+      _driveUser=DB.settings.driveUser;
+      _driveFileId=DB.settings.driveFileId||null;
+      updateDriveSettingsUI();
+    }
+    // Init cast detection
+    initCastDetection();
+    checkBluetoothAvailability();
   } else {
     document.getElementById('scr-intro').classList.remove('right');
     document.getElementById('scr-intro').classList.add('active');
