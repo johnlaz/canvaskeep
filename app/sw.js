@@ -1,15 +1,12 @@
 // CanvasKeep service worker. Keep CACHE_NAME in sync with APP_VERSION in index.html.
-const CACHE_NAME = 'canvaskeep-v1.3.0';
+const CACHE_NAME = 'canvaskeep-v1.3.1';
 const FONT_CACHE = 'canvaskeep-fonts';
 const SHELL_URLS = [
   './',
   './index.html',
   './manifest.json',
-  './icon-192x192.png',
-  './icon-512x512.png',
-  './icon-192x192-maskable.png',
-  './icon-512x512-maskable.png',
-  './apple-touch-icon.png'
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 // Install: precache the shell. Individual adds so one 404 can't fail the whole install.
