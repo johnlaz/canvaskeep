@@ -714,6 +714,17 @@
       align-items: center;
     }
 
+
+    .shots-section { text-align: center; }
+    .shots-row { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; margin-top: 36px; }
+    .shots-row figure { margin: 0; width: min(260px, 80vw); }
+    .shots-row img { width: 100%; height: auto; border-radius: 26px; box-shadow: 0 24px 60px rgba(155,93,229,0.25), 0 0 0 6px rgba(155,93,229,0.08); }
+    .shots-row figcaption { margin-top: 14px; font-weight: 800; color: var(--ink-soft); font-size: .95rem; }
+    .privacy-section { max-width: 720px; margin: 0 auto; padding: 56px 24px; }
+    .privacy-section h2 { font-family: 'Fredoka One', cursive; font-size: 1.8rem; margin-bottom: 14px; }
+    .privacy-section p, .privacy-section li { color: var(--ink-soft); line-height: 1.75; font-size: 1.02rem; }
+    .privacy-section ul { padding-left: 1.2rem; margin: 10px 0; }
+    .privacy-section a { color: var(--grape); font-weight: 800; }
     .showcase-img-wrap {
       position: relative;
       display: flex;
@@ -722,7 +733,8 @@
 
     .showcase-img {
       width: 100%;
-      max-width: 340px;
+      max-width: 300px;
+      height: auto;
       border-radius: 32px;
       box-shadow: 0 32px 80px rgba(155, 93, 229, 0.28), 0 0 0 10px rgba(155,93,229,0.08);
       position: relative;
@@ -795,7 +807,7 @@
   <!-- NAV -->
   <nav>
     <a href="#" class="nav-logo">
-      <img src="canvas_icon.jpg" alt="CanvasKeep" />
+      <img src="icon-192x192.png" alt="CanvasKeep" />
       CanvasKeep
     </a>
     <a href="./app/" class="nav-cta">Open App →</a>
@@ -810,7 +822,7 @@
       Free forever · No account needed
     </div>
 
-    <img src="canvas_icon.jpg" alt="CanvasKeep icon" class="hero-icon" />
+    <img src="icon-512x512.png" alt="CanvasKeep icon" class="hero-icon" width="130" height="130" />
 
     <h1>Your child's art deserves more than<br><em>the recycling bin.</em></h1>
 
@@ -835,19 +847,19 @@
 
   <!-- TRUST STRIP -->
   <div class="trust-strip">
-    <div class="trust-item"><span class="icon">🔒</span> Photos never leave your device</div>
+    <div class="trust-item"><span class="icon">🔒</span> Photos stay on your device</div>
     <div class="trust-item"><span class="icon">📵</span> No account or login</div>
     <div class="trust-item"><span class="icon">📶</span> Works without internet</div>
     <div class="trust-item"><span class="icon">💜</span> Completely free</div>
   </div>
 
-  <!-- ICON SHOWCASE -->
+  <!-- APP SHOWCASE -->
   <section class="showcase-section">
     <div class="showcase-inner">
       <div class="showcase-img-wrap">
-        <img src="canvas_icon.jpg" alt="CanvasKeep app" class="showcase-img" />
+        <img src="app/shot-1-gallery.png" alt="The CanvasKeep gallery showing a child's paintings" class="showcase-img" width="1080" height="1920" loading="lazy" />
         <div class="showcase-glow"></div>
-        <div class="showcase-badge showcase-badge-1">🎨 34 pieces saved</div>
+        <div class="showcase-badge showcase-badge-1">🎨 Every piece saved</div>
         <div class="showcase-badge showcase-badge-2">⭐ Studio mode</div>
         <div class="showcase-badge showcase-badge-3">📵 No cloud needed</div>
       </div>
@@ -862,6 +874,17 @@
         </p>
         <a href="./app/" class="btn-primary" style="display:inline-flex">🎨 Try it free →</a>
       </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS -->
+  <section class="section shots-section" id="screens">
+    <p class="section-label">A look inside</p>
+    <h2 class="section-title">Simple enough for everyone.</h2>
+    <div class="shots-row">
+      <figure><img src="app/shot-2-studio.png" alt="Studio mode with a museum-style frame" width="1080" height="1920" loading="lazy" /><figcaption>Studio mode</figcaption></figure>
+      <figure><img src="app/shot-3-add.png" alt="Choosing how to add artwork" width="1080" height="1920" loading="lazy" /><figcaption>Add art in seconds</figcaption></figure>
+      <figure><img src="app/shot-4-backup.png" alt="Backup and restore settings" width="1080" height="1920" loading="lazy" /><figcaption>Backup &amp; restore</figcaption></figure>
     </div>
   </section>
 
@@ -924,8 +947,8 @@
       <div class="feature-card">
         <div class="feature-icon">💾</div>
         <div>
-          <h3>Export Anytime</h3>
-          <p>Download your entire archive as a single JSON file — photos and all. Your data is yours, and you can take it anywhere.</p>
+          <h3>Back Up Anytime</h3>
+          <p>Save everything in one backup file — photos and all — and restore it on any phone. Your art is yours, and you can take it anywhere.</p>
         </div>
       </div>
       <div class="feature-card">
@@ -978,8 +1001,8 @@
         </div>
         <div class="privacy-card">
           <span class="big-emoji">📤</span>
-          <h3>Export Anytime</h3>
-          <p>Take your data with you. Full JSON export gives you everything in one file.</p>
+          <h3>Back Up Anytime</h3>
+          <p>Save a backup file with everything in it, and restore it on any phone.</p>
         </div>
       </div>
     </div>
@@ -1018,6 +1041,20 @@
     </div>
   </section>
 
+  <!-- PRIVACY -->
+  <section class="privacy-section" id="privacy">
+    <h2>Privacy, in plain words</h2>
+    <p>CanvasKeep has no accounts and no ads, and it doesn't track you. Here is exactly what happens with your family's art:</p>
+    <ul>
+      <li>Your children's names, birthdays and artwork are saved <strong>only on your own device</strong>.</li>
+      <li>We never see, collect or sell any of it.</li>
+      <li>The app loads its fonts from Google Fonts. That is the only thing it fetches during normal use.</li>
+      <li>Backups are files you save yourself. If you choose to connect Google Drive, the backup goes to <em>your</em> Drive, and only because you asked.</li>
+      <li>"Wipe All Data" in Settings removes everything from the device.</li>
+    </ul>
+    <p>Questions? Email <a href="mailto:lazlab.io@gmail.com">lazlab.io@gmail.com</a>.</p>
+  </section>
+
   <!-- FOOTER -->
   <footer>
     <div class="footer-logo">CanvasKeep</div>
@@ -1026,8 +1063,9 @@
       <a href="./app/">Open App</a>
       <a href="#how-it-works">How It Works</a>
       <a href="#install">Install</a>
+      <a href="#privacy">Privacy</a>
     </div>
-    <p class="footer-copy">© 2025 LAZLAB Creations. Made for parents, by a parent, with love. 💜</p>
+    <p class="footer-copy">© 2026 LAZLAB Creations. All Rights Reserved. · <a href="mailto:lazlab.io@gmail.com" style="color:inherit">lazlab.io@gmail.com</a><br>Made for parents, by a parent, with love. 💜</p>
   </footer>
 
   <!-- LANDING TOAST -->

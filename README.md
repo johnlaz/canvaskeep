@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="icon-512x512.png" alt="CanvasKeep" width="128" height="128" style="border-radius:28px">
+<img src="docs/banner.svg" alt="CanvasKeep: Preserve the canvas. Keep the memory." width="100%">
 
 # CanvasKeep
 
@@ -43,9 +43,15 @@ Because it does.
 
 ---
 
+<div align="center">
+
+<img src="docs/how-it-works.svg" alt="Snap a photo, pick the child, watch it shine" width="100%">
+
+</div>
+
 ## What it does
 
-🎨 **Capture in seconds.** Photo, title, date — that's it. Notes optional. Sample data on first launch so you can play before you commit.
+🎨 **Capture in seconds.** Photo, title, date — that's it. Notes optional. Your gallery starts empty — one tap on **Add First Artwork** and you're off.
 
 👧 **Organized around your kids.** Add each child once with their birthday and school start date. CanvasKeep figures out their age and grade for every piece automatically.
 
@@ -53,7 +59,7 @@ Because it does.
 
 📅 **Timeline that grows with them.** From "scribbled at 2" to "watercolor at 14" — every piece in context.
 
-💾 **Yours. Forever.** Everything stays on your device. No cloud upload, no account, no algorithm deciding what's worth keeping. Export the whole archive as JSON whenever you want.
+💾 **Yours. Forever.** Everything stays on your device. No cloud upload, no account, no algorithm deciding what's worth keeping. Save a backup file whenever you want and restore it on any phone.
 
 🌐 **Works offline.** Drop it on your home screen and use it on a plane, at the cabin, anywhere. Install once, runs forever.
 
@@ -88,7 +94,7 @@ Show it to your kid on their 18th birthday. I dare you not to cry.
 - **Nothing leaves your device.** Photos, names, birthdays, notes — all stored locally in your browser.
 - **No account. No login. No email collection.**
 - **No analytics, no ads, no tracking pixels.** Open the network tab and check. (Web fonts from Google Fonts on first load are the only outbound request, and they're cached forever after.)
-- **Export anytime.** Your data is yours. JSON export gives you the full archive, photos and all, in a single file.
+- **Back up anytime.** Your data is yours. One tap saves a backup file with every child and photo; "Restore From Backup" brings it all back on any phone.
 
 ---
 
@@ -109,6 +115,36 @@ On desktop, Chrome and Edge will show an install icon in the address bar. Same i
 - 📱 **Apple Watch glance** showing today's most recent addition
 
 Have an idea? Open an issue. This thing belongs to the families who use it.
+
+---
+
+## Live links
+
+- Landing page: https://johnlaz.github.io/canvaskeep/
+- App: https://johnlaz.github.io/canvaskeep/app/
+
+## Repo layout
+
+```
+/index.html        landing page
+/README.md         this file
+/docs/             README visuals (banner.svg, how-it-works.svg)
+/app/index.html    the app (single file)
+/app/manifest.json install info and store screenshots
+/app/sw.js         offline support (cache name matches the version in Settings)
+/app/icon-*.png    app icons (192, 512, plus maskable versions)
+/app/shot-*.png    store screenshots
+/app/samples/      optional sample artwork (loaded only if you tap "Load Sample Artwork")
+```
+
+## Deploy and update
+
+Push to `main`; GitHub Pages serves it. When you change the app, bump `APP_VERSION` in `app/index.html` and `CACHE_NAME` in `app/sw.js` together so installed copies pick up the update.
+
+## Changelog
+
+- **1.3.0** Optional sample artwork, plain-language Backup / Restore, store screenshots, landing page and docs refresh.
+- **1.2.0** Empty first-run gallery with "Add First Artwork", normal back-button behavior, service worker update fix, icon corners filled.
 
 ---
 
