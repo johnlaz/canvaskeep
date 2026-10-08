@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-labelledby="t d">
+  <title id="t">CanvasKeep</title>
+  <desc id="d">CanvasKeep: Preserve the canvas. Keep the memory.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B5DE5"/><stop offset="1" stop-color="#5B8DEF"/></linearGradient>
+  </defs>
+  <rect width="1200" height="360" rx="28" fill="url(#bg)"/>
+  <circle cx="1080" cy="60" r="150" fill="#fff" opacity=".08"/><circle cx="130" cy="330" r="120" fill="#fff" opacity=".07"/>
+  <g transform="translate(70 70)"><rect width="220" height="220" rx="50" fill="#fff" opacity=".18"/>
+    <rect x="40" y="46" width="140" height="108" rx="10" fill="#FFF9F0"/><path d="M52 138l34-38 24 26 20-20 38 32z" fill="#4ECDC4"/><circle cx="148" cy="78" r="12" fill="#FFD166"/>
+    <rect x="40" y="162" width="140" height="12" rx="6" fill="#FFF9F0" opacity=".85"/></g>
+  <text x="340" y="170" font-family="Trebuchet MS,Verdana,sans-serif" font-size="82" font-weight="800" fill="#fff">CanvasKeep</text>
+  <text x="344" y="226" font-family="Trebuchet MS,Verdana,sans-serif" font-size="32" fill="#fff" opacity=".95">Preserve the canvas. Keep the memory.</text>
+  <text x="344" y="276" font-family="Trebuchet MS,Verdana,sans-serif" font-size="22" fill="#fff" opacity=".8">A private, offline home for your child's artwork</text>
+</svg>
