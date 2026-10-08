@@ -1,16 +1,11 @@
 {
   "name": "CanvasKeep",
   "short_name": "CanvasKeep",
-  "description": "Preserve your child's artwork — every crayon, every grade, every year.",
+  "description": "A private, offline home for your child's artwork — every crayon, every grade, every year.",
   "start_url": "./index.html",
   "id": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "display_override": [
-    "window-controls-overlay",
-    "standalone",
-    "minimal-ui"
-  ],
   "orientation": "portrait-primary",
   "theme_color": "#9B5DE5",
   "background_color": "#9B5DE5",
@@ -45,15 +40,8 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
     }
   ],
-  "screenshots": [],
   "shortcuts": [
     {
       "name": "Open Gallery",
@@ -83,7 +71,41 @@
     }
   ],
   "prefer_related_applications": false,
-  "edge_side_panel": {
-    "preferred_width": 430
-  }
+  "screenshots": [
+    {
+      "src": "shot-1-gallery.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Your gallery of saved artwork"
+    },
+    {
+      "src": "shot-2-studio.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Studio mode shows each piece in a museum-style frame"
+    },
+    {
+      "src": "shot-3-add.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Add artwork one at a time or in batches"
+    },
+    {
+      "src": "shot-4-backup.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Simple backup and restore"
+    },
+    {
+      "src": "shot-wide.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "CanvasKeep overview"
+    }
+  ]
 }
