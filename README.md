@@ -8,10 +8,10 @@
 
 *A private, offline-first home for your child's artwork — every crayon, every grade, every year.*
 
-[![PWA](https://img.shields.io/badge/PWA-installable-9B5DE5?style=flat-square)](#)
-[![No tracking](https://img.shields.io/badge/tracking-none-4ECDC4?style=flat-square)](#)
-[![Works offline](https://img.shields.io/badge/works-offline-FFD166?style=flat-square)](#)
-[![Free forever](https://img.shields.io/badge/free-forever-FF6B6B?style=flat-square)](#)
+![PWA](https://img.shields.io/badge/PWA-installable-9B5DE5?style=flat-square)
+![No tracking](https://img.shields.io/badge/tracking-none-4ECDC4?style=flat-square)
+![Works offline](https://img.shields.io/badge/works-offline-FFD166?style=flat-square)
+![Free forever](https://img.shields.io/badge/free-forever-FF6B6B?style=flat-square)
 
 </div>
 
@@ -37,7 +37,7 @@ Because it does.
 
 <div align="center">
 
-<img src="apple-touch-icon.png" alt="" width="80" height="80" style="border-radius:18px;margin:20px">
+<img src="app/icon-192.png" alt="" width="80" height="80" style="border-radius:18px;margin:20px">
 
 </div>
 
@@ -73,7 +73,7 @@ I'm a dad. My son's preschool sent home thirty pieces of art last semester. Thir
 
 There had to be a better way than "decide right now, in this moment, which of your child's creations is worth saving forever." So I built one. Take the photo. Toss the paper (or don't — but you *can*). The memory is preserved either way.
 
-CanvasKeep is part of a small family of tools I'm building at **[JVox.org](#)** — a non-profit focused on AI and accessibility technology for families. The other projects there started with my non-verbal son. This one started with the recycling bin.
+CanvasKeep is one of a small family of free tools I build at **LAZLAB Creations**, alongside jVox, a free communication app for non-verbal kids that started with my own son. This one started with the recycling bin.
 
 ---
 
@@ -106,15 +106,12 @@ On desktop, Chrome and Edge will show an install icon in the address bar. Same i
 
 ---
 
-## Coming soon
+## Also included
 
-- 📤 **Share to anywhere** via the native share sheet — Messages, AirDrop, Instagram, email
-- 🖼️ **Year-end memory book** export as a PDF
-- 🎬 **Slideshow mode** for birthdays and family gatherings
-- ✂️ **Background removal** so a single photo of a piece on the kitchen floor looks frame-ready
-- 📱 **Apple Watch glance** showing today's most recent addition
-
-Have an idea? Open an issue. This thing belongs to the families who use it.
+- 📤 **Share or print** any piece as a picture card
+- 🎬 **Slideshow mode** for birthdays and family gatherings, with Cast to TV where the browser supports it
+- 🖼️ **Year-end memory book** as a PDF
+- ✂️ **Background removal** so a photo of a piece on the kitchen floor looks frame-ready
 
 ---
 
@@ -132,10 +129,15 @@ Have an idea? Open an issue. This thing belongs to the families who use it.
 /app/index.html    the app (single file)
 /app/manifest.json install info and store screenshots
 /app/sw.js         offline support (cache name matches the version in Settings)
-/app/icon-*.png    app icons (192, 512, plus maskable versions)
+/app/icon-192.png  app icon (192, maskable-safe)
+/app/icon-512.png  app icon (512, maskable-safe)
 /app/shot-*.png    store screenshots
 /app/samples/      optional sample artwork (loaded only if you tap "Load Sample Artwork")
 ```
+
+## AI and models
+
+None. CanvasKeep has no AI features, no API keys and no model list.
 
 ## Deploy and update
 
@@ -143,6 +145,7 @@ Push to `main`; GitHub Pages serves it. When you change the app, bump `APP_VERSI
 
 ## Changelog
 
+- **1.3.1** Flattened the repo (icons, manifest, stray files), accessibility labels, README cleanup.
 - **1.3.0** Optional sample artwork, plain-language Backup / Restore, store screenshots, landing page and docs refresh.
 - **1.2.0** Empty first-run gallery with "Add First Artwork", normal back-button behavior, service worker update fix, icon corners filled.
 
@@ -161,7 +164,7 @@ Design system: **Lazzaro Standard** — dark luxury with grape `#9B5DE5`, coral 
 ### Save your children's art.
 ### Not the clutter.
 
-**[CanvasKeep](#)** — a project of [JVox.org](#)
+**CanvasKeep** — a project of LAZLAB Creations
 
 *Made for parents. By a parent. With love.*
 
